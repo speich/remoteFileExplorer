@@ -1,4 +1,4 @@
-define("rfe/dnd/Tree", ["dojo", "dijit", "dijit/tree/dndSource", "dijit/tree/_dndSelector"], function(dojo, dijit) {
+define("rfe/dnd/Tree", ["dojo", "dijit", "dijit/tree/_dndSelector"], function(dojo, dijit) {
 
 	// set references to call be able to call overriden methods
 	var ref =  dijit.tree._dndSelector.prototype;
@@ -9,7 +9,6 @@ define("rfe/dnd/Tree", ["dojo", "dijit", "dijit/tree/dndSource", "dijit/tree/_dn
 	dojo.declare("rfe.dnd.Tree", null, {
 
 		constructor: function() {
-			//dijit.tree.dndSource.prototype.accept = ["text", "treeNode"];
 
 			dojo.extend(dijit.tree._dndSelector, {
 				_markedNode: null,
@@ -20,7 +19,7 @@ define("rfe/dnd/Tree", ["dojo", "dijit", "dijit/tree/dndSource", "dijit/tree/_dn
 				onMouseMove: this.onMouseMove
 			});
 		},
-
+		
 		onMouseDown: function(e) {
 			oldMouseDown.apply(this, arguments);
 			this._doMarkNode = true;

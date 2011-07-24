@@ -6,55 +6,27 @@ define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"
 		// object attributes (for markup)
 		isSource: true,
 
+		accept: ['treeNode', 'gridNode'],
+
 		copyOnly: false,
 
-		dragThreshold: 0,
-
-		accept: ["text", 'treeNode', 'gridNode'],
 
 		constructor: function(grid, params) {
-			// summary: a constructor of the Source
-			// grid: dojox.grid: the grid widget to build the source on
-			// params: Object: a dict of parameters, recognized parameters are:
-			//	isSource: Boolean: can be used as a DnD source, if true; assumed to be "true" if omitted
-			//	accept: Array: list of accepted types (text strings) for a target; assumed to be ["text"] if omitted
-			//	horizontal: Boolean: a horizontal container, if true, vertical otherwise or when omitted
-			//	copyOnly: Boolean: always copy items, if true, use a state of Ctrl key otherwise
-			//	skipForm: Boolean: don't start the drag operation, if clicked on form elements
-			//	the rest of parameters are passed to the selector
-			if (!params) {
-				params = {};
-			}
-			dojo.mixin(this, params);
-			this.isSource = typeof params.isSource == "undefined" ? true : params.isSource;
-			var type = params.accept instanceof Array ? params.accept : ["text"];
-			this.accept = null;
-			if (type.length) {
-				this.accept = {};
-				for (var i = 0; i < type.length; ++i) {
-					this.accept[type[i]] = 1;
-				}
-			}
+
+			dojo.mixin(this, params || {});
 
 			// class-specific variables
 			this.isDragging = false;
 			this.mouseDown = false;
 			this.targetAnchor = null;
 			this.targetBox = null;
-			this._lastX = 0;
-			this._lastY = 0;
 
 			// states
 			this.targetState = "";
-			if (this.isSource) {
-				dojo.addClass(this.domNode, "dojoDndSource");
-			}
-			if (this.accept) {
-				dojo.addClass(this.domNode, "dojoDndTarget");
-			}
-			if (this.horizontal) {
-				dojo.addClass(this.domNode, "dojoDndHorizontal");
-			}
+			
+			dojo.addClass(this.domNode, "dojoDndSource");
+			dojo.addClass(this.domNode, "dojoDndTarget");
+
 			// set up events
 			this.topics = [
 				dojo.subscribe("/dnd/source/over", this, "onDndSourceOver"),
@@ -68,39 +40,19 @@ define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"
 				dojo.connect(this.domNode, "onmouseup", this, "onMouseUp")
 			);
 		},
-
+		
 		// methods
-		canDrag: function(source, nodes) {
-			// summary: checks, if the target can accept nodes from this source
-			// source: Object: the source which provides items
-			// nodes: Array: the list of transferred items
+		checkAcceptance: function(source, nodes){
+			// summary:
+			//		Checks if the target can accept nodes from this source
+			// source: dijit.tree.dndSource
+			//		The source which provides items
+			// nodes: DOMNode[]
+			//		Array of DOM nodes corresponding to nodes being dropped, dijitTreeRow nodes if
+			//		source is a dijit.Tree.
+			// tags:
+			//		extension
 			return true;	// Boolean
-		},
-
-		/**
-		 * Check if nodes can be dropped from source onto this target.
-		 * @param source
-		 * @param nodes
-		 */
-		canDrop: function(source, nodes) {
-			// Since user can (currently) only drop one node from tree onto grid (tree.dndController.singular = true)
-			// we ony need to check the last selected tree node instead of dropped nodes
-			// TODO: canDropExternal/canDropInternal or do this in onMouseMove?
-			console.log('canDrop', source, nodes)
-			var tree = this.rfe.tree;
-			var currTreeItem = this.rfe.currentTreeItem;
-			var targetRow = tree.getNodesByItem(currTreeItem)[0].rowNode; // onMouseDown sets this, so we cant use it (yet)
-			var isParent = this.checkParentChildDrop(source, targetRow);
-			var hasSameParent = (source.current.item.parId == currTreeItem.id);
-			var trgGridItem = this.getSelectedStoreItemFromGrid();
-			var isDir = trgGridItem && trgGridItem.dir;
-			console.log('isParent', isParent, 'hasSameParent', hasSameParent, 'isDir', isDir);
-			return isParent || (hasSameParent && !isDir) ? false : true;
-		},
-
-		canDropRow: function(rowIndex, source, nodes) {
-			// summary: stub funciton to be overridden if one wants to check for the ability to drop at the row level
-			return true;
 		},
 
 		copyState: function(keyPressed) {
@@ -121,26 +73,26 @@ define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"
 		onMouseMove: function(e) {
 			// summary: event processor for onmousemove
 			// e: Event: mouse event
+			var m;
 			if (this.isDragging && this.targetState == "Disabled") {
 				return;
 			}
 			this.inherited("onMouseMove", arguments);
-			var m = dojo.dnd.manager();
+
+			m = dojo.dnd.manager();
 
 			if (this.isDragging) {
-				if (this.canDropRow(this.currentRowIndex, m.source, m.nodes)) {
-					m.canDrop(true);
-				}
-				else {
-					m.canDrop(false);
-				}
+				m.canDrop(this.canDrop());
 			}
 			else {
-				if (this.mouseDown && this.isSource && !this.gridEditMode &&
-				(Math.abs(e.pageX - this._lastX) >= this.dragThreshold || Math.abs(e.pageY - this._lastY) >= this.dragThreshold)) {
+				if (this.mouseDown && this.isSource && !this.grid.editMode) {
+					var selection = this.grid.selection;
+					if (!selection.selected[this.currentRowIndex]) {
+						// Also allow drag even when row is not selected
+						selection.select(this.currentRowIndex);
+					}
 					var nodes = this.getSelectedNodes();
 					if (nodes.length) {
-						//console.log("start drag:",nodes);
 						m.startDrag(this, nodes, this.copyState(dojo.dnd.getCopyKeyState(e)));
 					}
 				}
@@ -152,11 +104,7 @@ define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"
 			// e: Event: mouse event
 			this.mouseDown = true;
 			this.mouseButton = e.button;
-			this._lastX = e.pageX;
-			this._lastY = e.pageY;
 			this.inherited("onMouseDown", arguments);
-
-			//console.log("mouseDown currentRow:",e.rowNode);
 		},
 
 		onMouseUp: function(e) {
@@ -168,57 +116,42 @@ define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"
 			}
 		},
 
-		onMouseOver: function(e) {
-			var m = dojo.dnd.manager();
-			if (this.isDragging) {
-				if (this.canDropRow(this.grid, e.rowIndex, m.source, m.nodes)) {
-					//console.log( (this.targetState != "Disabled") , (!this.currentRowNode), (m.source != this) , !(e.rowIndex in this.grid.selection.selected ) );
-					m.canDrop(this.targetState != "Disabled" && (!this.currentRowNode || m.source != this || !(e.rowIndex in this.grid.selection.selected)));
-				}
-			}
-			else {
-				m.canDrop(false);
-			}
-			this.inherited(arguments);
-		},
-
 		// topic event processors
 		onDndSourceOver: function(source) {
 			// summary: topic event processor for /dnd/source/over, called when detected a current source
 			// source: Object: the source which has the mouse over it
-			//console.log("onDndSourceOver: ",source,this, (source == this ) );
+			
+			//note: this is called on any detected dnd source (e.g. also when over the tree) and not only when over the grid
 			if (this != source) {
 				this.mouseDown = false;
-				if (this.targetAnchor) {
-					this._unmarkTargetAnchor();
-				}
 			}
 			else if (this.isDragging) {
 				var m = dojo.dnd.manager();
-				if (m.source && m.nodes && m.nodes.length > 0) {
-					var accepted = this.canDrop(m.source, m.nodes);
-					m.canDrop(accepted);
-				}
+				m.canDrop(false);
 			}
 		},
 
 		onDndStart: function(source, nodes, copy) {
-			// summary: topic event processor for /dnd/start, called to initiate the DnD operation
-			// source: Object: the source which provides items
-			// nodes: Array: the list of transferred items
-			// copy: Boolean: copy items, if true, move items otherwise
+			// summary:
+			//		Topic event processor for /dnd/start, called to initiate the DnD operation
+			// source: Object
+			//		The dijit.tree.dndSource / dojo.dnd.Source which is providing the items
+			// nodes: DomNode[]
+			//		The list of transferred items, dndTreeNode nodes if dragging from a Tree
+			// copy: Boolean
+			//		Copy items, if true, move items otherwise
+			// tags:
+			//		private
 
-			//console.log("onDndStart");
-			if (this.isSource) {
+			if(this.isSource){
 				this._changeState("Source", this == source ? (copy ? "Copied" : "Moved") : "");
 			}
-			var accepted = this.canDrag(source, nodes);
+			var accepted = this.checkAcceptance(source, nodes);
 
 			this._changeState("Target", accepted ? "" : "Disabled");
 
-			if (accepted) {
+			if (this == source){
 				dojo.dnd.manager().overSource(this);
-				dojo.dnd.manager().canDrop(false);
 			}
 
 			this.isDragging = true;
@@ -235,14 +168,17 @@ define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"
 
 			// - onDndDrop() --> onDrop() --> onDropExternal()/onDropInternal()
 			if (this == target) {
-				// this one is for us => move nodes!
-				this.onDrop(source, nodes, copy);
+				// note: this method is called from dnd.Manager. Make sure we only react if dropped on self (grid)
+				this.onDrop(source, nodes, copy, target);
+			}
+			else if (this == source && !copy) {
+				console.log('inDndRop: dropped outside of grid')
+				// TODO: remove from grid and from selection , but how do we not store was successful?
 			}
 			this.onDndCancel();
 		},
 
-
-		onDrop: function(source, nodes, copy) {
+		onDrop: function(source, nodes, copy, target) {
 			// summary:
 			//		called only on the current target, when drop is performed
 			// source: Object
@@ -252,22 +188,57 @@ define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"
 			// copy: Boolean
 			//		copy items, if true, move items otherwise
 			if (this != source) {
-				this.onDropExternal(source, nodes, copy);
+				this.onDropExternal(source, nodes, copy, target);
 			}
 			else {
-				this.onDropInternal(nodes, copy);
+				this.onDropInternal(source, nodes, copy);
 			}
 		},
 
 		// called by onDrop() which is called by onDndDrop()
-		onDropExternal: function(source, nodes, copy) {
+		onDropExternal: function(source, nodes, copy, target) {
+			console.log('grid onDropExternal: to be implemented', source, nodes, copy);
 			if (source.accept.treeNode) {
-				this.onDropFromTree(source, nodes, copy);
+				this.onDropFromTree(source, nodes, copy, target);
 			}
 		},
 
 		onDropInternal: function(source, nodes, copy) {
-			console.log('onDropInternal: to be implemented', source, nodes, copy);
+			console.log('grid onDropInternal');
+			var dfd;
+			var i = 0, len = nodes.length;
+			var store = this.store;
+			var item, oldParentItem, newParentItem;
+
+			newParentItem = this.getStoreItem();
+			if (!newParentItem || !newParentItem.dir) {	// do nothing when dropping on file or same parent folder
+				return;
+			}
+
+			for (i; i < len; i++) {
+				//item = nodes[i].data.item;	// TODO: ? instead of storing item in node in GridSelector.addToSelection, only use node.id to get item (note: tree uses node.item)
+				item = source.getItem(nodes[i].id);
+				item = item.data.item;
+				oldParentItem = store.storeMemory.get(item.parId);
+				// update master store and tree
+				dfd = store.pasteItem(item, oldParentItem, newParentItem, copy);
+				// if successful remove item from grid
+				dojo.when(dfd, dojo.hitch(this, function(id) {
+					// ideally this would be done by the master store, but grid uses its own store since the new dojo.store is not an option yet
+					var grid = this.grid;
+					var store = grid.store;
+					store.fetchItemByIdentity({
+						identity: id,
+						onItem: function(item) {
+							store.deleteItem(item)
+							store.save();
+						}
+					});
+
+					//this.removeFromSelection();
+				}));
+			}
+
 		},
 
 		onDndCancel: function() {
@@ -298,6 +269,28 @@ define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"
 			// summary: changes source's state based on "copy" status
 			this._changeState("Source", copy ? "Copied" : "Moved");
 		},
+		
+		/**
+		 * Check if nodes can be dropped from source onto this target.
+		 * @param source
+		 * @param nodes
+		 */
+		canDrop: function(source, nodes) {
+			var m, item;
+			m = dojo.dnd.manager();
+			if (m.source == this) {
+				item = this.getStoreItem();
+				if (!item || !item.dir) {	// do nothing when dropping on file or same parent folder
+					return false;
+				}
+				else {
+					return true;
+				}
+			}
+			else {
+				return true;
+			}
+		},
 
 		/**
 		 * Process dnd item(s) dropped externally from tree onto grid.
@@ -308,7 +301,7 @@ define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"
 		onDropFromTree: function(source, nodes, copy) {
 			var grid = this.rfe.grid, tree = this.rfe.grid;
 			var store = this.rfe.storeCache;
-			var trgItem = this.getSelectedStoreItemFromGrid();
+			var trgItem = this.getStoreItem();
 			var newParentItem = trgItem && trgItem.dir ? trgItem : this.rfe.currentTreeItem;
 
 			dojo.forEach(nodes, function(node, idx) {
@@ -341,16 +334,20 @@ define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"
 		},
 
 		/**
-		 * Returns store object form grid row index.
-		 * TODO: find shorter name for this which is still descriptive
+		 * Returns store object.
 		 */
-		getSelectedStoreItemFromGrid: function() {
-			var item = null;
-			var grid = this.rfe.grid;
-			var store = this.rfe.storeCache.storeMemory;
-			if (this.currentRowIdx) {
-				item = grid.getItem(this.currentRowIdx);
-				item = store.get(grid.store.getValue(item, 'id'));	// use memory store instead of grid's ItemWriteStore for direct property access and to always have same item format
+		getStoreItem: function() {
+			var item, id;
+			var grid = this.grid;
+			if (arguments[0]) {
+				item = arguments[0];
+			}
+			else if (this.currentRowIndex !== -1) {
+				item = grid.getItem(this.currentRowIndex);
+			}
+			if (item) {
+				id = grid.store.getValue(item, 'id');
+				item = this.store.storeMemory.get(id);	// use memory store instead of grid's ItemWriteStore for direct property access and to always have same item format
 			}
 			return item;
 		},

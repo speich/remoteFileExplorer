@@ -5,9 +5,9 @@ define("rfe/dnd/GridContainer", ["dojo", "dojo/dnd/common", "dojo/dnd/Container"
 		constructor: function(grid, params) {
 			// summary: a constructor of the Container modeled after dijit.tree._dndContainer
 			// params: Object: a dict of parameters, which gets mixed into the object
-			this.grid = grid;   // todo: we have this.grid and this.rfe.grid
+			this.grid = grid;
 			this.domNode = this.grid.domNode;
-			this.dndType = ['gridNode'];
+			this.dndType = 'gridNode';
 
 			dojo.mixin(this, params);
 
@@ -32,8 +32,15 @@ define("rfe/dnd/GridContainer", ["dojo", "dojo/dnd/common", "dojo/dnd/Container"
 		// abstract access to the map
 		getItem: function(/*String*/ key) {
 			// summary: returns a data item by its key (id)
+
+			// note: key = id and not the same as rowIndex. Can be called by any other dnd source with node.id = key
+			var grid = this.grid;
+			var node = this.selection[key];
+			var item = grid.getItem(node.gridRowIndex);
+			var id = grid.store.getValue(item, 'id');
+			node.item = this.store.storeMemory.get(id);
 			return {
-				data: this.grid.getItem(key),
+				data: node,
 				type: this.dndType
 			};
 		},
@@ -43,6 +50,10 @@ define("rfe/dnd/GridContainer", ["dojo", "dojo/dnd/common", "dojo/dnd/Container"
 			dojo.forEach(this.events, dojo.disconnect);
 		},
 
+		/**
+		 * Keep track on which row the mouse is over
+		 * @param e
+		 */
 		onMouseOver: function(e) {
 			this.currentRowNode = e.rowNode;
 			this.currentRowIndex = e.rowIndex;
@@ -77,7 +88,7 @@ define("rfe/dnd/GridContainer", ["dojo", "dojo/dnd/common", "dojo/dnd/Container"
 			dojo.removeClass(node, "dojoDndItem" + type);
 		},
 
-		onOverEvent: function(){
+		onOverEvent: function() {
 			// summary:
 			//		This function is called once, when mouse is over our container
 			// tags:
