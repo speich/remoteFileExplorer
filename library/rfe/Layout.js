@@ -19,10 +19,10 @@ define('rfe/Layout', [
 	"dijit/Toolbar",
 	"dijit/form/Button",
 	"dijit/form/CheckBox",
-	"dijit/Dialog"], function(dojo, dijit, StoreFileCache) {
+	"dijit/Dialog"], function(dojo, dijit) {
 
 	dojo.declare('rfe.Layout', null, {
-		storeCache: null,
+		store: null,
 		grid: null,
 		tree: null,
 		layout: {				// contains references to all layout elements
@@ -37,9 +37,9 @@ define('rfe/Layout', [
 			storeMaster = new dojo.store.JsonRest({target: '/library/rfe/controller.php/'});
 			storeMemory = new dojo.store.Memory({});
 
-			this.storeCache = new rfe.StoreFileCache(storeMaster, storeMemory);
-			this.grid = this.initGrid('rfeGrid', this.storeCache);
-			this.tree = this.initTree('rfeTree', this.storeCache);
+			this.store = new rfe.StoreFileCache(storeMaster, storeMemory);
+			this.grid = this.initGrid('rfeGrid', this.store);
+			this.tree = this.initTree('rfeTree', this.store);
 		},
 
 		/**
@@ -50,6 +50,7 @@ define('rfe/Layout', [
 		initTree: function(id, store) {
 			var tree, dnd;
 
+			// TODO. don't make this a class, only a function to extend the tree?
 			new rfe.dnd.Tree(); 	// setups the dnd for the tree
 
 			tree = new dijit.Tree({
@@ -80,7 +81,8 @@ define('rfe/Layout', [
 			var grid, structure;
 
 			grid = new rfe.Grid({
-				id: id
+				id: id,
+				store: null
 			});
 
 			structure = [
@@ -224,6 +226,7 @@ define('rfe/Layout', [
 		 * @return dijit.MenuBar
 		 */
 		createMenus: function() {
+			// TODO: reuse menu from edit.js?
 			var menuBar, menuFile, menuView, menuHelp;
 			var subMenuFile;
 
@@ -269,21 +272,11 @@ define('rfe/Layout', [
 			}));
 			menuFile.addChild(new dijit.MenuItem({
 				label: 'Rename',
-				onClick: dojo.hitch(this, function() {
-					var item = this.getSelectedItem();
-					if (item) {
-						this.renameItem(item);
-					}
-				})
+				onClick: dojo.hitch(this, this.renameItem)
 			}));
 			menuFile.addChild(new dijit.MenuItem({
 				label: 'Delete',
-				onClick: dojo.hitch(this, function() {
-					var item = this.getSelectedItem();
-					if (item) {
-						this.deleteItem(item)
-					}
-				})
+				onClick: dojo.hitch(this, this.deleteItems)
 			}));
 
 
@@ -373,9 +366,7 @@ define('rfe/Layout', [
 
 			}, id);
 			dojo.connect(panes.borderContainer.domNode, 'oncontextmenu', function(evt) {
-				if (evt.target.id != 'rfeTree' && evt.target.id != 'rfeGrid') {
-					dojo.stopEvent(evt);
-				}
+				dojo.stopEvent(evt);
 			});
 			panes.menuPane = new dijit.layout.ContentPane({
 				id: 'rfeContentPaneMenu',
@@ -518,7 +509,7 @@ define('rfe/Layout', [
 				new dijit.form.CheckBox({
 					checked: true,
 					onClick: function() {
-						self.storeCache.skipWithNoChildren = this.checked;
+						self.store.skipWithNoChildren = this.checked;
 					}
 				}, input);
 			}

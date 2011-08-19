@@ -15,19 +15,14 @@ define('rfe/Grid', ['dojox/grid/DataGrid', 'rfe/dnd/GridSource', 'dojo/data/Item
 		constructor: function(params) {
 			this.id = params.id;
 
-			this.store = new dojo.data.ItemFileWriteStore({
+/*			this.store = new dojo.data.ItemFileWriteStore({
 				data: {
 					identifier: 'id',
 					items: []	// will be set on tree click with folder content
 				}
-			});
+			});*/
 
-			dojo.connect(this, 'onRowMouseDown', function(e) {
-				// allow row selection also on right click
-				if (e.button == dojo.mouseButtons.RIGHT) {
-					this.selection.setSelected(e.rowIndex, true);	// add to selection if there are already selected rows
-				}
-			});
+
 
 		},
 

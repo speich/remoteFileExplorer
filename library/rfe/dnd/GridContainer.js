@@ -36,12 +36,10 @@ define("rfe/dnd/GridContainer", ["dojo", "dojo/dnd/common", "dojo/dnd/Container"
 			// note: key = id and not the same as rowIndex. Can be called by any other dnd source with node.id = key
 			var grid = this.grid;
 			var node = this.selection[key];
-			var item = grid.getItem(node.gridRowIndex);
-			var id = grid.store.getValue(item, 'id');
-			node.item = this.store.storeMemory.get(id);
+			node.item = grid.getItem(node.gridRowIndex);
 			return {
 				data: node,
-				type: this.dndType
+				type: [this.dndType]
 			};
 		},
 

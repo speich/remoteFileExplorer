@@ -1,7 +1,7 @@
 define([
 	"dojo",
 	'dijit',
-	'dijit/tree',
+	'dijit/Tree',
 	"dijit/tree/_dndSelector",
 	"dojo/dnd/Manager", // dojo.dnd.manager
 	"dojo/_base/array", // dojo.forEach dojo.indexOf dojo.map
@@ -39,6 +39,14 @@ define([
 
 			dojo.mixin(this, params || {});
 
+			var type = this.accept;	// create accepted types as properties of accept, which can be checkt in checkAcceptance()
+			if (type.length){
+				this.accept = {};
+				for (var i = 0; i < type.length; ++i) {
+					this.accept[type[i]] = 1;
+				}
+			}
+
 			// class-specific variables
 			this.isDragging = false;
 			this.mouseDown = false;
@@ -61,16 +69,17 @@ define([
 
 		// methods
 		checkAcceptance: function(source, nodes) {
-			// summary:
-			//		Checks if the target can accept nodes from this source
-			// source: dijit.tree.dndSource
-			//		The source which provides items
-			// nodes: DOMNode[]
-			//		Array of DOM nodes corresponding to nodes being dropped, dijitTreeRow nodes if
-			//		source is a dijit.Tree.
-			// tags:
-			//		extension
-			return true;	// Boolean
+			var i = 0, len = nodes.length;
+			for (; i < len; ++i) {
+				var type = source.getItem(nodes[i].id).type;
+				var j = 0, lenJ = type.length;
+				for (; j < lenJ; ++j){
+					if (type[j] in this.accept){
+						return true;
+					}
+				}
+			}
+			return false;
 		},
 
 		copyState: function(keyPressed) {
@@ -83,6 +92,7 @@ define([
 			//		protected
 			return this.copyOnly || keyPressed;	// Boolean
 		},
+
 		destroy: function() {
 			// summary:
 			//		Prepares the object to be garbage-collected.
@@ -265,28 +275,38 @@ define([
 				this.onDropExternal(source, nodes, copy, target);
 			}
 			else {
-				this.onDropInternal(source, nodes, copy);
+				this.onDropInternal(source, nodes, copy, target);
 			}
 		},
 
 		onDropExternal: function(source, nodes, copy, target) {
-			console.log('tree onDropExternal');
-			this.onDropInternal(source, nodes, copy);
+			// source == grid, target == tree
+			var gridStore = source.grid.store;
+			console.log('tree onDropExternal', source);
+			this.onDropInternal(source, nodes, copy, target);
+			// TODO: remove from grid, but where in code and how
+			// console.log('tree: remove now from grid)
 		},
 
-		onDropInternal: function(source, nodes, copy) {
+		onDropInternal: function(source, nodes, copy, target) {
 			var i = 0, len = nodes.length;
-			var store = this.tree.model;
-			var item, oldParentItem, newParentItem;
+			var store = this.store;
+			var dndItem, item, oldParentItem, newParentItem;
+			var dfd;
 
 			newParentItem = this.targetAnchor.item;
 
 			for (; i < len; i++) {
-				item = source.getItem(nodes[i].id);
-				item = item.data.item;
+				dndItem = source.getItem(nodes[i].id);
+				item = dndItem.data.item;
 				oldParentItem = store.storeMemory.get(item.parId);
-				// update master store and tree
-				store.pasteItem(item, oldParentItem, newParentItem, copy);
+				dfd = store.pasteItem(item, oldParentItem, newParentItem, copy)
+				// TODO: fix scope for i
+				dojo.when(dfd, dojo.hitch(dndItem, function() {
+					// TODO: find better solution, e.g. generic
+					console.log('treeSource removeFromSelection', this, source.selection)
+					source.removeFromSelection(this.data.gridRowIndex);	// will call removeFromSelection
+				}))
 			}
 		},
 

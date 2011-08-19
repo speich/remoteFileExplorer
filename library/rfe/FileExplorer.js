@@ -23,7 +23,8 @@ define('rfe/FileExplorer', [
 		version: '1.0',
 		versionDate: '2011',
 		currentTreeItem: null, 	// currently selected store object in tree, equals always parent of grid items
-		currentGridItem: null,  // currently selected store object in grid
+		currentGridItem: null,  // currently (last, when multi-) selected store object in grid
+		currentWidget: null,    // currently selected widget, which is either tree or grid
 
 		history: {
 			steps: [],     // saves the steps
@@ -38,6 +39,7 @@ define('rfe/FileExplorer', [
 		 * @constructor
 		 */
 		constructor: function(args) {
+			// TODO: should tree connect also on right click as grid? If so, attache event to set currentTreeItem
 			var grid = this.grid, tree = this.tree;
 
 			dojo.safeMixin(this, args);
@@ -46,8 +48,8 @@ define('rfe/FileExplorer', [
 			dojo.connect(tree, 'onLoad', this, function() {
 				var root = tree.rootNode;
 				var item = root.item;
-	//			root.setSelected(true);
-	//			tree.focusNode(root);
+		//		root.setSelected(true); // root is never deselected again
+		//		tree.focusNode(root);
 				this.showItemChildrenInGrid(item);
 				this.setHistory(item.id);
 				this.currentTreeItem = item;
@@ -70,19 +72,21 @@ define('rfe/FileExplorer', [
 				}
 			}, tree);
 
-			dojo.connect(grid, 'onRowDblClick', this, function(evt) {
-				var store = this.storeCache.storeMemory;
+			dojo.connect(grid, 'onRowMouseDown', this, function(evt) {
+				// rowMouseDown also registeres right click
 				var item = grid.getItem(evt.rowIndex);
-				var id = grid.store.getValue(item, 'id');
-				item = store.get(id);	// use memory store instead of grid's ItemWriteStore for direct property access and to always have same item format
+				this.currentGridItem = item;
+			});
+			dojo.connect(grid, 'onRowDblClick', this, function(evt) {
+				//var store = this.storeCache.storeMemory;
+				var item = grid.getItem(evt.rowIndex);
 				if (item != this.currentGridItem && item.dir) {	// prevent executing twice
 					this.display(item);
 					this.setHistory(item.id);
-					this.currentGridItem = item;
 				}
 			});
 			this.createLayout(this.id);
-			this.createContextMenu(dojo.byId(this.id));
+			this.initContextMenu(dojo.byId(this.id));
 		},
 
 		/**
@@ -91,22 +95,18 @@ define('rfe/FileExplorer', [
 		 * @return {dojo.Deferred}
 		 */
 		showItemChildrenInGrid: function(item) {
+			// TODO: use dojo.connect(store.getChildren) instead or even do it in getChildren?
 			var grid = this.grid;
 			var dfd = new dojo.Deferred();
-			var s1 = this.storeCache, s2 = grid.store;
+			var store = this.store;
 			if (item.dir) {
-				s1.skipWithNoChildren = false;
-				return dojo.when(s1.getChildren(item), function(items) {
-					s1.skipWithNoChildren = true;
-					s2.clearOnClose = true;
-					s2.data = {
-						identifier: 'id',
-						items: dojo.clone(items)   // prevents item properties to be converted to an array in the storeCache
-					};
-					s2.close();
-					grid.setStore(s2);
-					// unfortunately, this can not be used since sorting would not work anymore
-					//grid.setItems(items);
+				store.skipWithNoChildren = false;
+				return dojo.when(store.getChildren(item), function() {
+					store.skipWithNoChildren = true;
+					grid.setStore(store, {
+						parId: item.id
+					});
+					// grid.setItems(items);	// this can not be used since it kills sorting
 				});
 			}
 			else {
@@ -124,7 +124,7 @@ define('rfe/FileExplorer', [
 		showItemInTree: function(item) {
 			var dfd = new dojo.Deferred();
 			if (item.dir) {
-				var path = this.storeCache.getPath(item);
+				var path = this.store.getPath(item);
 				dfd = this.tree.set('path', path);
 			}
 			else {
@@ -144,7 +144,7 @@ define('rfe/FileExplorer', [
 				item = this.currentTreeItem;
 			}
 			if (item.parId) {
-				return dojo.when(this.storeCache.get(item.parId), dojo.hitch(this, function(item) {
+				return dojo.when(this.store.get(item.parId), dojo.hitch(this, function(item) {
 					return this.display(item);
 				}), function(err) {
 					console.debug('Error occurred when going directory up', err);
@@ -165,8 +165,7 @@ define('rfe/FileExplorer', [
 		display: function(item) {
 			var grid = this.grid;
 			var def = this.showItemInTree(item);
-		//	grid.selection.clear();
-			grid.selection.deselect();
+			grid.selection.deselectAll();
 			def.then(dojo.hitch(this, function() {
 				grid.showMessage(grid.loadingMessage);
 				this.showItemChildrenInGrid(item);
@@ -179,19 +178,12 @@ define('rfe/FileExplorer', [
 		 */
 		reload: function() {
 			var grid = this.grid;
-			var gridStore = grid.store;
 			var dndController = this.tree.dndController.declaredClass;
 
-			this.storeCache.storeMemory.data = [];
+			this.store.storeMemory.data = [];
 
 			// reset grid
-			gridStore.clearOnClose = true;
-			gridStore.data = {
-				identifier: 'id',
-				items: []
-			};
-			gridStore.close();
-			grid.setStore(gridStore);
+			grid._clearData();	// this is not really necessary, more of a visual feedback to user
 
 			// reset and rebuild tree
 			this.tree.dndController.destroy();	// cleanup dnd connections and such
@@ -259,7 +251,7 @@ define('rfe/FileExplorer', [
 				id = hist.steps[++hist.curIdx];
 			}
 			if (id != null) {
-				return dojo.when(this.storeCache.get(id), dojo.hitch(this, function(item) {
+				return dojo.when(this.store.get(id), dojo.hitch(this, function(item) {
 					return this.display(item);
 				}));
 			}
@@ -280,24 +272,20 @@ define('rfe/FileExplorer', [
 		},
 
 		/**
-		 * Returns the selected item.
-		 * Returns the item that is currently selected in the grid or tree. Grid takes precedence over tree.
-		 * @return {object|null} dojo.store object
+		 * Returns the last selected item of the focused widget.
 		 */
-		getSelectedItem: function() {
-			var item = null, id;
-			var grid = this.grid, tree = this.tree;
-			var idx = grid.selection.selectedIndex;
-			if (idx > -1) {
-				item = grid.getItem(idx);
-				id = grid.store.getValue(item, 'id');
-				item = this.storeCache.storeMemory.get(id);   // dojo.data.item has different structure than dojo.store.item
+		getLastSelectedItem: function() {
+			if (this.tree.focused || this.layout.panes.treePane.focused) {
+				return this.currentTreeItem;
 			}
-			else if (tree.get('selectedItem')) {
-				item = tree.get('selectedItem');
+			else if (this.grid.focused) {
+				return this.currentGridItem;
 			}
-			return item;
+			else {
+				return null;
+			}
 		}
+
 	});
 	return rfe.FileExplorer;
 });

@@ -2,9 +2,8 @@ define("rfe/dnd/GridSelector", ["dojo", "dijit", "dojo/dnd/common", "rfe/dnd/Gri
 
 
 	dojo.declare("rfe.dnd.GridSelector", rfe.dnd.GridContainer, {
-		// note: grid rows (nodes) do not have an id attribute -> therefore it is not possible to maintain
-		// a dictionary object keyed by ids of selected nodes as required by the dnd.Selector api. Instead we
-		// use the grid.selection object which uses row indexes instead
+		// note: grid rows (nodes) do not have an id attribute -> The grid.Selection uses the rowIndex instead
+		// -> Create own dictionary object keyed by ids of selected nodes as required by the dnd.Selector api.
 
 		constructor: function() {
 			var sel = this.grid.selection;
@@ -17,8 +16,18 @@ define("rfe/dnd/GridSelector", ["dojo", "dijit", "dojo/dnd/common", "rfe/dnd/Gri
 			this.events.push(
 				dojo.connect(sel, 'onSelected', this, this.addToSelection),
 				dojo.connect(sel, 'onDeselected', this, this.removeFromSelection),
-				dojo.connect(this.grid, 'onRowDblClick', this, function(evt) {
+				/*dojo.connect(this.grid, 'onRowDblClick', this, function(evt) {
 					this.removeFromSelection(evt.rowIndex);
+				}),*/
+				// add selection also on right click context menu
+				dojo.connect(this.grid, 'onRowMouseDown', function(e) {
+					if (e.button != dojo.mouseButtons.RIGHT) {
+						return;
+					}
+					if ((!dojo.isCopyKey(e) && !e.shiftKey) && !this.selection.selected[e.rowIndex]) {
+						this.selection.deselectAll();
+					}
+					this.selection.setSelected(e.rowIndex, true);
 				})
 			);
 		},
@@ -48,9 +57,8 @@ define("rfe/dnd/GridSelector", ["dojo", "dijit", "dojo/dnd/common", "rfe/dnd/Gri
 			node = grid.getRowNode(rowIndex);
 			if (!node.id) {
 				item = grid.getItem(rowIndex);
-				id = grid.store.getValue(item, 'id');
-				node.id = this.dndType + '_' + id;
-				// TODO: not sure, but probably not the right place to do this
+				node.id = this.dndType + '_' + item.id;
+				// TODO: Move this somewhere else, probably to grid itself
 			}
 			this.selection[node.id] = node;	// this is for GridContainer.getItem to be able to return the node
 		},

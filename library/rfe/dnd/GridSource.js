@@ -3,23 +3,28 @@ define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"
 	dojo.declare("rfe.dnd.GridSource", rfe.dnd.GridSelector, {
 		// summary: a Source object, which can be used as a DnD source, or a DnD target
 
-		// object attributes (for markup)
 		isSource: true,
 
 		accept: ['treeNode', 'gridNode'],
 
 		copyOnly: false,
 
-
 		constructor: function(grid, params) {
 
 			dojo.mixin(this, params || {});
+
+			var type = this.accept;	// create accepted types as properties of accept, which can be checkt in checkAcceptance
+			if (type.length){
+				this.accept = {};
+				for (var i = 0; i < type.length; ++i) {
+					this.accept[type[i]] = 1;
+				}
+			}
 
 			// class-specific variables
 			this.isDragging = false;
 			this.mouseDown = false;
 			this.targetAnchor = null;
-			this.targetBox = null;
 
 			// states
 			this.targetState = "";
@@ -40,19 +45,25 @@ define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"
 				dojo.connect(this.domNode, "onmouseup", this, "onMouseUp")
 			);
 		},
-		
-		// methods
-		checkAcceptance: function(source, nodes){
-			// summary:
-			//		Checks if the target can accept nodes from this source
-			// source: dijit.tree.dndSource
-			//		The source which provides items
-			// nodes: DOMNode[]
-			//		Array of DOM nodes corresponding to nodes being dropped, dijitTreeRow nodes if
-			//		source is a dijit.Tree.
-			// tags:
-			//		extension
-			return true;	// Boolean
+
+		/**
+		 * Checks if the target can accept nodes from this source.
+		 * @param {object} source
+		 * @param {Array} nodes
+		 * @return {boolean}
+		 */
+		checkAcceptance: function(source, nodes) {
+			var i = 0, len = nodes.length;
+			for (; i < len; ++i) {
+				var type = source.getItem(nodes[i].id).type;
+				var j = 0, lenJ = type.length;
+				for (; j < lenJ; ++j){
+					if (type[j] in this.accept){
+						return true;
+					}
+				}
+			}
+			return false;
 		},
 
 		copyState: function(keyPressed) {
@@ -173,7 +184,6 @@ define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"
 			}
 			else if (this == source && !copy) {
 				console.log('inDndRop: dropped outside of grid')
-				// TODO: remove from grid and from selection , but how do we not store was successful?
 			}
 			this.onDndCancel();
 		},
@@ -191,7 +201,7 @@ define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"
 				this.onDropExternal(source, nodes, copy, target);
 			}
 			else {
-				this.onDropInternal(source, nodes, copy);
+				this.onDropInternal(source, nodes, copy, target);
 			}
 		},
 
@@ -205,10 +215,10 @@ define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"
 
 		onDropInternal: function(source, nodes, copy) {
 			console.log('grid onDropInternal');
-			var dfd;
 			var i = 0, len = nodes.length;
 			var store = this.store;
-			var item, oldParentItem, newParentItem;
+			var dndItem, item, oldParentItem, newParentItem;
+			var dfd;
 
 			newParentItem = this.getStoreItem();
 			if (!newParentItem || !newParentItem.dir) {	// do nothing when dropping on file or same parent folder
@@ -217,28 +227,16 @@ define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"
 
 			for (i; i < len; i++) {
 				//item = nodes[i].data.item;	// TODO: ? instead of storing item in node in GridSelector.addToSelection, only use node.id to get item (note: tree uses node.item)
-				item = source.getItem(nodes[i].id);
-				item = item.data.item;
+				dndItem = source.getItem(nodes[i].id);
+				item = dndItem.data.item;
 				oldParentItem = store.storeMemory.get(item.parId);
-				// update master store and tree
-				dfd = store.pasteItem(item, oldParentItem, newParentItem, copy);
-				// if successful remove item from grid
-				dojo.when(dfd, dojo.hitch(this, function(id) {
-					// ideally this would be done by the master store, but grid uses its own store since the new dojo.store is not an option yet
-					var grid = this.grid;
-					var store = grid.store;
-					store.fetchItemByIdentity({
-						identity: id,
-						onItem: function(item) {
-							store.deleteItem(item)
-							store.save();
-						}
-					});
-
-					//this.removeFromSelection();
+				dfd = store.pasteItem(item, oldParentItem, newParentItem, copy)
+				dojo.when(dfd, dojo.hitch(this, function() {
+					// TODO: find better solution, e.g. generic that can also be used in TreeSource.
+					console.log('gridSource removeFromSelection', dndItem.data.gridRowIndex, this.selection)
+					this.removeFromSelection(dndItem.data.gridRowIndex);
 				}));
 			}
-
 		},
 
 		onDndCancel: function() {
@@ -300,7 +298,7 @@ define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"
 		 */
 		onDropFromTree: function(source, nodes, copy) {
 			var grid = this.rfe.grid, tree = this.rfe.grid;
-			var store = this.rfe.storeCache;
+			var store = this.rfe.store;
 			var trgItem = this.getStoreItem();
 			var newParentItem = trgItem && trgItem.dir ? trgItem : this.rfe.currentTreeItem;
 
@@ -312,8 +310,7 @@ define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"
 
 				// add item to grid (store) if not dropped on folder in grid
 				if (!trgItem || !trgItem.dir) {
-					grid.store.newItem(srcItem);
-					grid.store.save();
+					grid.store.add(srcItem);
 				}
 
 				// add new item and remove old from old tree location by updating the store

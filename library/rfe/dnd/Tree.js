@@ -1,5 +1,7 @@
 define("rfe/dnd/Tree", ["dojo", "dijit", "dijit/tree/_dndSelector"], function(dojo, dijit) {
 
+	// TODO: make right click (context menu) select the tree node (also see dnd/GridSelector.js)
+
 	// set references to call be able to call overriden methods
 	var ref =  dijit.tree._dndSelector.prototype;
 	var oldMouseDown = ref.onMouseDown;
@@ -16,7 +18,8 @@ define("rfe/dnd/Tree", ["dojo", "dijit", "dijit/tree/_dndSelector"], function(do
 				setSelection: this.setSelection,
 				onMouseDown: this.onMouseDown,
 				onMouseUp: this.onMouseUp,
-				onMouseMove: this.onMouseMove
+				onMouseMove: this.onMouseMove,
+				getSelectedNodes: ref.getSelectedTreeNodes  // TODO: why doesn' tree._dndSelector not use this instead?
 			});
 		},
 		
