@@ -1,0 +1,4 @@
+This is a web application to manage files and folders on a remote web server with your browser.
+remoteFileExplorer is programmed in JavaScript using dojo and PHP. All communication with the web server is done through REST.
+This file was modified by JetBrains PhpStorm 2.1.2 for binding GitHub repository
+This file was modified by JetBrains PhpStorm 2.1.2 for binding GitHub repository
