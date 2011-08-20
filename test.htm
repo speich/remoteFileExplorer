@@ -1,0 +1,45 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Remote File Explorer (rfe)</title>
+<style type="text/css">
+@import "library/dojo/dijit/themes/claro/claro.css";
+</style
+
+</head>
+<body class="claro">
+<div id="remoteFileExplorer"></div>
+<script type="text/javascript">
+var djConfig = {
+	//async: true,
+	isDebug: false,
+	parseOnLoad: false,
+	locale: 'de',
+	baseUrl: '/library/dojo/dojo/',
+	modulePaths: {
+		rfe: '/library/rfe/'
+	},
+	useCommentedJson: true
+};
+</script>
+<script src="library/dojo/dojo/dojo.js" type="text/javascript"></script>
+
+
+<script type="text/javascript">
+dojo.require('dojo.store.Memory');
+
+dojo.ready(function() {
+	var i = 0, len = 1000000;
+	var obj, store, res, id;
+	store = new dojo.store.Memory({});
+	for (; i < len; i++) {
+		store.add({
+			id: i,
+			name: 'someProp'
+		});
+	}
+
+});
+</script>
+</body>
+</html>
