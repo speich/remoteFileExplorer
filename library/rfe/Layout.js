@@ -272,21 +272,11 @@ define('rfe/Layout', [
 			}));
 			menuFile.addChild(new dijit.MenuItem({
 				label: 'Rename',
-				onClick: dojo.hitch(this, function() {
-					var item = this.getSelectedItem();
-					if (item) {
-						this.renameItem(item);
-					}
-				})
+				onClick: dojo.hitch(this, this.renameItem)
 			}));
 			menuFile.addChild(new dijit.MenuItem({
 				label: 'Delete',
-				onClick: dojo.hitch(this, function() {
-					var item = this.getSelectedItem();
-					if (item) {
-						this.deleteItems(item)
-					}
-				})
+				onClick: dojo.hitch(this, this.deleteItems)
 			}));
 
 
