@@ -1,9 +1,15 @@
-define('rfe/FileExplorer', [
-	'dojo',
-	'dijit',
+define([
+	'dojo/_base/lang',
+	'dojo/_base/declare',
+	'dojo/_base/Deferred',
+	"dojo/on",
+	'dojo/keys',
+	'dojo/dom',
+	'dojo/date/locale',
+	'dijit/registry',
 	'rfe/Layout',
-	'rfe/Edit', 
-	'dojo/date/locale'], function(dojo, dijit, Layout, Edit) {
+	'rfe/Edit'
+], function(lang, declare, Deferred, on, keys, dom, locale, registry, Layout, Edit) {
 	/**
 	 * File explorer allows you to browse files.
 	 *
@@ -19,7 +25,7 @@ define('rfe/FileExplorer', [
 	/**
 	 * @class
 	 */
-	dojo.declare('rfe.FileExplorer', [rfe.Layout, rfe.Edit], {
+	return declare('rfe.FileExplorer', [Layout, Edit], {
 		version: '1.0',
 		versionDate: '2011',
 		currentTreeItem: null, 	// currently selected store object in tree, equals always parent of grid items
@@ -42,10 +48,10 @@ define('rfe/FileExplorer', [
 			// TODO: should tree connect also on right click as grid? If so, attache event to set currentTreeItem
 			var grid = this.grid, tree = this.tree;
 
-			dojo.safeMixin(this, args);
+			lang.mixin(this, args);
 
 			// init tree events
-			dojo.connect(tree, 'onLoad', this, function() {
+			on(tree, 'onLoad', this, function() {
 				var root = tree.rootNode;
 				var item = root.item;
 		//		root.setSelected(true); // root is never deselected again
@@ -54,7 +60,7 @@ define('rfe/FileExplorer', [
 				this.setHistory(item.id);
 				this.currentTreeItem = item;
 			});
-			dojo.connect(tree, 'onClick', this, function(item) {
+			on(tree, 'onClick', this, function(item) {
 				if (item != this.currentTreeItem) { // prevent executing twice (dblclick)
 					grid.selection.clear(); // otherwise item in not-displayed folder is still selected or with same idx
 					this.showItemChildrenInGrid(item);	// only called, when store.openOnClick is set to false
@@ -62,9 +68,9 @@ define('rfe/FileExplorer', [
 				}
 				this.currentTreeItem = item;
 			});
-			dojo.connect(tree, 'onKeyDown', this, function(evt) {
-				if (evt.keyCode == dojo.keys.SPACE) {
-					var node = dijit.getEnclosingWidget(evt.target);
+			on(tree, 'onKeyDown', this, function(evt) {
+				if (evt.keyCode == keys.SPACE) {
+					var node = registry.getEnclosingWidget(evt.target);
 					tree.focusNode(node);
 					this.showItemChildrenInGrid(node.item);
 					this.setHistory(node.item.id);
@@ -72,12 +78,12 @@ define('rfe/FileExplorer', [
 				}
 			}, tree);
 
-			dojo.connect(grid, 'onRowMouseDown', this, function(evt) {
+			on(grid, 'onRowMouseDown', this, function(evt) {
 				// rowMouseDown also registeres right click
 				var item = grid.getItem(evt.rowIndex);
 				this.currentGridItem = item;
 			});
-			dojo.connect(grid, 'onRowDblClick', this, function(evt) {
+			on(grid, 'onRowDblClick', this, function(evt) {
 				//var store = this.storeCache.storeMemory;
 				var item = grid.getItem(evt.rowIndex);
 				if (item != this.currentGridItem && item.dir) {	// prevent executing twice
@@ -86,7 +92,7 @@ define('rfe/FileExplorer', [
 				}
 			});
 			this.createLayout(this.id);
-			this.initContextMenu(dojo.byId(this.id));
+			this.initContextMenu(dom.byId(this.id));
 		},
 
 		/**
@@ -95,13 +101,13 @@ define('rfe/FileExplorer', [
 		 * @return {dojo.Deferred}
 		 */
 		showItemChildrenInGrid: function(item) {
-			// TODO: use dojo.connect(store.getChildren) instead or even do it in getChildren?
+			// TODO: use on(store.getChildren) instead or even do it in getChildren?
 			var grid = this.grid;
-			var dfd = new dojo.Deferred();
+			var dfd = new Deferred();
 			var store = this.store;
 			if (item.dir) {
 				store.skipWithNoChildren = false;
-				return dojo.when(store.getChildren(item), function() {
+				return Deferred.when(store.getChildren(item), function() {
 					store.skipWithNoChildren = true;
 					grid.setStore(store, {
 						parId: item.id
@@ -122,7 +128,7 @@ define('rfe/FileExplorer', [
 		 * @return {object} dojo.Deferred returning boolean
 		 */
 		showItemInTree: function(item) {
-			var dfd = new dojo.Deferred();
+			var dfd = new Deferred();
 			if (item.dir) {
 				var path = this.store.getPath(item);
 				dfd = this.tree.set('path', path);
@@ -139,12 +145,12 @@ define('rfe/FileExplorer', [
 		 * @param {Object} [item] dojo.data.item
 		 */
 		goDirUp: function(item) {
-			var def = new dojo.Deferred();
+			var def = new Deferred();
 			if (!item) {
 				item = this.currentTreeItem;
 			}
 			if (item.parId) {
-				return dojo.when(this.store.get(item.parId), dojo.hitch(this, function(item) {
+				return Deferred.when(this.store.get(item.parId), lang.hitch(this, function(item) {
 					return this.display(item);
 				}), function(err) {
 					console.debug('Error occurred when going directory up', err);
@@ -166,7 +172,7 @@ define('rfe/FileExplorer', [
 			var grid = this.grid;
 			var def = this.showItemInTree(item);
 			grid.selection.deselectAll();
-			def.then(dojo.hitch(this, function() {
+			def.then(lang.hitch(this, function() {
 				grid.showMessage(grid.loadingMessage);
 				this.showItemChildrenInGrid(item);
 			}));
@@ -241,7 +247,7 @@ define('rfe/FileExplorer', [
 		 * @return {object} dojo.Deferred
 		 */
 		goHistory: function(direction) {
-			var def = new dojo.Deferred();
+			var def = new Deferred();
 			var hist = this.history;
 			var id = null;
 			if (direction == 'back' && hist.curIdx > 0) {
@@ -251,7 +257,7 @@ define('rfe/FileExplorer', [
 				id = hist.steps[++hist.curIdx];
 			}
 			if (id != null) {
-				return dojo.when(this.store.get(id), dojo.hitch(this, function(item) {
+				return Deferred.when(this.store.get(id), lang.hitch(this, function(item) {
 					return this.display(item);
 				}));
 			}
@@ -265,7 +271,7 @@ define('rfe/FileExplorer', [
 		 * @return {string} formated date
 		 */
 		getDate: function() {
-			return dojo.date.locale.format(new Date(), {
+			return locale.format(new Date(), {
 					datePattern: 'dd.MM.yyyy',
 					timePattern: 'HH:mm'
 			  });
@@ -287,5 +293,5 @@ define('rfe/FileExplorer', [
 		}
 
 	});
-	return rfe.FileExplorer;
+
 });

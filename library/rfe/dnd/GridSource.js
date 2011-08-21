@@ -1,6 +1,14 @@
-define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"], function(dojo) {
+define([
+	'dojo/_base/lang',
+	"dojo/_base/declare",
+	'dojo/_base/Deferred',
+	'dojo/on',
+	'dojo/dom-class',
+	"rfe/dnd/GridSelector",
+	"dojo/dnd/Manager"
+], function(lang, declare, Deferred, on, domClass, GridSelector, Manager) {
 
-	dojo.declare("rfe.dnd.GridSource", rfe.dnd.GridSelector, {
+	return declare("rfe.dnd.GridSource", GridSelector, {
 		// summary: a Source object, which can be used as a DnD source, or a DnD target
 
 		isSource: true,
@@ -11,7 +19,7 @@ define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"
 
 		constructor: function(grid, params) {
 
-			dojo.mixin(this, params || {});
+			lang.mixin(this, params || {});
 
 			var type = this.accept;	// create accepted types as properties of accept, which can be checkt in checkAcceptance
 			if (type.length){
@@ -29,20 +37,20 @@ define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"
 			// states
 			this.targetState = "";
 			
-			dojo.addClass(this.domNode, "dojoDndSource");
-			dojo.addClass(this.domNode, "dojoDndTarget");
+			domClass.contains(this.domNode, "dojoDndSource");
+			domClass.contains(this.domNode, "dojoDndTarget");
 
 			// set up events
 			this.topics = [
-				dojo.subscribe("/dnd/source/over", this, "onDndSourceOver"),
-				dojo.subscribe("/dnd/start", this, "onDndStart"),
-				dojo.subscribe("/dnd/drop", this, "onDndDrop"),
-				dojo.subscribe("/dnd/cancel", this, "onDndCancel")
+				on("/dnd/source/over", this, "onDndSourceOver"),
+				on("/dnd/start", this, "onDndStart"),
+				on("/dnd/drop", this, "onDndDrop"),
+				on("/dnd/cancel", this, "onDndCancel")
 			];
 			this.events.push(
-				dojo.connect(this.domNode, "onmousedown", this, "onMouseDown"),
-				dojo.connect(this.domNode, "onmousemove", this, "onMouseMove"),
-				dojo.connect(this.domNode, "onmouseup", this, "onMouseUp")
+				on(this.domNode, "mousedown", this, "onMouseDown"),
+				on(this.domNode, "mousemove", this, "onMouseMove"),
+				on(this.domNode, "mouseup", this, "onMouseUp")
 			);
 		},
 
@@ -76,7 +84,7 @@ define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"
 		destroy: function() {
 			// summary: prepares the object to be garbage-collected
 			this.inherited("destroy", arguments);
-			dojo.forEach(this.topics, dojo.unsubscribe);
+			array.forEach(this.topics, remove);
 			this.targetAnchor = null;
 		},
 
@@ -90,7 +98,7 @@ define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"
 			}
 			this.inherited("onMouseMove", arguments);
 
-			m = dojo.dnd.manager();
+			m = Manager.manager();
 
 			if (this.isDragging) {
 				m.canDrop(this.canDrop());
@@ -137,7 +145,7 @@ define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"
 				this.mouseDown = false;
 			}
 			else if (this.isDragging) {
-				var m = dojo.dnd.manager();
+				var m = Manger.manager();
 				m.canDrop(false);
 			}
 		},
@@ -162,7 +170,7 @@ define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"
 			this._changeState("Target", accepted ? "" : "Disabled");
 
 			if (this == source){
-				dojo.dnd.manager().overSource(this);
+				Manager.manager().overSource(this);
 			}
 
 			this.isDragging = true;
@@ -231,7 +239,7 @@ define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"
 				item = dndItem.data.item;
 				oldParentItem = store.storeMemory.get(item.parId);
 				dfd = store.pasteItem(item, oldParentItem, newParentItem, copy)
-				dojo.when(dfd, dojo.hitch(this, function() {
+				Deferred.when(dfd, lang.hitch(this, function() {
 					// TODO: find better solution, e.g. generic that can also be used in TreeSource.
 					console.log('gridSource removeFromSelection', dndItem.data.gridRowIndex, this.selection)
 					this.removeFromSelection(dndItem.data.gridRowIndex);
@@ -254,13 +262,13 @@ define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"
 		onOverEvent: function() {
 			// summary: this function is called once, when mouse is over our container
 			this.inherited(arguments);
-			dojo.dnd.manager().overSource(this);
+			Manager().overSource(this);
 		},
 
 		onOutEvent: function() {
 			// summary: this function is called once, when mouse is out of our container
 			this.inherited(arguments);
-			dojo.dnd.manager().outSource(this);
+			Manager().outSource(this);
 		},
 
 		_markDndStatus: function(copy) {
@@ -275,7 +283,7 @@ define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"
 		 */
 		canDrop: function(source, nodes) {
 			var m, item;
-			m = dojo.dnd.manager();
+			m = Manager.manager();
 			if (m.source == this) {
 				item = this.getStoreItem();
 				if (!item || !item.dir) {	// do nothing when dropping on file or same parent folder
@@ -302,7 +310,7 @@ define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"
 			var trgItem = this.getStoreItem();
 			var newParentItem = trgItem && trgItem.dir ? trgItem : this.rfe.currentTreeItem;
 
-			dojo.forEach(nodes, function(node, idx) {
+			array.forEach(nodes, function(node, idx) {
 				// Don't confuse the different use of items (DnD item versus store.object).
 				var dndItem = source.getItem(node.id);
 				var srcItem = dndItem.data.item;
@@ -381,7 +389,6 @@ define("rfe/dnd/GridSource", ["dojo", "rfe/dnd/GridSelector", "dojo/dnd/Manager"
 
 	});
 
-	return rfe.dnd.Source;
 });
 
 

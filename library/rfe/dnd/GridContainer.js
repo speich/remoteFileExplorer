@@ -1,6 +1,14 @@
-define("rfe/dnd/GridContainer", ["dojo", "dojo/dnd/common", "dojo/dnd/Container"], function(dojo) {
+define([
+	"dojo/_base/lang",
+	'dojo/_base/array',
+	'dojo/_base/declare',
+	'dojo/on',
+	'dojo/mouse',
+	'dojo/dom-class',
+	"dojo/dnd/Container"
+], function(lang, array, declare, on, mouse, domClass, Container) {
 
-	dojo.declare("rfe.dnd.GridContainer", null, {
+	return declare("rfe.dnd.GridContainer", null, {
 
 		constructor: function(grid, params) {
 			// summary: a constructor of the Container modeled after dijit.tree._dndContainer
@@ -9,23 +17,23 @@ define("rfe/dnd/GridContainer", ["dojo", "dojo/dnd/common", "dojo/dnd/Container"
 			this.domNode = this.grid.domNode;
 			this.dndType = 'gridNode';
 
-			dojo.mixin(this, params);
+			lang.mixin(this, params);
 
 			this.currentRowNode = null;
 			this.currentRowIndex = -1;
 
 			// states
 			this.containerState = "";
-			dojo.addClass(this.domNode, "dojoDndContainer");
+			domClass.contains(this.domNode, "dojoDndContainer");
 
 			// set up events
 			this.events = [
 				// container level events
-				dojo.connect(this.grid, "onMouseEnter", this, "onOverEvent"),
-				dojo.connect(this.grid, "onMouseLeave", this, "onOutEvent"),
+				on(this.grid, mouse.enter, this, "onOverEvent"),
+				on(this.grid, mouse.leave, this, "onOutEvent"),
          	// row level events
-				dojo.connect(this.grid, "onRowMouseOver", this, "onMouseOver"),
-				dojo.connect(this.grid, "onRowMouseOut", this, "onMouseOut")
+				on(this.grid, "RowMouseOver", this, "onMouseOver"),
+				on(this.grid, "RowMouseOut", this, "onMouseOut")
 			];
 		},
 
@@ -45,7 +53,7 @@ define("rfe/dnd/GridContainer", ["dojo", "dojo/dnd/common", "dojo/dnd/Container"
 
 		destroy: function() {
 			// summary: prepares the object to be garbage-collected
-			dojo.forEach(this.events, dojo.disconnect);
+			array.forEach(this.events, remove);
 		},
 
 		/**
@@ -68,7 +76,7 @@ define("rfe/dnd/GridContainer", ["dojo", "dojo/dnd/common", "dojo/dnd/Container"
 			// newState: String: new state
 			var prefix = "dojoDnd" + type;
 			var state = type.toLowerCase() + "State";
-			dojo.replaceClass(this.domNode, prefix + newState, prefix + this[state]);
+			domClass.replace(this.domNode, prefix + newState, prefix + this[state]);
 			this[state] = newState;
 		},
 
@@ -76,14 +84,14 @@ define("rfe/dnd/GridContainer", ["dojo", "dojo/dnd/common", "dojo/dnd/Container"
 			// summary: adds a class with prefix "dojoDndItem"
 			// node: Node: a node
 			// type: String: a variable suffix for a class name
-			dojo.addClass(node, "dojoDndItem" + type);
+			domClass.add(node, "dojoDndItem" + type);
 		},
 
 		_removeItemClass: function(node, type) {
 			// summary: removes a class with prefix "dojoDndItem"
 			// node: Node: a node
 			// type: String: a variable suffix for a class name
-			dojo.removeClass(node, "dojoDndItem" + type);
+			domClass.remove(node, "dojoDndItem" + type);
 		},
 
 		onOverEvent: function() {
@@ -103,5 +111,5 @@ define("rfe/dnd/GridContainer", ["dojo", "dojo/dnd/common", "dojo/dnd/Container"
 		}
 
 	});
-	return rfe.dnd.GridContainer;
+
 });

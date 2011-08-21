@@ -1,6 +1,9 @@
-define('rfe/Grid', ['dojox/grid/DataGrid', 'rfe/dnd/GridSource', 'dojo/data/ItemFileWriteStore'], function() {
+define([
+	'dojo/_base/declare',
+	'dojox/grid/DataGrid'
+], function(declare, DataGrid) {
 
-	dojo.declare('rfe.Grid', dojox.grid.DataGrid, {
+	return declare('rfe.Grid', DataGrid, {
 
 		dndController: null,
 
@@ -21,9 +24,6 @@ define('rfe/Grid', ['dojox/grid/DataGrid', 'rfe/dnd/GridSource', 'dojo/data/Item
 					items: []	// will be set on tree click with folder content
 				}
 			});*/
-
-
-
 		},
 
 		onStyleRow: function(inRow) {
@@ -47,7 +47,7 @@ define('rfe/Grid', ['dojox/grid/DataGrid', 'rfe/dnd/GridSource', 'dojo/data/Item
 		 */
 		formatType: function(value) {
 			// TODO: return correct file type
-			if (value === true || dojo.isArray(value)) {
+			if (value === true || value instanceof Array) {
 				value = 'directory';
 			}
 			else {
@@ -71,5 +71,4 @@ define('rfe/Grid', ['dojox/grid/DataGrid', 'rfe/dnd/GridSource', 'dojo/data/Item
 		}
 	});
 
-	return rfe.Grid;
 });
