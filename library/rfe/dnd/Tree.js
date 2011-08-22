@@ -1,18 +1,23 @@
-define("rfe/dnd/Tree", ["dojo", "dijit", "dijit/tree/_dndSelector"], function(dojo, dijit) {
+define([
+	"dojo/_base/lang",
+	'dojo/_base/array',
+	'dojo/_base/declare',
+	"dijit/tree/_dndSelector"
+], function(lang, array, declare, _dndSelector) {
 
 	// TODO: make right click (context menu) select the tree node (also see dnd/GridSelector.js)
 
 	// set references to call be able to call overriden methods
-	var ref =  dijit.tree._dndSelector.prototype;
+	var ref = _dndSelector.prototype;
 	var oldMouseDown = ref.onMouseDown;
 	var oldMouseUp = ref.onMouseUp;
 	var oldMouseMove = ref.onMouseMove;
 
-	dojo.declare("rfe.dnd.Tree", null, {
+	return declare("rfe.dnd.Tree", null, {
 
 		constructor: function() {
 
-			dojo.extend(dijit.tree._dndSelector, {
+			lang.extend(_dndSelector, {
 				_markedNode: null,
 				_doMarkNode: false,
 				setSelection: this.setSelection,
@@ -52,7 +57,7 @@ define("rfe/dnd/Tree", ["dojo", "dijit", "dijit/tree/_dndSelector"], function(do
 
 		setSelection: function(/*dijit._treeNode[]*/ newSelection) {
 			var oldSelection = this.getSelectedTreeNodes();
-			dojo.forEach(this._setDifference(oldSelection, newSelection), dojo.hitch(this, function(node) {
+			array.forEach(this._setDifference(oldSelection, newSelection), lang.hitch(this, function(node) {
 				if (this._markedNode != node) {
 					node.setSelected(false);
 				}
@@ -61,12 +66,11 @@ define("rfe/dnd/Tree", ["dojo", "dijit", "dijit/tree/_dndSelector"], function(do
 				}
 				delete this.selection[node.id];
 			}));
-			dojo.forEach(this._setDifference(newSelection, oldSelection), dojo.hitch(this, function(node) {
+			array.forEach(this._setDifference(newSelection, oldSelection), lang.hitch(this, function(node) {
 				this.selection[node.id] = node;
 			}));
 			this._updateSelectionProperties();
 		}
 	});
 
-	return rfe.dnd.Tree;
 });

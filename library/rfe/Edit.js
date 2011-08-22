@@ -1,14 +1,18 @@
-define('rfe/Edit', [
+define([
+	'dojo/_base/lang',
+	'dojo/_base/array',
 	'dojo/_base/declare',
-//	'dojo/on',
-//	'dojo/dom',
-//	'dijit/registry',
+	'dojo/on',
+	'dojo/mouse',
+	'dojo/dom',
+	'dojo/dom-class',
+	'dijit/registry',
 	'dijit/Menu',
 	'dijit/MenuItem',
-	'dijit/PopupMenuItem'], function(declare, Menu, MenuItem, PopupMenuItem) {
-//	'dijit/PopupMenuItem'], function(declare, on, dom, registry, Menu, MenuItem, PopupMenuItem) {
+	'dijit/PopupMenuItem'
+], function(lang, array, declare, on, mouse, dom, domClass, registry, Menu, MenuItem, PopupMenuItem) {
 
-	var Editor = declare('rfe.Edit', null, {
+	return declare('rfe.Edit', null, {
 		edit: {
 			contextMenu: null,   // reference to the context menu
 			contextWidget: null  // reference to the widget the context menu was created on (right clicked on)
@@ -29,19 +33,16 @@ define('rfe/Edit', [
 			// Override to enable context menu, since grid stops this event by default
 			this.grid.onCellContextMenu = function() {};
 
-			dojo.forEach(menu.targetNodeIds, function(id) {
-				//var domNode = dom.byId(id);
-				var domNode = dojo.byId(id);
-				//dojo.connect(domNode, 'contextmenu', this, function(evt) {
-				dojo.connect(domNode, 'mousedown', function(evt) {
-					if (evt.button != dojo.mouseButtons.RIGHT) {
+			array.forEach(menu.targetNodeIds, function(id) {
+				var domNode = dom.byId(id);
+				on(domNode, 'mousedown', function(evt) {
+					if (!mouse.isRight(evt)) {
 						return;
 					}
 
 					var isOnWidget = false;
 
-					//var widget = registry.getEnclosingWidget(evt.target);
-					var widget = dijit.getEnclosingWidget(evt.target);
+					var widget = registry.getEnclosingWidget(evt.target);
 					console.log(widget, evt.target, widget.item)
 					if (widget.id == 'rfeContentPaneTree') {
 						// TODO: find generic solution for this instead of using id
@@ -56,14 +57,14 @@ define('rfe/Edit', [
 					// If not clicked on a item (tree.node or grid.row), but below widget,
 					// and nothing is selected, then set all menuItems to disabled except create/upload
 					if (!isOnWidget) {
-						dojo.filter(menu.getChildren(), function(item) {
+						array.filter(menu.getChildren(), function(item) {
 							if (item.get('label') != 'New' && item.get('label') != 'Upload') {
 								item.set('disabled', true);
 							}
 						});
 					}
 					else {
-						dojo.forEach(menu.getChildren(), function(item) {
+						array.forEach(menu.getChildren(), function(item) {
 							item.set('disabled', false);
 						});
 					}
@@ -77,17 +78,17 @@ define('rfe/Edit', [
 			}));
 			menu.addChild(MenuItem({
 				label: 'Rename',
-				onClick: dojo.hitch(this, this.renameItem)
+				onClick: lang.hitch(this, this.renameItem)
 			}));
 			menu.addChild(MenuItem({
 				label: 'Delete',
-				onClick: dojo.hitch(this, this.deleteItems)
+				onClick: lang.hitch(this, this.deleteItems)
 			}));
 
 			// subMenu new
 			subMenu.addChild(MenuItem({
 				label: 'Directory',
-				onClick: dojo.hitch(this, function() {
+				onClick: lang.hitch(this, function() {
 					this.createRenameItem({
 						dir: true
 					});
@@ -95,7 +96,7 @@ define('rfe/Edit', [
 			}));
 			subMenu.addChild(MenuItem({
 				label: 'File',
-				onClick: dojo.hitch(this, this.createRenameItem)
+				onClick: lang.hitch(this, this.createRenameItem)
 			}));
 
 			menu.startup();
@@ -121,7 +122,7 @@ define('rfe/Edit', [
 			for (; i < len; i++) {
 				dndItem = dnd.getItem(nodes[i].id);
 				item = dndItem.data.item;
-				dojo.when(store.remove(item.id), function() {
+				Deferred.when(store.remove(item.id), function() {
 					self.removeHistory(item.id);
 					// When deleting folder in tree, grid is not updated by store.onDelete() since grid only contains folders chilren!
 					if (item.dir && self.edit.contextWidget == self.tree) {
@@ -146,7 +147,7 @@ define('rfe/Edit', [
 			var cell = grid.getCell(0);
 			var item = this.getLastSelectedItem();
 			// grid calls editor.apply onBlur on the grid -> add id to row/cell?
-/*			var cnn = dojo.connect(cell, 'onBlur', this, function() {
+/*			var cnn = on(cell, 'onBlur', this, function() {
 				console.log('done editing')   
 				dojo.disconnect(cnn);
 				grid.edit.apply();
@@ -161,7 +162,7 @@ define('rfe/Edit', [
 					item.name = value;
 					item.mod = self.getDate();
 					console.log('applying edit')
-					dojo.when(store.put(item), function() {
+					Deferred.when(store.put(item), function() {
 						//grid.edit.apply();
 						//grid.store.save();
 						//	grid.edit.save();
@@ -184,7 +185,7 @@ define('rfe/Edit', [
 			cnns[cnns.length] = on(dom.byId(this.id), 'mousedown', this, function(evt) {
 				console.log('cnnExtraCancel')
 				// editing is not canceled when clicking on the scrollbox
-				if (!dojo.hasClass(evt.target, 'dojoxGridCell')) {
+				if (!domClass.contains(evt.target, 'dojoxGridCell')) {
 					grid.edit.cancel();
 				}
 			});
@@ -217,7 +218,7 @@ define('rfe/Edit', [
 				item.name = 'new text file.txt';
 			}
 
-			return dojo.when(store.add(item), function() {
+			return Deferred.when(store.add(item), function() {
 				return item;
 			})
 		},
@@ -231,10 +232,10 @@ define('rfe/Edit', [
 
 			// createItem makes the grid update all its rows -> we cant rename the new item right away since it's not rendered yet
 			// Connect to endUpdate to time it right
-			return dojo.when(this.createItem(itemProps), dojo.hitch(this, function(item) {
+			return Deferred.when(this.createItem(itemProps), lang.hitch(this, function(item) {
 				var grid = this.grid;
 				var rowIndex = grid.getItemIndex(item);
-				var cnn = dojo.connect(grid, 'endUpdate', this, function() {
+				var cnn = on(grid, 'endUpdate', this, function() {
 					dojo.disconnect(cnn);
 					grid.selection.setSelected(rowIndex, true);	// new item in grid needs to be selected before it can be renamed
 					this.renameItem(item);
@@ -243,5 +244,4 @@ define('rfe/Edit', [
 		}
 	});
 
-	return Editor;
 });

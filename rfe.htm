@@ -117,26 +117,52 @@ body {
 <body class="claro">
 <div id="remoteFileExplorer"></div>
 <script type="text/javascript">
-var djConfig = {
+/*
+    var djConfig = {
 	//async: true,
 	isDebug: false,
 	parseOnLoad: false,
 	locale: 'de',
-	baseUrl: '/library/dojo/dojo/',
+	baseUrl: '/library/dojo-trunk/dojo/',
 	modulePaths: {
 		rfe: '/library/rfe/'
 	},
 	useCommentedJson: true
+ };
+ */
+// TODO: move this to a loader file
+var dojoConfig = {
+	async: true,
+	baseUrl: '/library',
+	packages: [
+		{
+			'name': 'dojo',
+			'location': 'dojo-trunk/dojo'
+		},{
+			'name': 'dijit',
+			'location': 'dojo-trunk/dijit'
+		},{
+			'name': 'dojox',
+			'location': 'dojo-trunk/dojox'
+		},
+		{
+			'name': 'rfe',
+			"location": "rfe"
+		}
+	]
 };
+
 </script>
-<script src="library/dojo/dojo/dojo.js" type="text/javascript"></script>
+<script src="library/dojo-trunk/dojo/dojo.js"></script>
 <!-- <script src="http://ajax.googleapis.com/ajax/libs/dojo/1.6/dojo/dojo.xd.js" type="text/javascript"></script> -->
 <script type="text/javascript">
-dojo.require('rfe.FileExplorer');
-dojo.ready(function() {
-	new rfe.FileExplorer({
-		id: 'remoteFileExplorer'
-	});
+require(['rfe/FileExplorer'], function() {
+    new rfe.FileExplorer({
+            id: 'remoteFileExplorer'
+    });
+});
+require.on("error", function(error) {
+	console.log(error);
 });
 </script>
 </body>

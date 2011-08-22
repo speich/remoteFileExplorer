@@ -1,7 +1,15 @@
-define("rfe/dnd/GridSelector", ["dojo", "dijit", "dojo/dnd/common", "rfe/dnd/GridContainer"], function(dojo) {
+define([
+	"dojo/_base/declare",
+	'dojo/_base/connect',
+	'dojo/on',
+	'dojo/mouse',
+	"dijit",
+	"dojo/dnd/common",
+	"rfe/dnd/GridContainer"
+], function(declare, connect, on, mouse, dijit, common, GridContainer) {
 
 
-	dojo.declare("rfe.dnd.GridSelector", rfe.dnd.GridContainer, {
+	return declare("rfe.dnd.GridSelector", GridContainer, {
 		// note: grid rows (nodes) do not have an id attribute -> The grid.Selection uses the rowIndex instead
 		// -> Create own dictionary object keyed by ids of selected nodes as required by the dnd.Selector api.
 
@@ -14,20 +22,20 @@ define("rfe/dnd/GridSelector", ["dojo", "dijit", "dojo/dnd/common", "rfe/dnd/Gri
 			this.selection = {};	// maps node.id to lookup to find dndItem from rowNode.
 
 			this.events.push(
-				dojo.connect(sel, 'onSelected', this, this.addToSelection),
-				dojo.connect(sel, 'onDeselected', this, this.removeFromSelection),
-				/*dojo.connect(this.grid, 'onRowDblClick', this, function(evt) {
+				on(sel, 'Selected', this, this.addToSelection),
+				on(sel, 'Deselected', this, this.removeFromSelection),
+				/*on(this.grid, 'RowDblClick', this, function(evt) {
 					this.removeFromSelection(evt.rowIndex);
 				}),*/
 				// add selection also on right click context menu
-				dojo.connect(this.grid, 'onRowMouseDown', function(e) {
-					if (e.button != dojo.mouseButtons.RIGHT) {
+				on(this.grid, 'RowMouseDown', function(evt) {
+					if (!mouse.isRight(evt)) {
 						return;
 					}
-					if ((!dojo.isCopyKey(e) && !e.shiftKey) && !this.selection.selected[e.rowIndex]) {
+					if ((!connect.isCopyKey(evt) && !evt.shiftKey) && !this.selection.selected[evt.rowIndex]) {
 						this.selection.deselectAll();
 					}
-					this.selection.setSelected(e.rowIndex, true);
+					this.selection.setSelected(evt.rowIndex, true);
 				})
 			);
 		},
@@ -85,6 +93,5 @@ define("rfe/dnd/GridSelector", ["dojo", "dijit", "dojo/dnd/common", "rfe/dnd/Gri
 
 
 	});
-	
-	return rfe.dnd.GridSelector;
+
 });
