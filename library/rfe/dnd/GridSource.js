@@ -42,15 +42,15 @@ define([
 
 			// set up events
 			this.topics = [
-				on("/dnd/source/over", this, "onDndSourceOver"),
-				on("/dnd/start", this, "onDndStart"),
-				on("/dnd/drop", this, "onDndDrop"),
-				on("/dnd/cancel", this, "onDndCancel")
+				on("/dnd/source/over", lang.hitch(this, "onDndSourceOver")),
+				on("/dnd/start", lang.hitch(this, "onDndStart")),
+				on("/dnd/drop", lang.hitch(this, "onDndDrop")),
+				on("/dnd/cancel", lang.hitch(this, "onDndCancel"))
 			];
 			this.events.push(
-				on(this.domNode, "mousedown", this, "onMouseDown"),
-				on(this.domNode, "mousemove", this, "onMouseMove"),
-				on(this.domNode, "mouseup", this, "onMouseUp")
+				on(this.domNode, "mousedown", lang.hitch(this, "onMouseDown")),
+				on(this.domNode, "mousemove", lang.hitch(this, "onMouseMove")),
+				on(this.domNode, "mouseup", lang.hitch(this, "onMouseUp"))
 			);
 		},
 
@@ -145,7 +145,7 @@ define([
 				this.mouseDown = false;
 			}
 			else if (this.isDragging) {
-				var m = Manger.manager();
+				var m = Manager.manager();
 				m.canDrop(false);
 			}
 		},

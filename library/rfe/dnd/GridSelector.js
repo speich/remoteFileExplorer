@@ -3,10 +3,9 @@ define([
 	'dojo/_base/connect',
 	'dojo/aspect',
 	'dojo/mouse',
-	"dijit",
 	"dojo/dnd/common",
 	"rfe/dnd/GridContainer"
-], function(declare, connect, aspect, mouse, dijit, common, GridContainer) {
+], function(declare, connect, aspect, mouse, common, GridContainer) {
 
 
 	return declare("rfe.dnd.GridSelector", GridContainer, {
@@ -28,7 +27,7 @@ define([
 					this.removeFromSelection(evt.rowIndex);
 				}),*/
 				// add selection also on right click context menu
-				aspect.after(this.grid, 'onRowMouseDown', function(evt) {
+				this.grid.on('rowMouseDown', dojo.hitch(this, function(evt) {
 					if (!mouse.isRight(evt)) {
 						return;
 					}
@@ -36,7 +35,7 @@ define([
 						this.selection.deselectAll();
 					}
 					this.selection.setSelected(evt.rowIndex, true);
-				})
+				}))
 			);
 		},
 

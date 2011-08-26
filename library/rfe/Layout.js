@@ -65,7 +65,7 @@ define([
 				var tree, dnd;
 
 				// TODO. don't make this a class, only a function to extend the tree?
-//				new dndTree(); 	// setups the dnd for the tree
+				new dndTree(); 	// setups the dnd for the tree
 
 				tree = new Tree({
 					id: id,
@@ -78,12 +78,10 @@ define([
 					showRoot: true
 				});
 
-				/*
 				new TreeSource(tree, {
 					store: store,
 					singular: true
 				});
-              */
 				return tree;
 			},
 
@@ -100,22 +98,14 @@ define([
 					store: null
 				});
 
-				structure = [
-					/*{
-					 name:  null,
-					 field: '_item', 	// there is a bug in 1.5 that prevents sorting on _item
-					 formatter: this.formatImg,
-					 width: '5%'
-					 }, */
-					{
-						name: "name",
-						field: 'name',
-						width: '35%',
-						formatter: function(value, idx) {
-							var item = this.grid.getItem(idx);
-							return this.grid.formatImg(item);
-						}
-					},{
+				structure = [{
+					name: "name",
+					field: 'name',
+					formatter: function(value, idx) {
+						var item = this.grid.getItem(idx);
+						return this.grid.formatImg(item);
+					},
+					width: '35%'},{
 						name: "size",
 						field: "size",
 						formatter: function(value) {
@@ -137,11 +127,10 @@ define([
 				grid.set('structure', structure);
 
 				// add drag and drop to the grid
-				/*
 				grid.dndController = new GridSource(grid, {
 					store: store
 				});
-              */
+
 				return grid;
 			},
 
@@ -427,7 +416,7 @@ define([
 				aspect.after(this, 'showItemChildrenInGrid', function(item) {
 					var button = registry.byId('rfeButtonDirectoryUp');
 					button.set('disabled', item == tree.rootNode.item);
-				});
+				}, true);
 				this.grid.on('RowDblClick', function(item) {
 					var button = registry.byId('rfeButtonDirectoryUp');
 					button.set('disabled', item == tree.rootNode.item);
@@ -443,12 +432,12 @@ define([
 						this.goHistory('back');
 					})
 				}));
-				aspect.after(this, 'setHistory', function() {
+				aspect.after(this, 'setHistory', dojo.hitch(this, function() {
 					registry.byId('rfeButtonHistoryBack').set('disabled', this.history.steps.length < 2);
-				});
-				aspect.after(this, 'goHistory', function() {
+				}));
+				aspect.after(this, 'goHistory', dojo.hitch(this, function() {
 					registry.byId('rfeButtonHistoryBack').set('disabled', this.history.curIdx < 1);
-				});
+				}));
 
 				toolbar.addChild(new dijit.form.Button({
 					id: 'rfeButtonHistoryForward',
@@ -487,7 +476,8 @@ define([
 						'<div id="rfeDialogAboutText">' +
 						'<h2>Remote File Explorer (rfe)</h2>' +
 						'<p>version ' + this.version + ' - ' + this.versionDate + '</p>' +
-						'<p>Created by <a href="http://www.speich.net">Simon Speich</a>, www.speich.net</p>' +
+						'<p>Created by <a href="http://www.speich.net">Simon Speich</a>, www.speich.net using the ' +
+						'<a href="http://www.dojotoolkit.org">dojotoolkit</a> and <a href="http://www.php.net">PHP</a>.</p>' +
 						'<p>Can be used and altered freely as long as this dialog with logo and link is included.</p>' +
 						'</div>'
 					});

@@ -17,13 +17,6 @@ define([
 
 		constructor: function(params) {
 			this.id = params.id;
-
-/*			this.store = new dojo.data.ItemFileWriteStore({
-				data: {
-					identifier: 'id',
-					items: []	// will be set on tree click with folder content
-				}
-			});*/
 		},
 
 		onStyleRow: function(inRow) {

@@ -28,12 +28,10 @@ define([
 
 			// set up events
 			this.events = [
-				// container level events
-				on(this.grid, mouse.enter, this, "onOverEvent"),
-				on(this.grid, mouse.leave, this, "onOutEvent"),
-         	// row level events
-				aspect.after(this.grid, "RowMouseOver", "onMouseOver"),
-				aspect.after(this.grid, "RowMouseOut", "onMouseOut")
+				on(this.grid.domNode, mouse.enter, lang.hitch(this, "onOverEvent")),
+			   on(this.grid.domNode, mouse.leave, lang.hitch(this, "onOutEvent")),
+				this.grid.on("rowMouseOver", lang.hitch(this, "onMouseOver")),
+				this.grid.on("rowMouseOut", lang.hitch(this, "onMouseOut"))
 			];
 		},
 

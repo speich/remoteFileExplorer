@@ -330,7 +330,7 @@ define([
 				// tags:
 				//		private
 				this.inherited(arguments);
-				dndManger.manager().overSource(this);
+				dndManager.manager().overSource(this);
 			},
 
 			onOutEvent: function() {

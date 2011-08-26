@@ -83,9 +83,8 @@ define([
 				this.currentGridItem = item;
 			}));
 			grid.on('rowDblClick', lang.hitch(this, function(evt) {
-				//var store = this.storeCache.storeMemory;
 				var item = grid.getItem(evt.rowIndex);
-				if (item != this.currentGridItem && item.dir) {	// prevent executing twice
+				if (item.dir) {
 					this.display(item);
 					this.setHistory(item.id);
 				}
@@ -145,7 +144,7 @@ define([
 		 * @param {Object} [item] dojo.data.item
 		 */
 		goDirUp: function(item) {
-			var def = new Deferred();
+			var def;
 			if (!item) {
 				item = this.currentTreeItem;
 			}
@@ -157,7 +156,9 @@ define([
 				});
 			}
 			else {
-				return def.resolve(false);
+				def = new Deferred();
+				def.resolve(false);
+				return def;
 			}
 		},
 
