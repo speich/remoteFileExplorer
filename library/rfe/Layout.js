@@ -2,6 +2,7 @@ define([
 	'dojo/_base/array',
 	'dojo/_base/lang',
 	'dojo/_base/declare',
+	'dojo/aspect',
 	'dojo/on',
 	'dojo/_base/event',
 	'dojo/dom-construct',
@@ -29,7 +30,7 @@ define([
 	"dijit/form/Button",
 	"dijit/form/CheckBox",
 	"dijit/Dialog"
-], function(array, lang, declare, on, event, construct, query, Memory, JsonRest, StoreFileCache, Tree, dndTree, TreeSource,
+], function(array, lang, declare, aspect, on, event, construct, query, Memory, JsonRest, StoreFileCache, Tree, dndTree, TreeSource,
 									  Grid, GridSource, registry,
 									  BorderContainer, ContentPane, MenuBar, MenuBarItem, PopupMenuBarItem, Menu, MenuItem, MenuSeparator,
 									  PopupMenuItem, CheckedMenuItem, Toolbar, Button, CheckBox, Dialog) {
@@ -64,7 +65,7 @@ define([
 				var tree, dnd;
 
 				// TODO. don't make this a class, only a function to extend the tree?
-				new dndTree(); 	// setups the dnd for the tree
+//				new dndTree(); 	// setups the dnd for the tree
 
 				tree = new Tree({
 					id: id,
@@ -77,11 +78,12 @@ define([
 					showRoot: true
 				});
 
+				/*
 				new TreeSource(tree, {
 					store: store,
 					singular: true
 				});
-
+              */
 				return tree;
 			},
 
@@ -135,10 +137,11 @@ define([
 				grid.set('structure', structure);
 
 				// add drag and drop to the grid
+				/*
 				grid.dndController = new GridSource(grid, {
 					store: store
 				});
-
+              */
 				return grid;
 			},
 
@@ -322,8 +325,9 @@ define([
 					checked: true,
 					onClick: lang.hitch(this, this.toggleTreePane)
 				}));
-				on('rfe/menuView/setView', registry.byId('rfeMenuItemFolders'), function() {
-					this.set('checked', true);
+				on('rfe/menuView/setView', function() {
+					var el = registry.byId('rfeMenuItemFolders')
+					el.set('checked', true);
 				});
 
 				// ********** menu tools ***************
@@ -378,7 +382,7 @@ define([
 					gutters: false
 
 				}, id);
-				on(panes.borderContainer.domNode, 'oncontextmenu', function(evt) {
+				on(panes.borderContainer.domNode, 'contextmenu', function(evt) {
 					event.stop(evt);
 				});
 				panes.menuPane = new ContentPane({
@@ -420,11 +424,13 @@ define([
 						}));
 					})
 				}));
-				on(this, 'showItemChildrenInGrid', registry.byId('rfeButtonDirectoryUp'), function(item) {
-					this.set('disabled', item == tree.rootNode.item);
+				aspect.after(this, 'showItemChildrenInGrid', function(item) {
+					var button = registry.byId('rfeButtonDirectoryUp');
+					button.set('disabled', item == tree.rootNode.item);
 				});
-				on(this.grid, 'onRowDblClick', registry.byId('rfeButtonDirectoryUp'), function(item) {
-					this.set('disabled', item == tree.rootNode.item);
+				this.grid.on('RowDblClick', function(item) {
+					var button = registry.byId('rfeButtonDirectoryUp');
+					button.set('disabled', item == tree.rootNode.item);
 				});
 
 				toolbar.addChild(new Button({
@@ -437,10 +443,10 @@ define([
 						this.goHistory('back');
 					})
 				}));
-				on(this, 'setHistory', this, function() {
+				aspect.after(this, 'setHistory', function() {
 					registry.byId('rfeButtonHistoryBack').set('disabled', this.history.steps.length < 2);
 				});
-				on(this, 'goHistory', this, function() {
+				aspect.after(this, 'goHistory', function() {
 					registry.byId('rfeButtonHistoryBack').set('disabled', this.history.curIdx < 1);
 				});
 
@@ -454,7 +460,7 @@ define([
 						this.goHistory('forward');
 					})
 				}));
-				on(this, 'goHistory', this, function() {
+				aspect.after(this, 'goHistory', function() {
 					registry.byId('rfeButtonHistoryForward').set('disabled', this.history.curIdx > this.history.steps.length - 2);
 				});
 				toolbar.addChild(new Button({

@@ -2,14 +2,13 @@ define([
 	'dojo/_base/lang',
 	'dojo/_base/declare',
 	'dojo/_base/Deferred',
-	"dojo/on",
 	'dojo/keys',
 	'dojo/dom',
 	'dojo/date/locale',
 	'dijit/registry',
 	'rfe/Layout',
 	'rfe/Edit'
-], function(lang, declare, Deferred, on, keys, dom, locale, registry, Layout, Edit) {
+], function(lang, declare, Deferred, keys, dom, locale, registry, Layout, Edit) {
 	/**
 	 * File explorer allows you to browse files.
 	 *
@@ -51,7 +50,7 @@ define([
 			lang.mixin(this, args);
 
 			// init tree events
-			on(tree, 'onLoad', this, function() {
+			tree.on('load', lang.hitch(this, function() {
 				var root = tree.rootNode;
 				var item = root.item;
 		//		root.setSelected(true); // root is never deselected again
@@ -59,16 +58,16 @@ define([
 				this.showItemChildrenInGrid(item);
 				this.setHistory(item.id);
 				this.currentTreeItem = item;
-			});
-			on(tree, 'onClick', this, function(item) {
+			}));
+			tree.on('click', lang.hitch(this, function(item) {
 				if (item != this.currentTreeItem) { // prevent executing twice (dblclick)
 					grid.selection.clear(); // otherwise item in not-displayed folder is still selected or with same idx
 					this.showItemChildrenInGrid(item);	// only called, when store.openOnClick is set to false
 					this.setHistory(item.id);
 				}
 				this.currentTreeItem = item;
-			});
-			on(tree, 'onKeyDown', this, function(evt) {
+			}));
+			tree.on('keyDown', lang.hitch(this, function(evt) {
 				if (evt.keyCode == keys.SPACE) {
 					var node = registry.getEnclosingWidget(evt.target);
 					tree.focusNode(node);
@@ -76,21 +75,22 @@ define([
 					this.setHistory(node.item.id);
 						 this.currentTreeItem = item;
 				}
-			}, tree);
+			}));
 
-			on(grid, 'onRowMouseDown', this, function(evt) {
+			grid.on('rowMouseDown', lang.hitch(this, function(evt) {
 				// rowMouseDown also registeres right click
 				var item = grid.getItem(evt.rowIndex);
 				this.currentGridItem = item;
-			});
-			on(grid, 'onRowDblClick', this, function(evt) {
+			}));
+			grid.on('rowDblClick', lang.hitch(this, function(evt) {
 				//var store = this.storeCache.storeMemory;
 				var item = grid.getItem(evt.rowIndex);
 				if (item != this.currentGridItem && item.dir) {	// prevent executing twice
 					this.display(item);
 					this.setHistory(item.id);
 				}
-			});
+			}));
+
 			this.createLayout(this.id);
 			this.initContextMenu(dom.byId(this.id));
 		},

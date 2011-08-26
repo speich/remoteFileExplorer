@@ -1,12 +1,12 @@
 define([
 	"dojo/_base/declare",
 	'dojo/_base/connect',
-	'dojo/on',
+	'dojo/aspect',
 	'dojo/mouse',
 	"dijit",
 	"dojo/dnd/common",
 	"rfe/dnd/GridContainer"
-], function(declare, connect, on, mouse, dijit, common, GridContainer) {
+], function(declare, connect, aspect, mouse, dijit, common, GridContainer) {
 
 
 	return declare("rfe.dnd.GridSelector", GridContainer, {
@@ -22,13 +22,13 @@ define([
 			this.selection = {};	// maps node.id to lookup to find dndItem from rowNode.
 
 			this.events.push(
-				on(sel, 'Selected', this, this.addToSelection),
-				on(sel, 'Deselected', this, this.removeFromSelection),
+				aspect.after(sel, 'selected', this.addToSelection),
+				aspect.after(sel, 'deselected', this.removeFromSelection),
 				/*on(this.grid, 'RowDblClick', this, function(evt) {
 					this.removeFromSelection(evt.rowIndex);
 				}),*/
 				// add selection also on right click context menu
-				on(this.grid, 'RowMouseDown', function(evt) {
+				aspect.after(this.grid, 'onRowMouseDown', function(evt) {
 					if (!mouse.isRight(evt)) {
 						return;
 					}

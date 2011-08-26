@@ -32,8 +32,8 @@ define([
 				on(this.grid, mouse.enter, this, "onOverEvent"),
 				on(this.grid, mouse.leave, this, "onOutEvent"),
          	// row level events
-				on(this.grid, "RowMouseOver", this, "onMouseOver"),
-				on(this.grid, "RowMouseOut", this, "onMouseOut")
+				aspect.after(this.grid, "RowMouseOver", "onMouseOver"),
+				aspect.after(this.grid, "RowMouseOut", "onMouseOut")
 			];
 		},
 

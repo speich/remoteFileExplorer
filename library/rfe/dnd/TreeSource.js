@@ -60,10 +60,10 @@ define([
 
 				// set up events
 				this.topics = [
-					on("/dnd/source/over", this, "onDndSourceOver"),
-					on("/dnd/start", this, "onDndStart"),
-					on("/dnd/drop", this, "onDndDrop"),
-					on("/dnd/cancel", this, "onDndCancel")
+					on("/dnd/source/over", lang.hitch(this, "onDndSourceOver")),
+					on("/dnd/start", lang.hitch(this, "onDndStart")),
+					on("/dnd/drop", lang.hitch(this, "onDndDrop")),
+					on("/dnd/cancel", lang.hitch(this, "onDndCancel"))
 				];
 			},
 
