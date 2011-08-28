@@ -11,8 +11,7 @@ define([
 	'dojo/store/JsonRest',
 	'rfe/StoreFileCache',
 	'dijit/Tree',
-	'rfe/dnd/Tree',
-	'rfe/dnd/TreeSource',
+	'dijit/tree/dndSource',
 	'rfe/Grid',
 	'rfe/dnd/GridSource',
 	'dijit/registry',
@@ -30,7 +29,7 @@ define([
 	"dijit/form/Button",
 	"dijit/form/CheckBox",
 	"dijit/Dialog"
-], function(array, lang, declare, aspect, on, event, construct, query, Memory, JsonRest, StoreFileCache, Tree, dndTree, TreeSource,
+], function(array, lang, declare, aspect, on, event, construct, query, Memory, JsonRest, StoreFileCache, Tree, TreeSource,
 									  Grid, GridSource, registry,
 									  BorderContainer, ContentPane, MenuBar, MenuBarItem, PopupMenuBarItem, Menu, MenuItem, MenuSeparator,
 									  PopupMenuItem, CheckedMenuItem, Toolbar, Button, CheckBox, Dialog) {
@@ -64,9 +63,6 @@ define([
 			initTree: function(id, store) {
 				var tree, dnd;
 
-				// TODO. don't make this a class, only a function to extend the tree?
-				new dndTree(); 	// setups the dnd for the tree
-
 				tree = new Tree({
 					id: id,
 					model: store,
@@ -82,6 +78,7 @@ define([
 					store: store,
 					singular: true
 				});
+
 				return tree;
 			},
 

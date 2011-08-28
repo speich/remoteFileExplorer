@@ -117,25 +117,13 @@ body {
 <body class="claro">
 <div id="remoteFileExplorer"></div>
 <script type="text/javascript">
-/*
-    var djConfig = {
-	//async: true,
-	isDebug: false,
-	parseOnLoad: false,
-	locale: 'de',
-	baseUrl: '/library/dojo-trunk/dojo/',
-	modulePaths: {
-		rfe: '/library/rfe/'
-	},
-	useCommentedJson: true
- };
- */
+
 // TODO: move this to a loader file
 var dojoConfig = {
 	async: true,
 	baseUrl: '/library',
-	packages: [
-		{
+
+	packages: [{
 			'name': 'dojo',
 			'location': 'dojo-trunk/dojo'
 		},{
@@ -144,12 +132,22 @@ var dojoConfig = {
 		},{
 			'name': 'dojox',
 			'location': 'dojo-trunk/dojox'
-		},
-		{
+		},{
 			'name': 'rfe',
-			"location": "rfe"
+			'location': "rfe"
+		},{
+			'name': 'original',
+			'location': 'dojo-trunk'
 		}
-	]
+	],
+
+	// redirect the following modules to my own modules
+	paths: {
+		'dijit/tree/_dndSelector': 'rfe/dnd/TreeSelector'
+//		'dijit/tree/dndSource': 'rfe/dnd/TreeSource'
+	}
+
+
 };
 
 </script>

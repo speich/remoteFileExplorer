@@ -1,40 +1,37 @@
 define([
 	"dojo/_base/declare",
+	'dojo/_base/lang',
 	'dojo/_base/connect',
 	'dojo/aspect',
 	'dojo/mouse',
 	"dojo/dnd/common",
 	"rfe/dnd/GridContainer"
-], function(declare, connect, aspect, mouse, common, GridContainer) {
+], function(declare, lang, connect, aspect, mouse, common, GridContainer) {
 
 
 	return declare("rfe.dnd.GridSelector", GridContainer, {
-		// note: grid rows (nodes) do not have an id attribute -> The grid.Selection uses the rowIndex instead
-		// -> Create own dictionary object keyed by ids of selected nodes as required by the dnd.Selector api.
 
 		constructor: function() {
 			var sel = this.grid.selection;
-			// summary:
-			//		Initialization
-			// tags:
-			//		private
+
+			// note: grid rows (nodes) do not have an id attribute -> The grid.Selection uses the rowIndex instead
+			// -> Create own dictionary object keyed by ids of selected nodes as required by the dnd.Selector api.
 			this.selection = {};	// maps node.id to lookup to find dndItem from rowNode.
 
 			this.events.push(
-				aspect.after(sel, 'selected', this.addToSelection),
-				aspect.after(sel, 'deselected', this.removeFromSelection),
-				/*on(this.grid, 'RowDblClick', this, function(evt) {
-					this.removeFromSelection(evt.rowIndex);
-				}),*/
-				// add selection also on right click context menu
-				this.grid.on('rowMouseDown', dojo.hitch(this, function(evt) {
+				aspect.after(sel, 'onSelected', lang.hitch(this, this.addToSelection), true),
+				aspect.after(sel, 'onDeselected', lang.hitch(this, this.removeFromSelection), true),
+
+			   // add selection also on right click context menu
+				this.grid.on('rowMouseDown', lang.hitch(this, function(evt) {
+					//var selection = this.grid.selection;
 					if (!mouse.isRight(evt)) {
 						return;
 					}
-					if ((!connect.isCopyKey(evt) && !evt.shiftKey) && !this.selection.selected[evt.rowIndex]) {
-						this.selection.deselectAll();
+					if ((!connect.isCopyKey(evt) && !evt.shiftKey) && !sel.selected[evt.rowIndex]) {
+						sel.deselectAll();
 					}
-					this.selection.setSelected(evt.rowIndex, true);
+					sel.setSelected(evt.rowIndex, true);
 				}))
 			);
 		},
