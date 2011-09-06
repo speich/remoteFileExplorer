@@ -2,6 +2,7 @@ define([
 	'dojo/_base/array',
 	'dojo/_base/lang',
 	'dojo/_base/declare',
+	'dojo/aspect',
 	'dojo/on',
 	'dojo/_base/event',
 	'dojo/dom-construct',
@@ -10,8 +11,7 @@ define([
 	'dojo/store/JsonRest',
 	'rfe/StoreFileCache',
 	'dijit/Tree',
-	'rfe/dnd/Tree',
-	'rfe/dnd/TreeSource',
+	'dijit/tree/dndSource',
 	'rfe/Grid',
 	'rfe/dnd/GridSource',
 	'dijit/registry',
@@ -29,7 +29,7 @@ define([
 	"dijit/form/Button",
 	"dijit/form/CheckBox",
 	"dijit/Dialog"
-], function(array, lang, declare, on, event, construct, query, Memory, JsonRest, StoreFileCache, Tree, dndTree, TreeSource,
+], function(array, lang, declare, aspect, on, event, construct, query, Memory, JsonRest, StoreFileCache, Tree, TreeSource,
 									  Grid, GridSource, registry,
 									  BorderContainer, ContentPane, MenuBar, MenuBarItem, PopupMenuBarItem, Menu, MenuItem, MenuSeparator,
 									  PopupMenuItem, CheckedMenuItem, Toolbar, Button, CheckBox, Dialog) {
@@ -63,9 +63,6 @@ define([
 			initTree: function(id, store) {
 				var tree, dnd;
 
-				// TODO. don't make this a class, only a function to extend the tree?
-				new dndTree(); 	// setups the dnd for the tree
-
 				tree = new Tree({
 					id: id,
 					model: store,
@@ -98,22 +95,14 @@ define([
 					store: null
 				});
 
-				structure = [
-					/*{
-					 name:  null,
-					 field: '_item', 	// there is a bug in 1.5 that prevents sorting on _item
-					 formatter: this.formatImg,
-					 width: '5%'
-					 }, */
-					{
-						name: "name",
-						field: 'name',
-						width: '35%',
-						formatter: function(value, idx) {
-							var item = this.grid.getItem(idx);
-							return this.grid.formatImg(item);
-						}
-					},{
+				structure = [{
+					name: "name",
+					field: 'name',
+					formatter: function(value, idx) {
+						var item = this.grid.getItem(idx);
+						return this.grid.formatImg(item);
+					},
+					width: '35%'},{
 						name: "size",
 						field: "size",
 						formatter: function(value) {
@@ -322,8 +311,9 @@ define([
 					checked: true,
 					onClick: lang.hitch(this, this.toggleTreePane)
 				}));
-				on('rfe/menuView/setView', registry.byId('rfeMenuItemFolders'), function() {
-					this.set('checked', true);
+				on('rfe/menuView/setView', function() {
+					var el = registry.byId('rfeMenuItemFolders')
+					el.set('checked', true);
 				});
 
 				// ********** menu tools ***************
@@ -378,7 +368,7 @@ define([
 					gutters: false
 
 				}, id);
-				on(panes.borderContainer.domNode, 'oncontextmenu', function(evt) {
+				on(panes.borderContainer.domNode, 'contextmenu', function(evt) {
 					event.stop(evt);
 				});
 				panes.menuPane = new ContentPane({
@@ -420,11 +410,13 @@ define([
 						}));
 					})
 				}));
-				on(this, 'showItemChildrenInGrid', registry.byId('rfeButtonDirectoryUp'), function(item) {
-					this.set('disabled', item == tree.rootNode.item);
-				});
-				on(this.grid, 'onRowDblClick', registry.byId('rfeButtonDirectoryUp'), function(item) {
-					this.set('disabled', item == tree.rootNode.item);
+				aspect.after(this, 'showItemChildrenInGrid', function(item) {
+					var button = registry.byId('rfeButtonDirectoryUp');
+					button.set('disabled', item == tree.rootNode.item);
+				}, true);
+				this.grid.on('RowDblClick', function(item) {
+					var button = registry.byId('rfeButtonDirectoryUp');
+					button.set('disabled', item == tree.rootNode.item);
 				});
 
 				toolbar.addChild(new Button({
@@ -437,12 +429,12 @@ define([
 						this.goHistory('back');
 					})
 				}));
-				on(this, 'setHistory', this, function() {
+				aspect.after(this, 'setHistory', dojo.hitch(this, function() {
 					registry.byId('rfeButtonHistoryBack').set('disabled', this.history.steps.length < 2);
-				});
-				on(this, 'goHistory', this, function() {
+				}));
+				aspect.after(this, 'goHistory', dojo.hitch(this, function() {
 					registry.byId('rfeButtonHistoryBack').set('disabled', this.history.curIdx < 1);
-				});
+				}));
 
 				toolbar.addChild(new dijit.form.Button({
 					id: 'rfeButtonHistoryForward',
@@ -454,7 +446,7 @@ define([
 						this.goHistory('forward');
 					})
 				}));
-				on(this, 'goHistory', this, function() {
+				aspect.after(this, 'goHistory', function() {
 					registry.byId('rfeButtonHistoryForward').set('disabled', this.history.curIdx > this.history.steps.length - 2);
 				});
 				toolbar.addChild(new Button({
@@ -481,7 +473,8 @@ define([
 						'<div id="rfeDialogAboutText">' +
 						'<h2>Remote File Explorer (rfe)</h2>' +
 						'<p>version ' + this.version + ' - ' + this.versionDate + '</p>' +
-						'<p>Created by <a href="http://www.speich.net">Simon Speich</a>, www.speich.net</p>' +
+						'<p>Created by <a href="http://www.speich.net">Simon Speich</a>, www.speich.net using the ' +
+						'<a href="http://www.dojotoolkit.org">dojotoolkit</a> and <a href="http://www.php.net">PHP</a>.</p>' +
 						'<p>Can be used and altered freely as long as this dialog with logo and link is included.</p>' +
 						'</div>'
 					});

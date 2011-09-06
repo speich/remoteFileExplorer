@@ -1,11 +1,8 @@
 define([
-	"dojo/_base/lang",
 	'dojo/_base/array',
-	'dojo/_base/declare',
-	"dijit/tree/_dndSelector"
-], function(lang, array, declare, _dndSelector) {
-
-	// TODO: make right click (context menu) select the tree node (also see dnd/GridSelector.js)
+	'dojo/_base/lang',
+	'original/dijit/tree/_dndSelector'
+], function(array, lang, _dndSelector) {
 
 	// set references to call be able to call overriden methods
 	var ref = _dndSelector.prototype;
@@ -13,28 +10,20 @@ define([
 	var oldMouseUp = ref.onMouseUp;
 	var oldMouseMove = ref.onMouseMove;
 
-	return declare("rfe.dnd.Tree", null, {
 
-		constructor: function() {
+	// TODO: make right click (context menu) select the tree node (also see dnd/GridSelector.js)
+	return _dndSelector.extend({
+		_markedNode: null,
+		_doMarkNode: false,
+		getSelectedNodes: ref.getSelectedTreeNodes,  // TODO: why doesn' tree._dndSelector not use this instead?
 
-			lang.extend(_dndSelector, {
-				_markedNode: null,
-				_doMarkNode: false,
-				setSelection: this.setSelection,
-				onMouseDown: this.onMouseDown,
-				onMouseUp: this.onMouseUp,
-				onMouseMove: this.onMouseMove,
-				getSelectedNodes: ref.getSelectedTreeNodes  // TODO: why doesn' tree._dndSelector not use this instead?
-			});
-		},
-		
 		onMouseDown: function(e) {
 			oldMouseDown.apply(this, arguments);
 			this._doMarkNode = true;
 		},
 
 		onMouseUp: function(e) {
-			// Prevent selecting onMouseDown -> move to onMouseUp, but not when dragging
+			// Prevent selecting onMouseDown -> move to onMouseUp, but not when dragging (-> set to false onMouseMove())
 			if (this._doMarkNode) {
 				var selection = this.getSelectedTreeNodes();
 				var i = 0, len = selection.length;
@@ -55,7 +44,7 @@ define([
 			this._doMarkNode = false;
 		},
 
-		setSelection: function(/*dijit._treeNode[]*/ newSelection) {
+		setSelection: function(newSelection) {
 			var oldSelection = this.getSelectedTreeNodes();
 			array.forEach(this._setDifference(oldSelection, newSelection), lang.hitch(this, function(node) {
 				if (this._markedNode != node) {

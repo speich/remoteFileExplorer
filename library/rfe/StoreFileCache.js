@@ -46,6 +46,8 @@ define('rfe/StoreFileCache', [
 			var self = this;
 			return Deferred.when(this.refPut.apply(this, arguments), function(id) {
 				self.onChange(item);	// notifies the tree (e.g. renamed an item)
+				// TODO: find out if this is necessary
+				//self.onChildrenChange(item, self.getChildren(item));	// do we need this?
 				return id;
 			}, function() {
 				self.revert();

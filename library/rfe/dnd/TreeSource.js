@@ -1,37 +1,20 @@
 define([
 	'dojo/_base/lang',
-	"dojo/_base/array",
-	"dojo/_base/declare",
 	'dojo/_base/Deferred',
-	'dojo/_base/connect',
 	'dojo/on',
 	'dojo/dom-class',
-	"dijit/tree/_dndSelector",
+	'original/dijit/tree/dndSource',
 	'dojo/dnd/Manager'
-], function(lang, array, declare, Deferred, connect, on, domClass, _dndSelector, dndManager) {
+], function(lang, Deferred, on, domClass, dndSource, dndManager) {
 
-		return declare("rfe.dnd.TreeSource", _dndSelector, {
-			// summary:
-			//		Handles drag and drop operations (as a source or a target) for `dijit.Tree`
-
-			// isSource: [private] Boolean
-			//		Can be used as a DnD source.
-			isSource: true,
+		return dndSource.extend({
 
 			// accept: String[]
 			//		List of accepted types (text strings) for the Tree; defaults to
 			//		["text"]
 			accept: ['treeNode', 'gridNode'],
 
-			// copyOnly: [private] Boolean
-			//		Copy items, if true, use a state of Ctrl key otherwise
-			copyOnly: false,
-
-			// dragThreshold: Number
-			//		The move delay in pixels before detecting a drag; 5 by default
-			dragThreshold: 5,
-
-			constructor: function(/*dijit.Tree*/ tree, /*dijit.tree.__SourceArgs*/ params) {
+			constructor: function(tree, params) {
 				// summary:
 				//		a constructor of the Tree DnD Source
 				// tags:
@@ -60,10 +43,10 @@ define([
 
 				// set up events
 				this.topics = [
-					on("/dnd/source/over", this, "onDndSourceOver"),
-					on("/dnd/start", this, "onDndStart"),
-					on("/dnd/drop", this, "onDndDrop"),
-					on("/dnd/cancel", this, "onDndCancel")
+					on("/dnd/source/over", lang.hitch(this, "onDndSourceOver")),
+					on("/dnd/start", lang.hitch(this, "onDndStart")),
+					on("/dnd/drop", lang.hitch(this, "onDndDrop")),
+					on("/dnd/cancel", lang.hitch(this, "onDndCancel"))
 				];
 			},
 
@@ -80,25 +63,6 @@ define([
 					}
 				}
 				return false;
-			},
-
-			copyState: function(keyPressed) {
-				// summary:
-				//		Returns true, if we need to copy items, false to move.
-				//		It is separated to be overwritten dynamically, if needed.
-				// keyPressed: Boolean
-				//		The "copy" control key was pressed
-				// tags:
-				//		protected
-				return this.copyOnly || keyPressed;	// Boolean
-			},
-
-			destroy: function() {
-				// summary:
-				//		Prepares the object to be garbage-collected.
-				this.inherited("destroy", arguments);
-				array.forEach(this.topics, remove);
-				this.targetAnchor = null;
 			},
 
 			_onDragMouse: function(e) {
@@ -127,127 +91,6 @@ define([
 
 					this.targetAnchor = newTarget;
 				}
-			},
-
-			onMouseMove: function(e) {
-				// summary:
-				//		Called for any onmousemove/ontouchmove events over the Tree
-				// e: Event
-				//		onmousemouse/ontouchmove event
-				// tags:
-				//		private
-				if (this.isDragging && this.targetState == "Disabled") {
-					return;
-				}
-				this.inherited(arguments);
-				var m = dndManager.manager();
-				if (this.isDragging) {
-					this._onDragMouse(e);
-				} else {
-					if (this.mouseDown && this.isSource &&
-					(Math.abs(e.pageX - this._lastX) >= this.dragThreshold || Math.abs(e.pageY - this._lastY) >= this.dragThreshold)) {
-						var nodes = this.getSelectedTreeNodes();
-						if (nodes.length) {
-							if (nodes.length > 1) {
-								//filter out all selected items which has one of their ancestor selected as well
-								var seen = this.selection, i = 0, r = [], n, p;
-								nextitem: while ((n = nodes[i++])) {
-									for (p = n.getParent(); p && p !== this.tree; p = p.getParent()) {
-										if (seen[p.id]) { //parent is already selected, skip this node
-											continue nextitem;
-										}
-									}
-									//this node does not have any ancestors selected, add it
-									r.push(n);
-								}
-								nodes = r;
-							}
-							nodes = array.map(nodes, function(n) {
-								return n.domNode
-							});
-							m.startDrag(this, nodes, this.copyState(connect.isCopyKey(e)));
-						}
-					}
-				}
-			},
-
-			onMouseDown: function(e) {
-				// summary:
-				//		Event processor for onmousedown/ontouchstart
-				// e: Event
-				//		onmousedown/ontouchend event
-				// tags:
-				//		private
-				this.mouseDown = true;
-				this.mouseButton = e.button;
-				this._lastX = e.pageX;
-				this._lastY = e.pageY;
-				this.inherited(arguments);
-			},
-
-			onMouseUp: function(e) {
-				// summary:
-				//		Event processor for onmouseup/ontouchend
-				// e: Event
-				//		onmouseup/ontouchend event
-				// tags:
-				//		private
-				if (this.mouseDown) {
-					this.mouseDown = false;
-					this.inherited(arguments);
-				}
-			},
-
-			onMouseOut: function() {
-				// summary:
-				//		Event processor for when mouse is moved away from a TreeNode
-				// tags:
-				//		private
-				this.inherited(arguments);
-				this._unmarkTargetAnchor();
-			},
-
-			// topic event processors
-			onDndSourceOver: function(source) {
-				// summary:
-				//		Topic event processor for /dnd/source/over, called when detected a current source.
-				// source: Object
-				//		The dijit.tree.dndSource / dojo.dnd.Source which has the mouse over it
-				// tags:
-				//		private
-				if (this != source) {
-					this.mouseDown = false;
-					this._unmarkTargetAnchor();
-				} else if (this.isDragging) {
-					var m = dndManager.manager();
-					m.canDrop(false);
-				}
-			},
-
-			onDndStart: function(source, nodes, copy) {
-				// summary:
-				//		Topic event processor for /dnd/start, called to initiate the DnD operation
-				// source: Object
-				//		The dijit.tree.dndSource / dojo.dnd.Source which is providing the items
-				// nodes: DomNode[]
-				//		The list of transferred items, dndTreeNode nodes if dragging from a Tree
-				// copy: Boolean
-				//		Copy items, if true, move items otherwise
-				// tags:
-				//		private
-
-				if (this.isSource) {
-					this._changeState("Source", this == source ? (copy ? "Copied" : "Moved") : "");
-				}
-				var accepted = this.checkAcceptance(source, nodes);
-
-				this._changeState("Target", accepted ? "" : "Disabled");
-
-				if (this == source) {
-					dndManager.manager().overSource(this);
-				}
-
-				this.isDragging = true;
 			},
 
 			onDndDrop: function(source, nodes, copy, target) {
@@ -308,97 +151,8 @@ define([
 						source.removeFromSelection(this.data.gridRowIndex);	// will call removeFromSelection
 					}))
 				}
-			},
-
-			onDndCancel: function() {
-				// summary:
-				//		Topic event processor for /dnd/cancel, called to cancel the DnD operation
-				// tags:
-				//		private
-				this._unmarkTargetAnchor();
-				this.isDragging = false;
-				this.mouseDown = false;
-				delete this.mouseButton;
-				this._changeState("Source", "");
-				this._changeState("Target", "");
-			},
-
-			// When focus moves in/out of the entire Tree
-			onOverEvent: function() {
-				// summary:
-				//		This method is called when mouse is moved over our container (like onmouseenter)
-				// tags:
-				//		private
-				this.inherited(arguments);
-				dndManger.manager().overSource(this);
-			},
-
-			onOutEvent: function() {
-				// summary:
-				//		This method is called when mouse is moved out of our container (like onmouseleave)
-				// tags:
-				//		private
-				this._unmarkTargetAnchor();
-				var m = dndManager.manager();
-				if (this.isDragging) {
-					m.canDrop(false);
-				}
-				m.outSource(this);
-
-				this.inherited(arguments);
-			},
-
-			_isParentChildDrop: function(source, targetRow) {
-				// summary:
-				//		Checks whether the dragged items are parent rows in the tree which are being
-				//		dragged into their own children.
-				//
-				// source:
-				//		The DragSource object.
-				//
-				// targetRow:
-				//		The tree row onto which the dragged nodes are being dropped.
-				//
-				// tags:
-				//		private
-
-				// If the dragged object is not coming from the tree this widget belongs to,
-				// it cannot be invalid.
-				if (!source.tree || source.tree != this.tree) {
-					return false;
-				}
-
-				var root = source.tree.domNode;
-				var ids = source.selection;
-
-				var node = targetRow.parentNode;
-
-				// Iterate up the DOM hierarchy from the target drop row,
-				// checking of any of the dragged nodes have the same ID.
-				while (node != root && !ids[node.id]) {
-					node = node.parentNode;
-				}
-
-				return node.id && ids[node.id];
-			},
-
-			_unmarkTargetAnchor: function() {
-				// summary:
-				//		Removes hover class of the current target anchor
-				// tags:
-				//		private
-				if (!this.targetAnchor) {
-					return;
-				}
-				this.targetAnchor = null;
-			},
-
-			_markDndStatus: function(copy) {
-				// summary:
-				//		Changes source's state based on "copy" status
-				this._changeState("Source", copy ? "Copied" : "Moved");
 			}
-		});
 
+		});
 
 });

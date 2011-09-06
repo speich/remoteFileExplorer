@@ -2,6 +2,7 @@ define([
 	'dojo/_base/lang',
 	'dojo/_base/array',
 	'dojo/_base/declare',
+	'dojo/_base/Deferred',
 	'dojo/on',
 	'dojo/mouse',
 	'dojo/dom',
@@ -10,7 +11,7 @@ define([
 	'dijit/Menu',
 	'dijit/MenuItem',
 	'dijit/PopupMenuItem'
-], function(lang, array, declare, on, mouse, dom, domClass, registry, Menu, MenuItem, PopupMenuItem) {
+], function(lang, array, declare, Deferred, on, mouse, dom, domClass, registry, Menu, MenuItem, PopupMenuItem) {
 
 	return declare('rfe.Edit', null, {
 		edit: {
@@ -35,7 +36,7 @@ define([
 
 			array.forEach(menu.targetNodeIds, function(id) {
 				var domNode = dom.byId(id);
-				on(domNode, 'mousedown', function(evt) {
+				on(domNode, 'mousedown', lang.hitch(this, function(evt) {
 					if (!mouse.isRight(evt)) {
 						return;
 					}
@@ -44,8 +45,8 @@ define([
 
 					var widget = registry.getEnclosingWidget(evt.target);
 					console.log(widget, evt.target, widget.item)
+					// TODO: find generic solution for this instead of using id
 					if (widget.id == 'rfeContentPaneTree') {
-						// TODO: find generic solution for this instead of using id
 						widget = this.tree
 					}
 					else {
@@ -68,7 +69,7 @@ define([
 							item.set('disabled', false);
 						});
 					}
-				});
+				}));
 			}, this);
 
 			menu.addChild(PopupMenuItem({
@@ -117,6 +118,8 @@ define([
 			var self = this;
 			var i = 0, item, dndItem, nodes, len;
 
+			// TODO: whould be nice if we didn't depend on dnd for editing.
+			// This is out of convenience to have one method to get the selected nodes instead of a widget specific
 			nodes = dnd.getSelectedNodes();
 			len = nodes.length;
 			for (; i < len; i++) {
@@ -124,7 +127,7 @@ define([
 				item = dndItem.data.item;
 				Deferred.when(store.remove(item.id), function() {
 					self.removeHistory(item.id);
-					// When deleting folder in tree, grid is not updated by store.onDelete() since grid only contains folders chilren!
+					// When deleting folder in tree, grid is not updated by store.onDelete() since grid only contains folders children!
 					if (item.dir && self.edit.contextWidget == self.tree) {
 						self.grid._refresh();   // note: grid._refresh has a timeout, so it doesn't matter to call it in rapid succession
 					}
