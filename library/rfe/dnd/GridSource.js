@@ -3,10 +3,11 @@ define([
 	"dojo/_base/declare",
 	'dojo/_base/Deferred',
 	'dojo/on',
+	'dojo/topic',
 	'dojo/dom-class',
 	"rfe/dnd/GridSelector",
 	"dojo/dnd/Manager"
-], function(lang, declare, Deferred, on, domClass, GridSelector, Manager) {
+], function(lang, declare, Deferred, on, topic, domClass, GridSelector, Manager) {
 
 	return declare("rfe.dnd.GridSource", GridSelector, {
 		// summary: a Source object, which can be used as a DnD source, or a DnD target
@@ -21,7 +22,8 @@ define([
 
 			lang.mixin(this, params || {});
 
-			var type = this.accept;	// create accepted types as properties of accept, which can be checkt in checkAcceptance
+			var type = params.accept instanceof Array ? params.accept : ['treeNode', 'gridNode'];
+			this.accept = null;
 			if (type.length){
 				this.accept = {};
 				for (var i = 0; i < type.length; ++i) {
@@ -42,10 +44,10 @@ define([
 
 			// set up events
 			this.topics = [
-				on("/dnd/source/over", lang.hitch(this, "onDndSourceOver")),
-				on("/dnd/start", lang.hitch(this, "onDndStart")),
-				on("/dnd/drop", lang.hitch(this, "onDndDrop")),
-				on("/dnd/cancel", lang.hitch(this, "onDndCancel"))
+				topic.on("/dnd/source/over", lang.hitch(this, "onDndSourceOver")),
+				topic.on("/dnd/start", lang.hitch(this, "onDndStart")),
+				topic.on("/dnd/drop", lang.hitch(this, "onDndDrop")),
+				topic.on("/dnd/cancel", lang.hitch(this, "onDndCancel"))
 			];
 			this.events.push(
 				on(this.domNode, "mousedown", lang.hitch(this, "onMouseDown")),
@@ -191,7 +193,7 @@ define([
 				this.onDrop(source, nodes, copy, target);
 			}
 			else if (this == source && !copy) {
-				console.log('inDndRop: dropped outside of grid')
+				console.log('inDndDrop: dropped outside of grid')
 			}
 			this.onDndCancel();
 		},
