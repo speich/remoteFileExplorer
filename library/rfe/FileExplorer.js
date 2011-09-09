@@ -4,11 +4,12 @@ define([
 	'dojo/_base/Deferred',
 	'dojo/keys',
 	'dojo/dom',
+	'dojo/dom-class',
 	'dojo/date/locale',
 	'dijit/registry',
 	'rfe/Layout',
 	'rfe/Edit'
-], function(lang, declare, Deferred, keys, dom, locale, registry, Layout, Edit) {
+], function(lang, declare, Deferred, keys, dom, domClass, locale, registry, Layout, Edit) {
 	/**
 	 * File explorer allows you to browse files.
 	 *
@@ -53,6 +54,7 @@ define([
 			tree.on('load', lang.hitch(this, function() {
 				var root = tree.rootNode;
 				var item = root.item;
+//				this.tree.set('path', ['root']);
 		//		root.setSelected(true); // root is never deselected again
 		//		tree.focusNode(root);
 				this.showItemChildrenInGrid(item);
@@ -291,6 +293,34 @@ define([
 			else {
 				return null;
 			}
+		},
+
+		/**
+		 * Returns an object describing on which part of the file explorer we are on
+		 * @param {Event} evt
+		 * @return {Object}
+		 */
+		getWidget: function(evt) {
+			// find in which pane (of grid/tree) we are and if we are over the grid/tree or below
+			// TODO: find better solution for this
+			var obj = {};
+			var widget = registry.getEnclosingWidget(evt.target);
+			if (domClass.contains(widget.domNode, 'dijitTreeNode')) {
+				obj.isOnTree = true;
+				obj.widget = widget.tree;
+			}
+			else if (domClass.contains(widget.domNode, 'dijitContentPane')) {
+				obj.isOnTreePane = true;
+				obj.widget = widget.tree;
+			}
+			else if (domClass.contains(widget.domNode, 'dojoxGridCell')) {
+				obj.isOnGrid = true;
+				obj.widget = widget.grid || widget.tree;
+			}
+			else if (domClass.contains(widget.domNode, 'dojoxGridScrollbox')) {
+				obj.isOnGridPane = true;	// = scrollbox
+			}
+			return obj;
 		}
 
 	});
