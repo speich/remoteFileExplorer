@@ -6,12 +6,11 @@ define([
 	'dojo/on',
 	'dojo/mouse',
 	'dojo/dom',
-	'dojo/dom-class',
 	'dijit/registry',
 	'dijit/Menu',
 	'dijit/MenuItem',
 	'dijit/PopupMenuItem'
-], function(lang, array, declare, Deferred, on, mouse, dom, domClass, registry, Menu, MenuItem, PopupMenuItem) {
+], function(lang, array, declare, Deferred, on, mouse, dom, registry, Menu, MenuItem, PopupMenuItem) {
 
 	return declare('rfe.Edit', null, {
 		edit: {
@@ -34,41 +33,17 @@ define([
 			// Override to enable context menu, since grid stops this event by default
 			this.grid.onCellContextMenu = function() {};
 
+			// Enable/disable menu items:
 			array.forEach(menu.targetNodeIds, function(id) {
-				var domNode = dom.byId(id);
+				var widget, domNode = dom.byId(id);
+
 				on(domNode, 'mousedown', lang.hitch(this, function(evt) {
 					if (!mouse.isRight(evt)) {
 						return;
 					}
-
-					var isOnWidget = false;
-
-					var widget = registry.getEnclosingWidget(evt.target);
-					console.log(widget, evt.target, widget.item)
-					// TODO: find generic solution for this instead of using id
-					if (widget.id == 'rfeContentPaneTree') {
-						widget = this.tree
-					}
-					else {
-						widget = widget.grid || widget.tree;
-					}
-
-					this.edit.contextWidget = widget;
-					isOnWidget = widget && widget.dndController.getSelectedNodes().length > 0;
-					// If not clicked on a item (tree.node or grid.row), but below widget,
-					// and nothing is selected, then set all menuItems to disabled except create/upload
-					if (!isOnWidget) {
-						array.filter(menu.getChildren(), function(item) {
-							if (item.get('label') != 'New' && item.get('label') != 'Upload') {
-								item.set('disabled', true);
-							}
-						});
-					}
-					else {
-						array.forEach(menu.getChildren(), function(item) {
-							item.set('disabled', false);
-						});
-					}
+					widget = this.getWidget(evt);
+					this.enableContextMenuItems(menu, widget);
+					this.edit.contextWidget = widget.widget;
 				}));
 			}, this);
 
@@ -102,6 +77,29 @@ define([
 
 			menu.startup();
 			this.edit.contextMenu = menu;
+
+		},
+
+		/**
+		 * Enables or disables context menu items depending on the clicked context.
+		 * @param {dijit.Menu} menu
+		 * @param {object} widget
+		 */
+		enableContextMenuItems: function(menu, widget) {
+			// If not clicked on a item (tree.node or grid.row), but below widget and nothing is selected,
+			// then set all menuItems to disabled except create/upload
+			if (widget.isOnTree || widget.isOnTreePane) {
+				array.filter(menu.getChildren(), function(item) {
+					if (item.get('label') != 'New' && item.get('label') != 'Upload') {
+						item.set('disabled', true);
+					}
+				});
+			}
+			else {
+				array.forEach(menu.getChildren(), function(item) {
+					item.set('disabled', false);
+				});
+			}
 		},
 
 		/**
