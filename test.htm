@@ -2,40 +2,85 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Remote File Explorer (rfe)</title>
-<style type="text/css">
-@import "library/dojo/dijit/themes/claro/claro.css";
-</style>
-
+<link rel="stylesheet" type="text/css" href="library/dojo-trunk/dijit/themes/claro/claro.css"/>
 </head>
-<body class="claro">
-<div id="remoteFileExplorer"></div>
-<script type="text/javascript">
-var djConfig = {
-	isDebug: false,
-	parseOnLoad: false,
-	locale: 'de',
-	baseUrl: '/library/dojo/dojo/',
-	modulePaths: {
-		rfe: '/library/rfe/'
-	},
-	useCommentedJson: true
-};
-</script>
-<script src="library/dojo/dojo/dojo.js" type="text/javascript"></script>
 
+<body class="claro">
+<div id="treeCont"></div>
+<script src="library/dojo-trunk/dojo/dojo.js" data-dojo-config="async: 1"></script>
 <script type="text/javascript">
-dojo.require('dojo.store.Memory');
-dojo.ready(function() {
-	var i = 0, len = 1000000;
-	var obj, store, res, id;
-	store = new dojo.store.Memory({});
-	for (; i < len; i++) {
-		store.add({
-			id: i,
-			name: 'someProp'
-		});
-	}
+var storeData = {
+	identifier: 'name',
+	label: 'name',
+  	items: [{ name:'Africa', type:'continent', children:[
+		{ name:'Egypt', type:'country' },
+		{ name:'Kenya', type:'country', children:[
+			{ name:'Nairobi', type:'city' },
+			{ name:'Mombasa', type:'city' } ]
+		},
+		{ name:'Sudan', type:'country', children:
+			{ name:'Khartoum', type:'city' }
+		} ]
+	},
+	{ name:'Asia', type:'continent', children:[
+		{ name:'China', type:'country' },
+		{ name:'India', type:'country' },
+		{ name:'Russia', type:'country' },
+		{ name:'Mongolia', type:'country' } ]
+	},
+	{ name:'Australia', type:'continent', population:'21 million', children:
+		{ name:'Commonwealth of Australia', type:'country', population:'21 million'}
+	},
+	{ name:'Europe', type:'continent', children:[
+		{ name:'Germany', type:'country' },
+		{ name:'France', type:'country' },
+		{ name:'Spain', type:'country' },
+		{ name:'Italy', type:'country' } ]
+	},
+	{ name:'North America', type:'continent', children:[
+		{ name:'Mexico', type:'country',  population:'108 million', area:'1,972,550 sq km', children:[
+			{ name:'Mexico City', type:'city', population:'19 million', timezone:'-6 UTC'},
+			{ name:'Guadalajara', type:'city', population:'4 million', timezone:'-6 UTC' } ]
+		},
+		{ name:'Canada', type:'country',  population:'33 million', area:'9,984,670 sq km', children:[
+			{ name:'Ottawa', type:'city', population:'0.9 million', timezone:'-5 UTC'},
+			{ name:'Toronto', type:'city', population:'2.5 million', timezone:'-5 UTC' }]
+		},
+		{ name:'United States of America', type:'country' } ]
+	},
+	{ name:'South America', type:'continent', children:[
+		{ name:'Brazil', type:'country', population:'186 million' },
+		{ name:'Argentina', type:'country', population:'40 million' } ]
+	} ]
+};
+
+
+require(["dojo/data/ItemFileReadStore", 'dijit/tree/ForestStoreModel', "dijit/Tree"],
+	function(ItemFileReadStore, ForestStoreModel, Tree) {
+	var tree = new Tree({
+		id: 'myTree',
+		openOnClick: false,
+		openOnDblClick: true,
+		showRoot: true,
+		persist: false,
+		model: new ForestStoreModel({
+			id: 'continentModel',
+			store: new ItemFileReadStore({
+				id: 'continentStore',
+				data: storeData
+			}),
+			query: {type: 'continent'},
+			rootId: 'continentRoot',
+			rootLabel: 'Continents',
+			childrenAttrs: ["children"]
+		})
+	}, 'treeCont');
+
+	tree.set('path', ['continentRoot']);
+
 });
+
+
 </script>
 </body>
 </html>

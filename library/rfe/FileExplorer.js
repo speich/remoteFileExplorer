@@ -54,9 +54,7 @@ define([
 			tree.on('load', lang.hitch(this, function() {
 				var root = tree.rootNode;
 				var item = root.item;
-//				this.tree.set('path', ['root']);
-		//		root.setSelected(true); // root is never deselected again
-		//		tree.focusNode(root);
+				this.tree.set('path', [this.store.rootId]);
 				this.showItemChildrenInGrid(item);
 				this.setHistory(item.id);
 				this.currentTreeItem = item;
@@ -81,8 +79,7 @@ define([
 
 			grid.on('rowMouseDown', lang.hitch(this, function(evt) {
 				// rowMouseDown also registeres right click
-				var item = grid.getItem(evt.rowIndex);
-				this.currentGridItem = item;
+				this.currentGridItem = grid.getItem(evt.rowIndex);
 			}));
 			grid.on('rowDblClick', lang.hitch(this, function(evt) {
 				var item = grid.getItem(evt.rowIndex);
@@ -178,6 +175,7 @@ define([
 			def.then(lang.hitch(this, function() {
 				grid.showMessage(grid.loadingMessage);
 				this.showItemChildrenInGrid(item);
+				//this.tree.getNodesByItem(item)[0].setSelected(true); set('path') should set selected...
 			}));
 			return def;
 		},

@@ -3,10 +3,9 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Remote File Explorer (rfe)</title>
+<link rel="stylesheet" type="text/css" href="library/dojo-trunk/dijit/themes/claro/claro.css"/>
+<link rel="stylesheet" type="text/css" href="library/dojo-trunk/dojox/grid/resources/claroGrid.css"/>
 <style type="text/css">
-@import "library/dojo/dijit/themes/claro/claro.css";
-@import "library/dojo/dojox/grid/resources/claroGrid.css";
-
 body {
 	font-family: Verdana, Helvetica, Arial, sans-serif;
 	font-size: 12px;
@@ -143,7 +142,7 @@ var dojoConfig = {
 
 	// redirect the following modules to my own modules
 	paths: {
-		'dijit/tree/_dndSelector': 'rfe/dnd/TreeSelector',
+//		'dijit/tree/_dndSelector': 'rfe/dnd/TreeSelector',
 		'dijit/tree/dndSource': 'rfe/dnd/TreeSource'
 	}
 

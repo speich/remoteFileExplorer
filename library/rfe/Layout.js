@@ -30,9 +30,9 @@ define([
 	"dijit/form/CheckBox",
 	"dijit/Dialog"
 ], function(array, lang, declare, aspect, on, event, construct, query, Memory, JsonRest, StoreFileCache, Tree, TreeSource,
-									  Grid, GridSource, registry,
-									  BorderContainer, ContentPane, MenuBar, MenuBarItem, PopupMenuBarItem, Menu, MenuItem, MenuSeparator,
-									  PopupMenuItem, CheckedMenuItem, Toolbar, Button, CheckBox, Dialog) {
+				Grid, GridSource, registry,
+				BorderContainer, ContentPane, MenuBar, MenuBarItem, PopupMenuBarItem, Menu, MenuItem, MenuSeparator,
+				PopupMenuItem, CheckedMenuItem, Toolbar, Button, CheckBox, Dialog) {
 
 		return declare('rfe.Layout', null, {
 			store: null,
@@ -58,7 +58,7 @@ define([
 			/**
 			 * Initializes the tree and tree dnd.
 			 * @param id
-			 * @param store
+			 * @param {rfe.StoreFileCache} store
 			 */
 			initTree: function(id, store) {
 				var tree, dnd;
@@ -75,10 +75,10 @@ define([
 				});
 
 				new TreeSource(tree, {
+					accept : ['treeNode', 'gridNode'],
 					store: store,
 					singular: true
 				});
-
 				return tree;
 			},
 
@@ -127,7 +127,6 @@ define([
 				grid.dndController = new GridSource(grid, {
 					store: store
 				});
-
 				return grid;
 			},
 
@@ -312,7 +311,7 @@ define([
 					onClick: lang.hitch(this, this.toggleTreePane)
 				}));
 				on('rfe/menuView/setView', function() {
-					var el = registry.byId('rfeMenuItemFolders')
+					var el = registry.byId('rfeMenuItemFolders');
 					el.set('checked', true);
 				});
 

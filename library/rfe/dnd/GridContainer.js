@@ -35,20 +35,6 @@ define([
 			];
 		},
 
-		// abstract access to the map
-		getItem: function(/*String*/ key) {
-			// summary: returns a data item by its key (id)
-
-			// note: key = id and not the same as rowIndex. Can be called by any other dnd source with node.id = key
-			var grid = this.grid;
-			var node = this.selection[key];
-			node.item = grid.getItem(node.gridRowIndex);
-			return {
-				data: node,
-				type: [this.dndType]
-			};
-		},
-
 		destroy: function() {
 			// summary: prepares the object to be garbage-collected
 			array.forEach(this.events, remove);

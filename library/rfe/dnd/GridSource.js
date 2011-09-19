@@ -1,13 +1,14 @@
 define([
 	'dojo/_base/lang',
-	"dojo/_base/declare",
+	'dojo/_base/array',
+	'dojo/_base/declare',
 	'dojo/_base/Deferred',
 	'dojo/on',
 	'dojo/topic',
 	'dojo/dom-class',
-	"rfe/dnd/GridSelector",
-	"dojo/dnd/Manager"
-], function(lang, declare, Deferred, on, topic, domClass, GridSelector, Manager) {
+	'rfe/dnd/GridSelector',
+	'dojo/dnd/Manager'
+], function(lang, array, declare, Deferred, on, topic, domClass, GridSelector, Manager) {
 
 	return declare("rfe.dnd.GridSource", GridSelector, {
 		// summary: a Source object, which can be used as a DnD source, or a DnD target
@@ -19,7 +20,6 @@ define([
 		copyOnly: false,
 
 		constructor: function(grid, params) {
-
 			lang.mixin(this, params || {});
 
 			var type = params.accept instanceof Array ? params.accept : ['treeNode', 'gridNode'];
@@ -38,9 +38,11 @@ define([
 
 			// states
 			this.targetState = "";
-			
-			domClass.contains(this.domNode, "dojoDndSource");
-			domClass.contains(this.domNode, "dojoDndTarget");
+			this.sourceState = "";
+			domClass.add(this.domNode, "dojoDndSource");
+			if (this.accept){
+				domClass.add(this.domNode, "dojoDndTarget");
+			}
 
 			// set up events
 			this.topics = [
@@ -85,8 +87,11 @@ define([
 
 		destroy: function() {
 			// summary: prepares the object to be garbage-collected
+			var h;
 			this.inherited("destroy", arguments);
-			array.forEach(this.topics, remove);
+			while (h = this.topics.pop()) {
+				h.remove();
+			}
 			this.targetAnchor = null;
 		},
 

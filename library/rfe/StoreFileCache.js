@@ -18,7 +18,8 @@ define('rfe/StoreFileCache', [
 		childrenAttr: 'dir',
 		parentAttr: 'parId',
 		labelAttr: 'name',
-		rootId: 'root',
+		rootId: 'root',	// for tree
+		rootLabel: 'web root',		// for tree
 		skipWithNoChildren: true, // getChildren returns only folders
 
 		/**
