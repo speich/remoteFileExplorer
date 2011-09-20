@@ -121,7 +121,6 @@ body {
 var dojoConfig = {
 	async: true,
 	baseUrl: '/library',
-
 	packages: [{
 			'name': 'dojo',
 			'location': 'dojo-trunk/dojo'
@@ -142,11 +141,9 @@ var dojoConfig = {
 
 	// redirect the following modules to my own modules
 	paths: {
-//		'dijit/tree/_dndSelector': 'rfe/dnd/TreeSelector',
+		'dijit/tree/_dndSelector': 'rfe/dnd/TreeSelector',
 		'dijit/tree/dndSource': 'rfe/dnd/TreeSource'
 	}
-
-
 };
 
 </script>
