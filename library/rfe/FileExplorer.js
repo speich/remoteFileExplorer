@@ -303,11 +303,11 @@ define([
 			// TODO: find better solution for this
 			var obj = {};
 			var widget = registry.getEnclosingWidget(evt.target);
-			if (domClass.contains(widget.domNode, 'dijitTreeNode')) {
+			if (widget.id == 'rfeTree') {
 				obj.isOnTree = true;
 				obj.widget = widget.tree;
 			}
-			else if (domClass.contains(widget.domNode, 'dijitContentPane')) {
+			else if (widget.id == 'rfeContentPaneTree') {
 				obj.isOnTreePane = true;
 				obj.widget = widget.tree;
 			}

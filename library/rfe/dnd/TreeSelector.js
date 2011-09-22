@@ -28,12 +28,12 @@ define([
 		getSelectedNodes: ref.getSelectedTreeNodes,	// map two dnd method
 
 		onMouseDown: function(evt) {
+			// note: Overriding to remove doing nothing on right click and also to remove stopping event (we need to bubble up
+			// to know where user clicked at in FileExplorer.getWidget
 			this._selectByMouse = true;
 
 			// ignore click on expando node
 			if(!this.current || this.tree.isExpandoNode(evt.target, this.current)){ return; }
-
-			event.stop(evt);
 
 			var treeNode = this.current,
 			  copy = connect.isCopyKey(evt), id = treeNode.id;

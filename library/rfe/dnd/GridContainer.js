@@ -92,6 +92,12 @@ define([
 			// tags:
 			//		protected
 			this._changeState("Container", "");
+		},
+
+		_normalizedCreator: function(/*dojo.dnd.Item*/ item, /*String*/ hint){
+			var t = this.creator.call(this, item, hint);
+			dojo.addClass(t.node, "dojoDndItem");
+			return t;
 		}
 
 	});

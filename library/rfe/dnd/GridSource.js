@@ -40,9 +40,7 @@ define([
 			this.targetState = "";
 			this.sourceState = "";
 			domClass.add(this.domNode, "dojoDndSource");
-			if (this.accept){
-				domClass.add(this.domNode, "dojoDndTarget");
-			}
+			domClass.add(this.domNode, "dojoDndTarget");
 
 			// set up events
 			this.topics = [

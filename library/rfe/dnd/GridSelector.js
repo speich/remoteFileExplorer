@@ -1,3 +1,6 @@
+/**
+ * Modeled after dijit.tree._dndSelector
+ */
 define([
 	"dojo/_base/declare",
 	'dojo/_base/lang',
@@ -36,10 +39,8 @@ define([
 			);
 		},
 
-		// abstract access to the map
-		getItem: function(/*String*/ key) {
+		getItem: function(key) {
 			// summary: returns a data item by its key (id)
-
 			// note: key = id and not the same as rowIndex. Can be called by any other dnd source with node.id = key
 			var grid = this.grid;
 			var node = this.selection[key];
@@ -60,25 +61,24 @@ define([
 
 		/**
 		 * Add node to selection map.
-		 * Grid rows don't have an id. But we need one to be able to return the corresponding
-		 * dnd.item (other dnd sources use source.getItem(id), which is expected to return a dnd.item.
 		 * @param {number} rowIndex
 		 */
 		addToSelection: function(rowIndex) {
 			console.log('addToSelection', rowIndex)
 			var grid = this.grid;
-			var item, id, node;
+			var item, node;
 
 			if (rowIndex == -1) {
 				return;
 			}
 			node = grid.getRowNode(rowIndex);
 			if (!node.id) {
+				// Grid rows don't have an id. But we need one to be able to return the corresponding
+		 		// dnd.item (other dnd sources use source.getItem(id), which is expected to return a dnd.item.
 				item = grid.getItem(rowIndex);
 				node.id = this.dndType + '_' + item.id;
-				// TODO: Move this somewhere else, probably to grid itself
 			}
-			this.selection[node.id] = node;	// this is for GridContainer.getItem to be able to return the node
+			this.selection[node.id] = node;
 		},
 
 		/**
@@ -99,8 +99,6 @@ define([
 			this.inherited(arguments);
 			this.selection = {};
 		}
-
-
 
 	});
 
