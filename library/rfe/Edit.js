@@ -15,7 +15,7 @@ define([
 	return declare('rfe.Edit', null, {
 		edit: {
 			contextMenu: null,   // reference to the context menu
-			contextWidget: null  // reference to the widget the context menu was created on (right clicked on)
+			context: null  // reference to the widget the context menu was created on (right clicked on)
 		},
 
 		/**
@@ -25,7 +25,7 @@ define([
 		initContextMenu: function() {
 			var menu = Menu({
 				id: 'rfeContextMenu',
-				targetNodeIds: ['rfeContentPaneTree','rfeGrid'],   // grid extends to same size as pane, tree not  
+				targetNodeIds: ['rfeContentPaneTree','rfeGrid'],   // grid extends to same size as pane, tree not
 				popUpDelay: 0
 			});
 			var subMenu = Menu();
@@ -33,17 +33,16 @@ define([
 			// Override to enable context menu, since grid stops this event by default
 			this.grid.onCellContextMenu = function() {};
 
-			// Enable/disable menu items:
+			// Enable/disable menu items before displaying it:
 			array.forEach(menu.targetNodeIds, function(id) {
-				var widget, domNode = dom.byId(id);
-
+				var context, domNode = dom.byId(id);
 				on(domNode, 'mousedown', lang.hitch(this, function(evt) {
 					if (!mouse.isRight(evt)) {
 						return;
 					}
-					widget = this.getWidget(evt);
-					this.enableContextMenuItems(menu, widget);
-					this.edit.contextWidget = widget.widget;
+					context = this.getContext(evt);
+					this.enableContextMenuItems(menu, context);
+					this.edit.context = context;
 				}));
 			}, this);
 
@@ -77,18 +76,17 @@ define([
 
 			menu.startup();
 			this.edit.contextMenu = menu;
-
 		},
 
 		/**
 		 * Enables or disables context menu items depending on the clicked context.
 		 * @param {dijit.Menu} menu
-		 * @param {object} widget
+		 * @param {object} context
 		 */
-		enableContextMenuItems: function(menu, widget) {
+		enableContextMenuItems: function(menu, context) {
 			// If not clicked on a item (tree.node or grid.row), but below widget and nothing is selected,
 			// then set all menuItems to disabled except create/upload
-			if (widget.isOnTree || widget.isOnTreePane) {
+			if (context.isOnTree || context.isOnTreePane) {
 				array.filter(menu.getChildren(), function(item) {
 					if (item.get('label') != 'New' && item.get('label') != 'Upload') {
 						item.set('disabled', true);
@@ -111,12 +109,13 @@ define([
 			// A. When deleting from toolbar we only use selected items from the grid (or use focus?). Currently this
 			// happens from the different menu in layout.js -> move here?
 			// B. When deleting from context menu use source to decide which selected items to use
-			var store = this.store;
-			var dnd = this.edit.contextWidget.dndController;
-			var self = this;
-			var i = 0, item, dndItem, nodes, len;
+			var self = this, store = this.store;
+			var context = this.edit.context;
+			var i = 0, item, dnd, dndItem, nodes, len;
 
-			// TODO: whould be nice if we didn't depend on dnd for editing.
+			dnd = context.isOnGrid || context.isOnGridPane ? this.grid.dndController : this.tree.dndController;
+
+			// TODO: would be nice if we didn't depend on dnd for editing.
 			// This is out of convenience to have one method to get the selected nodes instead of a widget specific
 			nodes = dnd.getSelectedNodes();
 			len = nodes.length;
@@ -126,8 +125,8 @@ define([
 				Deferred.when(store.remove(item.id), function() {
 					self.removeHistory(item.id);
 					// When deleting folder in tree, grid is not updated by store.onDelete() since grid only contains folders children!
-					if (item.dir && self.edit.contextWidget == self.tree) {
-						self.grid._refresh();   // note: grid._refresh has a timeout, so it doesn't matter to call it in rapid succession
+					if (item.dir && (context.isOnTree || context.isOnTreePane)) {
+						self.grid._refresh();   // note: grid._refresh has a timeout, so it doesn't matter to call it in rapid succession (in a loop)
 					}
 				}, function(err) {
 					console.log(err);

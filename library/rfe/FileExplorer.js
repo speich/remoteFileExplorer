@@ -298,29 +298,41 @@ define([
 		 * @param {Event} evt
 		 * @return {Object}
 		 */
-		getWidget: function(evt) {
+		getContext: function(evt) {
 			// find in which pane (of grid/tree) we are and if we are over the grid/tree or below
 			// TODO: find better solution for this
-			var obj = {};
-			var widget = registry.getEnclosingWidget(evt.target);
-			if (widget.id == 'rfeTree') {
-				obj.isOnTree = true;
-				obj.widget = widget.tree;
-			}
-			else if (widget.id == 'rfeContentPaneTree') {
-				obj.isOnTreePane = true;
-				obj.widget = widget.tree;
-			}
-			else if (domClass.contains(widget.domNode, 'dojoxGridCell')) {
-				obj.isOnGrid = true;
-				obj.widget = widget.grid || widget.tree;
-			}
-			else if (domClass.contains(widget.domNode, 'dojoxGridScrollbox')) {
-				obj.isOnGridPane = true;	// = scrollbox
+			var obj = {
+				isOnGrid: false,
+				isOnTree: false,
+				isOnTreePane: false,
+				isOnGridPane: false,
+				widget: null
+			};
+			var node = evt.target;
+			while (node && node.tagName !== "BODY") {
+				if (domClass.contains(node, 'dijitTree')) {
+					obj.isOnTree = true;
+					obj.widget = this.tree;
+					break;
+				}
+				else if (domClass.contains(node, 'dojoxGridContent')) {
+					obj.isOnGrid = true;
+					obj.widget = this.grid;
+					break;
+				}
+				else if (domClass.contains(node, 'dijitContentPane')) {
+					if (node.id == 'rfeContentPaneTree') {
+						obj.isOnTreePane = true;
+					}
+					else if (node.id == 'rfeContentPaneGrid') {
+						obj.isOnGridPane = true;
+					}
+					break;
+				}
+				node = node.parentNode;
 			}
 			return obj;
 		}
-
 	});
 
 });
