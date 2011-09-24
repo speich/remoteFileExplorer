@@ -35,7 +35,7 @@ define([
 			// ignore click on expando node
 			if(!this.current || this.tree.isExpandoNode(evt.target, this.current)){ return; }
 
-			event.stop(evt);	// prevent browser from selecting text in tree
+			evt.preventDefault(); // prevent browser from selecting text in tree, but still allows to bubble
 
 			var treeNode = this.current,
 			  copy = connect.isCopyKey(evt), id = treeNode.id;
