@@ -8,6 +8,14 @@ define([
 	'dojo/dnd/Avatar'], function(lang, window, array, construct, domClass, attr, Avatar) {
 
 		Avatar.prototype.construct = function() {
+			// preload icons
+			this.images = {};
+			this.images.folder = new Image();
+			this.images.folder.src = '/library/rfe/resources/images/folder_yellow.png';
+			this.images.files = new Image();
+			this.images.files.src = '/library/rfe/resources/images/files.png';
+			this.images.file = new Image();
+			this.images.file.src = '/library/rfe/resources/images/file.png';
 
 			this.isA11y = domClass.contains(window.body(), "dijit_a11y");
 			var a = construct.create("table", {
@@ -51,21 +59,20 @@ define([
 		};
 
 	   function createIcon() {
-			var nodes = this.manager.nodes;
+			var img, nodes = this.manager.nodes;
 			var source = this.manager.source;
 			var isDir = array.some(nodes, function(node) {
 				var item = source.getItem(node.id);
 				return item.data.item.dir;
 			}, this);
-			var img = new Image();
 			if (isDir) {
-				img.src = '/library/rfe/resources/images/folder_yellow.png'
+				img = this.images.folders;
 			}
 			else if (nodes.length > 1) {
-				img.src = '/library/rfe/resources/images/files.png'
+				img = this.images.files;
 			}
 			else {
-				img.src = '/library/rfe/resources/images/file.png'
+				img = this.images.file;
 			}
 			return img;
 		}
