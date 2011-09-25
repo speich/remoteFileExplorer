@@ -19,6 +19,8 @@ define([
 
 		copyOnly: false,
 
+		dragThreshold: 5,	// The move delay in pixels before detecting a drag
+
 		constructor: function(grid, params) {
 			lang.mixin(this, params || {});
 
@@ -31,18 +33,17 @@ define([
 				}
 			}
 
-			// class-specific variables
 			this.isDragging = false;
 			this.mouseDown = false;
 			this.targetAnchor = null;
+			this._lastX = 0;
+			this._lastY = 0;
 
-			// states
 			this.targetState = "";
 			this.sourceState = "";
 			domClass.add(this.domNode, "dojoDndSource");
 			domClass.add(this.domNode, "dojoDndTarget");
 
-			// set up events
 			this.topics = [
 				topic.on("/dnd/source/over", lang.hitch(this, "onDndSourceOver")),
 				topic.on("/dnd/start", lang.hitch(this, "onDndStart")),
@@ -109,7 +110,8 @@ define([
 				m.canDrop(this.canDrop());
 			}
 			else {
-				if (this.mouseDown && this.isSource && !this.grid.editMode) {
+				if (this.mouseDown && this.isSource && !this.grid.editMode &&
+				(Math.abs(e.pageX - this._lastX) >= this.dragThreshold || Math.abs(e.pageY - this._lastY) >= this.dragThreshold)) {
 					var selection = this.grid.selection;
 					if (!selection.selected[this.currentRowIndex]) {
 						// Also allow drag even when row is not selected
@@ -128,6 +130,8 @@ define([
 			// e: Event: mouse event
 			this.mouseDown = true;
 			this.mouseButton = e.button;
+			this._lastX = e.pageX;
+			this._lastY = e.pageY;
 			this.inherited("onMouseDown", arguments);
 		},
 
