@@ -13,17 +13,13 @@ define([
 
 
 	return declare("rfe.dnd.GridSelector", GridContainer, {
+		// note: grid rows (nodes) do not have an id attribute -> The grid.Selection uses the rowIndex instead
 
 		constructor: function() {
 			var sel = this.grid.selection;
 
-			// note: grid rows (nodes) do not have an id attribute -> The grid.Selection uses the rowIndex instead
-			// -> Create own dictionary object keyed by ids of selected nodes as required by the dnd.Selector api.
-			this.selection = {};	// maps node.id to lookup to find dndItem from rowNode.
-
 			this.events.push(
-				aspect.after(sel, 'onSelected', lang.hitch(this, this.addToSelection), true),
-				aspect.after(sel, 'onDeselected', lang.hitch(this, this.removeFromSelection), true),
+				aspect.after(sel, 'onSelected', lang.hitch(this, this.addIdToRow), true),
 
 			   // add selection also on right click context menu
 				this.grid.on('rowMouseDown', lang.hitch(this, function(evt) {
@@ -41,10 +37,13 @@ define([
 
 		getItem: function(key) {
 			// summary: returns a data item by its key (id)
-			// note: key = id and not the same as rowIndex. Can be called by any other dnd source with node.id = key
-			var grid = this.grid;
-			var node = this.selection[key];
-			node.item = grid.getItem(node.gridRowIndex);
+			// note: key == id and not the same as rowIdx. Can be called by any other dnd source with node.id = key
+			var node, rowIdx, grid = this.grid;
+			var item, itemId = key.replace(this.dndType + '_', '');
+			item = grid.store.get(itemId);
+			rowIdx = grid.getItemIndex(item);
+			node = grid.getRowNode(rowIdx);
+			node.item = item;
 			return {
 				data: node,
 				type: [this.dndType]
@@ -52,9 +51,14 @@ define([
 		},
 
 		getSelectedNodes: function() {
-			var nodes = [], sel = this.selection;
-			for (var i in sel) {
-				nodes.push(sel[i]);
+			var grid = this.grid;
+			var selection = grid.selection, sel = selection.selected;
+			var nodes = [];
+			var rowIdx = 0, len = sel.length;
+			for (; rowIdx < len; rowIdx++) {
+				if (sel[rowIdx]) {
+					nodes.push(grid.getRowNode(rowIdx));
+				}
 			}
 			return nodes;
 		},
@@ -63,8 +67,7 @@ define([
 		 * Add node to selection map.
 		 * @param {number} rowIndex
 		 */
-		addToSelection: function(rowIndex) {
-			console.log('addToSelection', rowIndex)
+		addIdToRow: function(rowIndex) {
 			var grid = this.grid;
 			var item, node;
 
@@ -78,28 +81,7 @@ define([
 				item = grid.getItem(rowIndex);
 				node.id = this.dndType + '_' + item.id;
 			}
-			this.selection[node.id] = node;
-		},
-
-		/**
-		 * Remove node from selection map.
-		 * @param rowIndex
-		 */
-		removeFromSelection: function(rowIndex) {
-			console.log('removeFromSelection', rowIndex)
-			var node;
-			if (rowIndex == -1) {	// this gets also called onEnter when renaming item
-				return;
-			}
-			node = this.grid.getRowNode(rowIndex);
-			delete this.selection[node.id];
-		},
-
-		destroy: function() {
-			this.inherited(arguments);
-			this.selection = {};
 		}
-
 	});
 
 });
