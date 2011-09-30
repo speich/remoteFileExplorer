@@ -66,7 +66,7 @@ define([
 				return item.data.item.dir;
 			}, this);
 			if (isDir) {
-				img = this.images.folders;
+				img = this.images.folder;
 			}
 			else if (nodes.length > 1) {
 				img = this.images.files;
@@ -76,4 +76,13 @@ define([
 			}
 			return img;
 		}
+
+		Avatar.prototype._generateText = function() {
+			// summary: generates a proper text to reflect copying or moving of items
+			var numItems = this.manager.nodes.length.toString();
+			var action = this.manager.copy ? 'Copy' : 'Move';
+			return numItems + ', ' + action;
+		};
+
+	return Avatar;
 });

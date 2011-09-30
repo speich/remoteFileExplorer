@@ -4,13 +4,17 @@ define([
 	'dojo/_base/declare',
 	'dojo/_base/Deferred',
 	'dojo/on',
+	'dojo/aspect',
 	'dojo/mouse',
 	'dojo/dom',
+	'dojo/dom-class',
 	'dijit/registry',
 	'dijit/Menu',
 	'dijit/MenuItem',
 	'dijit/PopupMenuItem'
-], function(lang, array, declare, Deferred, on, mouse, dom, registry, Menu, MenuItem, PopupMenuItem) {
+], function(lang, array, declare, Deferred, on, aspect, mouse, dom, domClass, registry, Menu, MenuItem, PopupMenuItem) {
+
+	// TODO: prevent dnd when editing
 
 	return declare('rfe.Edit', null, {
 		edit: {
@@ -111,21 +115,19 @@ define([
 			// B. When deleting from context menu use source to decide which selected items to use
 			var self = this, store = this.store;
 			var context = this.edit.context;
-			var i = 0, item, dnd, dndItem, nodes, len;
+			var i = 0, len;
+			var item, items, widget;
 
-			dnd = context.isOnGrid || context.isOnGridPane ? this.grid.dndController : this.tree.dndController;
-
-			// TODO: would be nice if we didn't depend on dnd for editing.
-			// This is out of convenience to have one method to get the selected nodes instead of a widget specific
-			nodes = dnd.getSelectedNodes();
-			len = nodes.length;
+			widget = context.isOnGrid || context.isOnGridPane ? this.grid : this.tree;
+         items = widget.selection.getSelected();	// TODO: make this work also for the tree which doesn't have the same selection object
+			len = items.length;
 			for (; i < len; i++) {
-				dndItem = dnd.getItem(nodes[i].id);
-				item = dndItem.data.item;
+				item = items[i];
 				Deferred.when(store.remove(item.id), function() {
 					self.removeHistory(item.id);
 					// When deleting folder in tree, grid is not updated by store.onDelete() since grid only contains folders children!
 					if (item.dir && (context.isOnTree || context.isOnTreePane)) {
+						console.log('deleteItems: refreshing grid');
 						self.grid._refresh();   // note: grid._refresh has a timeout, so it doesn't matter to call it in rapid succession (in a loop)
 					}
 				}, function(err) {
@@ -145,7 +147,8 @@ define([
 			var grid = this.grid;
 			// TODO: do not hard code, find column from item.name since name might not always be first column
 			var cell = grid.getCell(0);
-			var item = this.getLastSelectedItem();
+			var item = this.getLastSelectedItem(); // rename item is either called through contextMenu or createRenameItem
+
 			// grid calls editor.apply onBlur on the grid -> add id to row/cell?
 /*			var cnn = on(cell, 'onBlur', this, function() {
 				console.log('done editing')   
@@ -157,15 +160,15 @@ define([
 
 			var cnns = [];
 			var i = 0;
-			cnns[cnns.length] = on(grid, 'onApplyCellEdit', function(value) {
+			cnns[cnns.length] = on(grid, 'applyCellEdit', function(value) {
 				if (item.name !== value) {	// user just pressed enter but didn't change the name
 					item.name = value;
 					item.mod = self.getDate();
-					console.log('applying edit')
+
 					Deferred.when(store.put(item), function() {
-						//grid.edit.apply();
-						//grid.store.save();
-						//	grid.edit.save();
+//						grid.edit.apply();
+						console.log('applying edit on cell', cell)
+//						grid.edit.save();
 						cell.editable = false;
 					},
 					function(err) {
@@ -174,15 +177,17 @@ define([
 					});
 				}
 				for (; i < cnns.length; i++) {
-					dojo.disconnect(cnns[i]);
+					cnns[i].remove();
 				}
 			});
-			cnns[cnns.length] = on(grid, 'onCancelEdit', function() {
+			cnns[cnns.length] = on(grid, 'cancelEdit', function() {
 				for (; i < cnns.length; i++) {
-					dojo.disconnect(cnns[i]);
+					console.log('removing cnn', i);
+					cnns[i].remove();
 				}
 			});
-			cnns[cnns.length] = on(dom.byId(this.id), 'mousedown', this, function(evt) {
+			cnns[cnns.length] = on(dom.byId(this.id), 'mousedown', function(evt) {
+				// TODO: does not work yet
 				console.log('cnnExtraCancel')
 				// editing is not canceled when clicking on the scrollbox
 				if (!domClass.contains(evt.target, 'dojoxGridCell')) {
@@ -191,9 +196,9 @@ define([
 			});
 
 			cell.editable = true;	// enable editing
-			grid.edit.setEditCell(cell, grid.getItemIndex(item));
-//			grid.doStartEdit(cell, grid.getItemIndex(item));
 			//grid.focus.setFocusCell(cell, grid.getItemIndex(item));
+			grid.edit.setEditCell(cell, grid.getItemIndex(item));
+
 		},
 
 		/**
@@ -234,12 +239,17 @@ define([
 			// Connect to endUpdate to time it right
 			return Deferred.when(this.createItem(itemProps), lang.hitch(this, function(item) {
 				var grid = this.grid;
-				var rowIndex = grid.getItemIndex(item);
-				var cnn = on(grid, 'endUpdate', this, function() {
-					dojo.disconnect(cnn);
-					grid.selection.setSelected(rowIndex, true);	// new item in grid needs to be selected before it can be renamed
-					this.renameItem(item);
-				});
+				// store.add calls onNew() before returning. The grid listens to onNew() and calls grid._addItem() in turn.
+				// So item is added to internal grid index before it is rendered, e.g. rowIndex is available right away
+				var itemRowIndex = grid.getItemIndex(item);
+				var cnn = aspect.after(grid, 'renderRow', lang.hitch(this, function(rowIndex) {
+					if (rowIndex == itemRowIndex) {
+						cnn.remove();
+						grid.selection.setSelected(rowIndex, true);	// new item in grid needs to be selected before it can be renamed
+						this.currentGridItem = item;	// TODO use grid.selection instead ?
+						this.renameItem(item);
+					}
+				}), true);
 			}))
 		}
 	});

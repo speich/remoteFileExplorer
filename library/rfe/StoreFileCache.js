@@ -59,8 +59,8 @@ define('rfe/StoreFileCache', [
 			var self = this;
 			return Deferred.when(this.refNew.apply(this, arguments), function(newId) {
 				item.id = newId
-				self.onNewItem(item); // notifies tree
-				self.onNew(item);
+				self.onNewItem(item);	// tree only
+				self.onNew(item);			// dojo.data.api
 				return newId;
 			}, function() {
 				self.revert();

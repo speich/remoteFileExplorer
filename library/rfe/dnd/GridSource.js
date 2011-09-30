@@ -45,10 +45,10 @@ define([
 			domClass.add(this.domNode, "dojoDndTarget");
 
 			this.topics = [
-				topic.on("/dnd/source/over", lang.hitch(this, "onDndSourceOver")),
-				topic.on("/dnd/start", lang.hitch(this, "onDndStart")),
-				topic.on("/dnd/drop", lang.hitch(this, "onDndDrop")),
-				topic.on("/dnd/cancel", lang.hitch(this, "onDndCancel"))
+				topic.subscribe("/dnd/source/over", lang.hitch(this, "onDndSourceOver")),
+				topic.subscribe("/dnd/start", lang.hitch(this, "onDndStart")),
+				topic.subscribe("/dnd/drop", lang.hitch(this, "onDndDrop")),
+				topic.subscribe("/dnd/cancel", lang.hitch(this, "onDndCancel"))
 			];
 			this.events.push(
 				on(this.domNode, "mousedown", lang.hitch(this, "onMouseDown")),
@@ -99,6 +99,12 @@ define([
 			// summary: event processor for onmousemove
 			// e: Event: mouse event
 			var m;
+
+			// do not allow dnd when editing
+			if (this.grid.edit.isEditing()) {
+				return;
+			}
+
 			if (this.isDragging && this.targetState == "Disabled") {
 				return;
 			}
@@ -170,7 +176,6 @@ define([
 			//		Copy items, if true, move items otherwise
 			// tags:
 			//		private
-
 			if(this.isSource){
 				this._changeState("Source", this == source ? (copy ? "Copied" : "Moved") : "");
 			}

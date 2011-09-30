@@ -79,7 +79,7 @@ define([
 
 			grid.on('rowMouseDown', lang.hitch(this, function(evt) {
 				// rowMouseDown also registeres right click
-				this.currentGridItem = grid.getItem(evt.rowIndex);
+				this.currentGridItem = grid.getItem(evt.rowIndex);     // TODO use grid.selection instead ?
 			}));
 			grid.on('rowDblClick', lang.hitch(this, function(evt) {
 				var item = grid.getItem(evt.rowIndex);
@@ -282,6 +282,7 @@ define([
 		 * Returns the last selected item of the focused widget.
 		 */
 		getLastSelectedItem: function() {
+			// TODO use grid.selection and tree.selection instead ?
 			if (this.tree.focused || this.layout.panes.treePane.focused) {
 				return this.currentTreeItem;
 			}

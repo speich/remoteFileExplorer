@@ -92,7 +92,7 @@ define([
 
 				grid = new Grid({
 					id: id,
-					store: null
+					store: null	// set in FileExplorer.showItemChildrenInGrid() every time user clicks tree
 				});
 
 				structure = [{
