@@ -3,10 +3,12 @@
  * the items children in the cache.
  */
 define('rfe/StoreFileCache', [
+	'dojo/regexp',
 	'dojo/_base/declare',
 	'dojo/_base/lang',
 	'dojo/_base/Deferred',
-	'dojo/store/Cache'], function(declare, lang, Deferred, Cache) {
+	'dojo/_base/array',
+	'dojo/store/Cache'], function(regexp, declare, lang, Deferred, array, Cache) {
 
 	return declare('rfe.StoreFileCache', null, {
 		// references for MonkeyPatching the store.Cache
@@ -49,6 +51,8 @@ define('rfe/StoreFileCache', [
 				self.onChange(item);	// notifies the tree (e.g. renamed an item)
 				// TODO: find out if this is necessary
 				//self.onChildrenChange(item, self.getChildren(item));	// do we need this?
+				console.log('calling onSet for the grid');
+				self.onSet(item);			// dojo.data.api
 				return id;
 			}, function() {
 				self.revert();
@@ -88,7 +92,7 @@ define('rfe/StoreFileCache', [
 			var childItems, children;
 			var obj = {};
 			var id = item[this.idProperty];
-			var dfd = new dojo.Deferred();
+			var dfd = new Deferred();
 
 			obj[this.parentAttr] = id;
 			children = this.storeMemory.query(obj);
@@ -120,7 +124,7 @@ define('rfe/StoreFileCache', [
 						self.storeMemory.put(children[i]);
 					}
 					if (self.skipWithNoChildren) {
-						childItems = dojo.filter(children, function(child) {
+						childItems = array.filter(children, function(child) {
 							if (child[self.childrenAttr]) {  // only display directories in the tree
 								return true;
 							}
@@ -173,7 +177,7 @@ define('rfe/StoreFileCache', [
 			// copy item
 			if (copy) {
 				// create new item based on item and use same id -> when server sees POST with id this means copy (implicitly)
-				newItem = dojo.clone(item);
+				newItem = lang.clone(item);
 				newItem[this.parentAttr] = newParentItem.id;
 				dfd = this.add(newItem, {
 					incremental: true	// store JsonRest does POST instead of PUT even if object has an id
@@ -256,18 +260,19 @@ define('rfe/StoreFileCache', [
 		},
 
 		fetch: function(args) {
+			console.log('fetching', args)
 			// this is only used by the grid
-			args = dojo.delegate(args, args && args.queryOptions);
+			args = lang.delegate(args, args && args.queryOptions);
 			var self = this;
 			var scope = args.scope || self;
 			var query = args.query;
 			if (typeof query == "object") { // can be null, but that is ignore by for-in
-				query = dojo.delegate(query); // don't modify the original
+				query = lang.delegate(query); // don't modify the original
 				for (var i in query) {
 					// find any strings and convert them to regular expressions for wildcard support
 					var required = query[i];
 					if (typeof required == "string") {
-						query[i] = new RegExp("^" + dojo.regexp.escapeString(required, "*?").replace(/\*/g, '.*').replace(/\?/g, '.') + "$", args.ignoreCase ? "mi" : "m");
+						query[i] = new RegExp("^" + regexp.escapeString(required, "*?").replace(/\*/g, '.*').replace(/\?/g, '.') + "$", args.ignoreCase ? "mi" : "m");
 						query[i].toString = (function(original) {
 							return function() {
 								return original;
@@ -307,9 +312,11 @@ define('rfe/StoreFileCache', [
 					results.cancel();
 				}
 			};
+			/*
 			if (results.observe) {
+				console.log('results.observe self.oinSet')
 				results.observe(function(object, removedFrom, insertedInto) {
-					if (dojo.indexOf(self._dirtyObjects, object) == -1) {
+					if (array.indexOf(self._dirtyObjects, object) == -1) {
 						if (removedFrom == -1) {
 							self.onNew(object);
 						}
@@ -326,7 +333,7 @@ define('rfe/StoreFileCache', [
 					}
 				});
 			}
-
+*/
 			args.store = this;
 			return args;
 		},
@@ -336,9 +343,15 @@ define('rfe/StoreFileCache', [
 			return obj[attribute];
 		},
 
-		setValue: function() {},
+		setValue: function(item, attribute, value) {
+			item[attribute] = value;
+			console.log('setValue', arguments)
+			this.put(item);
+		},
 
 		onNew: function(item) {},
+
+		onSet: function(item) {},
 
 		/**
 		 * Callback when an item has been deleted.
