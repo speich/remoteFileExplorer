@@ -61,9 +61,7 @@ define([
 			 * @param {rfe.StoreFileCache} store
 			 */
 			initTree: function(id, store) {
-				var tree, dnd;
-
-				tree = new Tree({
+				var tree = new Tree({
 					id: id,
 					model: store,
 					childrenAttrs: [store.childrenAttr],
@@ -73,7 +71,7 @@ define([
 					persist: true,
 					showRoot: true
 				});
-
+				// add dnd to the tree
 				new TreeSource(tree, {
 					accept : ['treeNode', 'gridNode'],
 					store: store,
@@ -88,45 +86,16 @@ define([
 			 * @param {dojo.store.Memory} store
 			 */
 			initGrid: function(id, store) {
-				var grid, structure;
-
-				grid = new Grid({
+				var grid = new Grid({
 					id: id,
 					store: null	// set in FileExplorer.showItemChildrenInGrid() every time user clicks tree
 				});
-
-				structure = [{
-					name: "name",
-					field: 'name',
-					formatter: function(value, idx) {
-						var item = this.grid.getItem(idx);
-						return this.grid.formatImg(item);
-					},
-					width: '35%'},{
-						name: "size",
-						field: "size",
-						formatter: function(value) {
-							return this.grid.formatFileSize(value);
-						},
-						width: '20%'
-					},{
-						name: 'type',
-						field: 'dir',
-						formatter: function(value) {
-							return this.grid.formatType(value);
-						},
-						width: '20%'
-					},{
-						name: 'last modified',
-						field: 'mod',
-						width: '20%'
-				}];
-				grid.set('structure', structure);
-
 				// add drag and drop to the grid
+				/*
 				grid.dndController = new GridSource(grid, {
 					store: store
 				});
+				*/
 				return grid;
 			},
 

@@ -6,14 +6,41 @@ define([
 	return declare('rfe.Grid', DataGrid, {
 
 		dndController: null,
-
+		editable: false,
 		rowSelector: false,
 		selectionMode: 'extended',
 		columnReordering: true,
 		autoHeight: false,
-		defaultHeight: '100%',
-		initialWidth: '100%',
+		height: '100%',
+		width: '100%',
 		loadingMessage: 'loading data...',
+		structure: [{
+				name: "name",
+				field: 'name',
+				width: '35%',
+				formatter: function(value, idx) {
+					var item = this.grid.getItem(idx);
+					return this.grid.formatImg(item);
+				}},
+			{
+				name: "size",
+				field: "size",
+				width: '20%',
+				formatter: function(value) {
+					return this.grid.formatFileSize(value);
+				}},
+			{
+				name: 'type',
+				field: 'dir',
+				width: '20%',
+				formatter: function(value) {
+					return this.grid.formatType(value);
+				}},
+			{
+				name: 'last modified',
+				field: 'mod',
+				width: '20%'
+			}],
 
 		constructor: function(params) {
 			this.id = params.id;
