@@ -61,7 +61,8 @@ define([
 				selection[i].setSelected(false);
 			}
 			selection = this.getSelectedTreeNodes();
-			i = 0, len = selection.length;
+			i = 0;
+            len = selection.length;
 			for (; i < len; i++) {
 				selection[i].setSelected(true);
 			}
