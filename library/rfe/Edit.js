@@ -14,8 +14,6 @@ define([
 	'dijit/PopupMenuItem'
 ], function(lang, array, declare, Deferred, on, aspect, mouse, dom, domClass, registry, Menu, MenuItem, PopupMenuItem) {
 
-	// TODO: prevent dnd when editing
-
 	return declare('rfe.Edit', null, {
 		editor: {
 			contextMenu: null,   // reference to the context menu
