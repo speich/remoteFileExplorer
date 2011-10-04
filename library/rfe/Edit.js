@@ -17,7 +17,7 @@ define([
 	// TODO: prevent dnd when editing
 
 	return declare('rfe.Edit', null, {
-		edit: {
+		editor: {
 			contextMenu: null,   // reference to the context menu
 			context: null  // reference to the widget the context menu was created on (right clicked on)
 		},
@@ -46,7 +46,7 @@ define([
 					}
 					context = this.getContext(evt);
 					this.enableContextMenuItems(menu, context);
-					this.edit.context = context;
+					this.editor.context = context;
 				}));
 			}, this);
 
@@ -57,7 +57,7 @@ define([
 			}));
 			menu.addChild(MenuItem({
 				label: 'Rename',
-				onClick: lang.hitch(this, this.renameItem)
+				onClick: lang.hitch(this, this.edit)
 			}));
 			menu.addChild(MenuItem({
 				label: 'Delete',
@@ -79,7 +79,7 @@ define([
 			}));
 
 			menu.startup();
-			this.edit.contextMenu = menu;
+			this.editor.contextMenu = menu;
 		},
 
 		/**
@@ -106,20 +106,20 @@ define([
 
 		/**
 		 * Delete selected item(s).
-		 * @return {dojo.DeferredList}
 		 */
 		deleteItems: function() {
+            // TODO: return deferred list of all deleted items
 			// Notes:
 			// A. When deleting from toolbar we only use selected items from the grid (or use focus?). Currently this
 			// happens from the different menu in layout.js -> move here?
 			// B. When deleting from context menu use source to decide which selected items to use
 			var self = this, store = this.store;
-			var context = this.edit.context;
+			var context = this.editor.context;
 			var i = 0, len;
 			var item, items, widget;
 
 			widget = context.isOnGrid || context.isOnGridPane ? this.grid : this.tree;
-         items = widget.selection.getSelected();	// TODO: make this work also for the tree which doesn't have the same selection object
+            items = widget.selection.getSelected();	// TODO: make this work also for the tree which doesn't have the same selection object
 			len = items.length;
 			for (; i < len; i++) {
 				item = items[i];
@@ -137,71 +137,6 @@ define([
 		},
 
 		/**
-		 * Rename item
-		 * @param {object} item dojo.store.object
-		 * @return {object} dojo.Deferred
-		 */
-		renameItem: function() {
-			var self = this;
-			var store = this.store;
-			var grid = this.grid;
-			// TODO: do not hard code, find column from item.name since name might not always be first column
-			var cell = grid.getCell(0);
-			var item = this.getLastSelectedItem(); // rename item is either called through contextMenu or createRenameItem
-
-			// grid calls editor.apply onBlur on the grid -> add id to row/cell?
-/*			var cnn = on(cell, 'onBlur', this, function() {
-				console.log('done editing')   
-				dojo.disconnect(cnn);
-				grid.edit.apply();
-				grid.edit.save();
-				cell.editable = false;
-			});*/
-
-			var cnns = [];
-			var i = 0;
-			cnns[cnns.length] = on(grid, 'applyCellEdit', function(value) {
-				if (item.name !== value) {	// user just pressed enter but didn't change the name
-					item.name = value;
-					item.mod = self.getDate();
-
-					Deferred.when(store.put(item), function() {
-//						grid.edit.apply();
-						console.log('applying edit on cell', cell)
-//						grid.edit.save();
-						cell.editable = false;
-					},
-					function(err) {
-						grid.edit.cancel();
-						cell.editable = false;
-					});
-				}
-				for (; i < cnns.length; i++) {
-					cnns[i].remove();
-				}
-			});
-			cnns[cnns.length] = on(grid, 'cancelEdit', function() {
-				for (; i < cnns.length; i++) {
-					console.log('removing cnn', i);
-					cnns[i].remove();
-				}
-			});
-			cnns[cnns.length] = on(dom.byId(this.id), 'mousedown', function(evt) {
-				// TODO: does not work yet
-				console.log('cnnExtraCancel')
-				// editing is not canceled when clicking on the scrollbox
-				if (!domClass.contains(evt.target, 'dojoxGridCell')) {
-					grid.edit.cancel();
-				}
-			});
-
-			cell.editable = true;	// enable editing
-			//grid.focus.setFocusCell(cell, grid.getItemIndex(item));
-			grid.edit.setEditCell(cell, grid.getItemIndex(item));
-
-		},
-
-		/**
 		 * Creates a new file object.
 		 * @param {object} itemProps
 		 * @return {object} dojo.store object
@@ -209,7 +144,6 @@ define([
 		createItem: function(itemProps) {
 			var store = this.store;
 			var parId = this.currentTreeItem.id;
-
 			var item = {
 				size: 0,
 				parId: parId,
@@ -232,9 +166,10 @@ define([
 		 * Create and rename an item
 		 * Creates a new item, selects it in the grid and switches to edit mode.
 		 * @param {object} itemProps
+         *
 		 */
 		createRenameItem: function(itemProps) {
-
+            // TODO: return item after it is renamed
 			// createItem makes the grid update all its rows -> we cant rename the new item right away since it's not rendered yet
 			// Connect to endUpdate to time it right
 			return Deferred.when(this.createItem(itemProps), lang.hitch(this, function(item) {
@@ -247,11 +182,24 @@ define([
 						cnn.remove();
 						grid.selection.setSelected(rowIndex, true);	// new item in grid needs to be selected before it can be renamed
 						this.currentGridItem = item;	// TODO use grid.selection instead ?
-						this.renameItem(item);
+                        this.edit();
 					}
 				}), true);
 			}))
-		}
+		},
+
+        /**
+         * Display grid's inline editor.
+         */
+        edit: function() {
+            // note: rfe.Grid.doApplyCellEdit() does the actual renaming, e.g. call store.put
+            var grid = this.grid, cell = grid.getCell(0); // TODO: get cell index from item.name instead
+            var item = this.getLastSelectedItem(); // rename item is either called through contextMenu or menu toolbar
+            cell.editable = true;
+            grid.edit.setEditCell(cell, grid.getItemIndex(item));
+        }
+
 	});
+
 
 });
