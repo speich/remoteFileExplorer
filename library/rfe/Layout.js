@@ -91,11 +91,9 @@ define([
 					store: null	// set in FileExplorer.showItemChildrenInGrid() every time user clicks tree
 				});
 				// add drag and drop to the grid
-				/*
 				grid.dndController = new GridSource(grid, {
 					store: store
 				});
-				*/
 				return grid;
 			},
 
@@ -197,7 +195,7 @@ define([
 			 */
 			createMenus: function() {
 				// TODO: reuse menu from edit.js?
-				var menuBar, menuFile, menuView, menuHelp;
+				var menuBar, menuFile, menuView, menuHelp, menuTools;
 				var subMenuFile;
 
 				menuBar = new MenuBar({ id: 'rfeMenuBar' });
@@ -242,7 +240,7 @@ define([
 				}));
 				menuFile.addChild(new MenuItem({
 					label: 'Rename',
-					onClick: lang.hitch(this, this.renameItem)
+					onClick: lang.hitch(this, this.edit)
 				}));
 				menuFile.addChild(new MenuItem({
 					label: 'Delete',

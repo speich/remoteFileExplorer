@@ -76,19 +76,21 @@ define([
 						 this.currentTreeItem = item;
 				}
 			}));
-
 			grid.on('rowMouseDown', lang.hitch(this, function(evt) {
-				// rowMouseDown also registeres right click
+				// rowMouseDown also registers right click
 				this.currentGridItem = grid.getItem(evt.rowIndex);     // TODO use grid.selection instead ?
 			}));
 			grid.on('rowDblClick', lang.hitch(this, function(evt) {
+				// cancel when editing
+				if (grid.edit.isEditing()) {
+					return;
+				}
 				var item = grid.getItem(evt.rowIndex);
 				if (item.dir) {
 					this.display(item);
 					this.setHistory(item.id);
 				}
 			}));
-
 			this.createLayout(this.id);
 			this.initContextMenu(dom.byId(this.id));
 		},
@@ -282,6 +284,7 @@ define([
 		 * Returns the last selected item of the focused widget.
 		 */
 		getLastSelectedItem: function() {
+            // does not work when used from toolbar, since focus is moved to menu
 			// TODO use grid.selection and tree.selection instead ?
 			if (this.tree.focused || this.layout.panes.treePane.focused) {
 				return this.currentTreeItem;
@@ -290,7 +293,7 @@ define([
 				return this.currentGridItem;
 			}
 			else {
-				return null;
+				return this.currentGridItem || this.currentTreeItem;
 			}
 		},
 
@@ -309,7 +312,7 @@ define([
 				isOnGridPane: false,
 				widget: null
 			};
-			var node = evt.target;
+			var node = evt.target || node;
 			while (node && node.tagName !== "BODY") {
 				if (domClass.contains(node, 'dijitTree')) {
 					obj.isOnTree = true;
