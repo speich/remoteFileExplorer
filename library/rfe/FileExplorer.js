@@ -2,6 +2,7 @@ define([
 	'dojo/_base/lang',
 	'dojo/_base/declare',
 	'dojo/_base/Deferred',
+   'dojo/cookie',
 	'dojo/keys',
 	'dojo/dom',
 	'dojo/dom-class',
@@ -9,7 +10,7 @@ define([
 	'dijit/registry',
 	'rfe/Layout',
 	'rfe/Edit'
-], function(lang, declare, Deferred, keys, dom, domClass, locale, registry, Layout, Edit) {
+], function(lang, declare, Deferred, cookie, keys, dom, domClass, locale, registry, Layout, Edit) {
 	/**
 	 * File explorer allows you to browse files.
 	 *
@@ -26,11 +27,12 @@ define([
 	 * @class
 	 */
 	return declare('rfe.FileExplorer', [Layout, Edit], {
-		version: '1.0',
-		versionDate: '2011',
-		currentTreeItem: null, 	// currently selected store object in tree, equals always parent of grid items
-		currentGridItem: null,  // currently (last, when multi-) selected store object in grid
-		currentWidget: null,    // currently selected widget, which is either tree or grid
+		version:'1.0',
+		versionDate:'2011',
+		currentTreeItem:null, // currently selected store object in tree, equals always parent of grid items
+		currentGridItem:null, // currently (last, when multi-) selected store object in grid
+		currentWidget:null, // currently selected widget, which is either tree or grid
+		cookieNameTreePath: 'SavedTreePath',    // name of cookie to remember tree's selected path
 
 		history: {
 			steps: [],     // saves the steps
@@ -54,28 +56,21 @@ define([
 			tree.on('load', lang.hitch(this, function() {
 				var root = tree.rootNode;
 				var item = root.item;
-				this.tree.set('path', [this.store.rootId]);
-				this.showItemChildrenInGrid(item);
-				this.setHistory(item.id);
-				this.currentTreeItem = item;
+				this.display(item);
+				this.setHistory(item.id);   // do not set history in display() since history uses display too
 			}));
-			tree.on('click', lang.hitch(this, function(item) {
-				if (item != this.currentTreeItem) { // prevent executing twice (dblclick)
-					grid.selection.clear(); // otherwise item in not-displayed folder is still selected or with same idx
-					this.showItemChildrenInGrid(item);	// only called, when store.openOnClick is set to false
+			tree.on('click', lang.hitch(this, function(item, node, evt) {
+				// note onClick is also fired when user uses keyboard navigation and hits space
+				if (item != this.currentTreeItem) {		// prevent executing twice (dblclick)
+					grid.selection.clear(); 				// otherwise item in not-displayed folder is still selected or with same idx
+					Deferred.when(this.showItemChildrenInGrid(item), function() {	// only called, when store.openOnClick is set to false
+						tree.focusNode(node);				// refocus node because it got moved to grid
+					});
 					this.setHistory(item.id);
 				}
 				this.currentTreeItem = item;
 			}));
-			tree.on('keyDown', lang.hitch(this, function(evt) {
-				if (evt.keyCode == keys.SPACE) {
-					var node = registry.getEnclosingWidget(evt.target);
-					tree.focusNode(node);
-					this.showItemChildrenInGrid(node.item);
-					this.setHistory(node.item.id);
-						 this.currentTreeItem = item;
-				}
-			}));
+
 			grid.on('rowMouseDown', lang.hitch(this, function(evt) {
 				// rowMouseDown also registers right click
 				this.currentGridItem = grid.getItem(evt.rowIndex);     // TODO use grid.selection instead ?
@@ -112,7 +107,7 @@ define([
 					grid.setStore(store, {
 						parId: item.id
 					});
-					// grid.setItems(items);	// this can not be used since it kills sorting
+					// grid.setItems(items); can not be used since it kills sorting
 				});
 			}
 			else {
@@ -140,28 +135,7 @@ define([
 			return dfd;
 		},
 
-		/**
-		 * Display parent directory.
-		 * @param {Object} [item] dojo.data.item
-		 */
-		goDirUp: function(item) {
-			var def;
-			if (!item) {
-				item = this.currentTreeItem;
-			}
-			if (item.parId) {
-				return Deferred.when(this.store.get(item.parId), lang.hitch(this, function(item) {
-					return this.display(item);
-				}), function(err) {
-					console.debug('Error occurred when going directory up', err);
-				});
-			}
-			else {
-				def = new Deferred();
-				def.resolve(false);
-				return def;
-			}
-		},
+
 
 		/**
 		 * Displays the data item (folder) in the tree and it's children in the grid.
@@ -176,11 +150,33 @@ define([
 			grid.selection.deselectAll();
 			def.then(lang.hitch(this, function() {
 				grid.showMessage(grid.loadingMessage);
-				this.showItemChildrenInGrid(item);
-				//this.tree.getNodesByItem(item)[0].setSelected(true); set('path') should set selected...
+				return this.showItemChildrenInGrid(item);
 			}));
 			return def;
 		},
+
+		/**
+		 * Display parent directory.
+		 * @param {Object} [item] dojo.data.item
+		 */
+		goDirUp: function(item) {
+            var def;
+            if (!item) {
+                item = this.currentTreeItem;
+            }
+            if (item.parId) {
+                return Deferred.when(this.store.get(item.parId), lang.hitch(this, function(item) {
+                    return this.display(item);
+                }), function(err) {
+                    console.debug('Error occurred when going directory up', err);
+                });
+            }
+            else {
+                def = new Deferred();
+                def.resolve(false);
+                return def;
+            }
+        },
 
 		/**
 		 * Reload current folder.
@@ -208,9 +204,9 @@ define([
 
 		/**
 		 * Adds current item id to history.
-		 * @param {string} resourceId id of JsonRestStore item
+		 * @param {string} itemId id of JsonRestStore item
 		 */
-		setHistory: function(resourceId) {
+		setHistory: function(itemId) {
 			var hist = this.history;
 
 			// first use: initialize history array
@@ -229,17 +225,17 @@ define([
 			if (hist.steps.length == hist.numSteps + 1) {
 				hist.steps.shift();
 			}
-			hist.steps.push(resourceId);
+			hist.steps.push(itemId);
 		},
 
 		/**
 		 * Remove item form history.
-		 * @param {string} resourceId
+		 * @param {string} itemId
 		 */
-		removeHistory: function(resourceId) {
+		removeHistory: function(itemId) {
 			var hist = this.history;
 			hist.steps = dojo.filter(hist.steps, function(item) {
-				return item !== resourceId;
+				return item !== itemId;
 			});
 			hist.curIdx--;
 		},
@@ -284,7 +280,7 @@ define([
 		 * Returns the last selected item of the focused widget.
 		 */
 		getLastSelectedItem: function() {
-            // does not work when used from toolbar, since focus is moved to menu
+            // widget.focused does not work when used from toolbar, since focus is moved to menu
 			// TODO use grid.selection and tree.selection instead ?
 			if (this.tree.focused || this.layout.panes.treePane.focused) {
 				return this.currentTreeItem;

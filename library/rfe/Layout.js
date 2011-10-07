@@ -2,9 +2,10 @@ define([
 	'dojo/_base/array',
 	'dojo/_base/lang',
 	'dojo/_base/declare',
+	'dojo/_base/event',
 	'dojo/aspect',
 	'dojo/on',
-	'dojo/_base/event',
+	'dojo/cookie',
 	'dojo/dom-construct',
 	'dojo/query',
 	'dojo/store/Memory',
@@ -29,7 +30,7 @@ define([
 	"dijit/form/Button",
 	"dijit/form/CheckBox",
 	"dijit/Dialog"
-], function(array, lang, declare, aspect, on, event, construct, query, Memory, JsonRest, StoreFileCache, Tree, TreeSource,
+], function(array, lang, declare, event, aspect, on, cookie, construct, query, Memory, JsonRest, StoreFileCache, Tree, TreeSource,
 				Grid, GridSource, registry,
 				BorderContainer, ContentPane, MenuBar, MenuBarItem, PopupMenuBarItem, Menu, MenuItem, MenuSeparator,
 				PopupMenuItem, CheckedMenuItem, Toolbar, Button, CheckBox, Dialog) {
@@ -65,18 +66,29 @@ define([
 					id: id,
 					model: store,
 					childrenAttrs: [store.childrenAttr],
-					isEdited: false,
 					openOnClick: false,
 					openOnDblClick: true,
 					persist: true,
-					showRoot: true
+					showRoot: true,
+					/**
+					 * TODO: is not called when using set path in showItemInTree()
+					 */
+					_onNodeFocus: lang.hitch(this, function(item, node) {
+						this.inherited('_onNodeFocus', arguments)
+						var path = this.store.getPath(item);
+						console.log(path)
+						cookie(this.tree.id + this.cookieNameTreePath, path.join(','), {expires: 365})
+					})
 				});
 				// add dnd to the tree
 				new TreeSource(tree, {
-					accept : ['treeNode', 'gridNode'],
+					accept: ['treeNode', 'gridNode'],
 					store: store,
-					singular: true
+					singular: true,
+					persist: true
 				});
+
+
 				return tree;
 			},
 

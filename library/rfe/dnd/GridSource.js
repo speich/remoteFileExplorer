@@ -248,16 +248,10 @@ define([
 			}
 
 			for (i; i < len; i++) {
-				//item = nodes[i].data.item;	// TODO: ? instead of storing item in node in GridSelector.addToSelection, only use node.id to get item (note: tree uses node.item)
 				dndItem = source.getItem(nodes[i].id);
 				item = dndItem.data.item;
 				oldParentItem = store.storeMemory.get(item.parId);
-				dfd = store.pasteItem(item, oldParentItem, newParentItem, copy)
-				Deferred.when(dfd, lang.hitch(this, function() {
-					// TODO: find better solution, e.g. generic that can also be used in TreeSource.
-					console.log('gridSource removeFromSelection', dndItem.data.gridRowIndex, this.selection)
-					this.removeFromSelection(dndItem.data.gridRowIndex);
-				}));
+				store.pasteItem(item, oldParentItem, newParentItem, copy);  // note: when moving store calls onDelete which removes selection in the grid
 			}
 		},
 

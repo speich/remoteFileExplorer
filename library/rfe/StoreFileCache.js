@@ -64,7 +64,7 @@ define('rfe/StoreFileCache', [
 			return Deferred.when(this.refNew.apply(this, arguments), function(newId) {
 				item.id = newId
 				self.onNewItem(item);	// tree only
-				self.onNew(item);			// dojo.data.api
+				self.onNew(item);		// dojo.data.api
 				return newId;
 			}, function() {
 				self.revert();
@@ -162,7 +162,7 @@ define('rfe/StoreFileCache', [
 		},
 
 		/**
-		 * Move or 	copy an item from one parent item to another.
+		 * Move or copy an item from one parent item to another.
 		 * Used in drag & drop by the tree and grid
 		 * @param {object} item dojo.store object
 		 * @param {object} oldParentItem dojo.store object
@@ -177,6 +177,7 @@ define('rfe/StoreFileCache', [
 			// copy item
 			if (copy) {
 				// create new item based on item and use same id -> when server sees POST with id this means copy (implicitly)
+                console.log('pasteItem copy', item, oldParentItem, newParentItem, copy)
 				newItem = lang.clone(item);
 				newItem[this.parentAttr] = newParentItem.id;
 				dfd = this.add(newItem, {

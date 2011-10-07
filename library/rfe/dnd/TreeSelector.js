@@ -74,7 +74,7 @@ define([
 			// note: Parent method does two things: Add/remove nodes from/to selection and set them selected.
 			// To make 1. and 2. (see class comment) work, this should be rewritten and split into two separated methods.
 			// Unfortunately that's not possible since this method is also used by other methods, such as tree.set('path').
-			// Therefore we use a flag when using it with the mouse and thne defer the selecting to mouseUp
+			// Therefore we use a flag when using it with the mouse and then defer the selecting to mouseUp
 			var oldSelection = this.getSelectedTreeNodes();
 			array.forEach(this._setDifference(oldSelection, newSelection), lang.hitch(this, function(node){
 				if (!this._selectByMouse) {
