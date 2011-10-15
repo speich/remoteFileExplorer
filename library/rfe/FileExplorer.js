@@ -1,5 +1,6 @@
 define([
 	'dojo/_base/lang',
+	'dojo/_base/array',
 	'dojo/_base/declare',
 	'dojo/_base/Deferred',
    'dojo/cookie',
@@ -10,7 +11,7 @@ define([
 	'dijit/registry',
 	'rfe/Layout',
 	'rfe/Edit'
-], function(lang, declare, Deferred, cookie, keys, dom, domClass, locale, registry, Layout, Edit) {
+], function(lang, array, declare, Deferred, cookie, keys, dom, domClass, locale, registry, Layout, Edit) {
 	/**
 	 * File explorer allows you to browse files.
 	 *
@@ -31,7 +32,6 @@ define([
 		versionDate:'2011',
 		currentTreeItem:null, // currently selected store object in tree, equals always parent of grid items
 		currentGridItem:null, // currently (last, when multi-) selected store object in grid
-		currentWidget:null, // currently selected widget, which is either tree or grid
 		cookieNameTreePath: 'SavedTreePath',    // name of cookie to remember tree's selected path
 
 		history: {
@@ -53,12 +53,7 @@ define([
 			lang.mixin(this, args);
 
 			// init tree events
-			tree.on('load', lang.hitch(this, function() {
-				var root = tree.rootNode;
-				var item = root.item;
-				this.display(item);
-				this.setHistory(item.id);   // do not set history in display() since history uses display too
-			}));
+			tree.on('load', lang.hitch(this, this._initState));
 			tree.on('click', lang.hitch(this, function(item, node, evt) {
 				// note onClick is also fired when user uses keyboard navigation and hits space
 				if (item != this.currentTreeItem) {		// prevent executing twice (dblclick)
@@ -135,8 +130,6 @@ define([
 			return dfd;
 		},
 
-
-
 		/**
 		 * Displays the data item (folder) in the tree and it's children in the grid.
 		 * The tree and the grid can either be in sync meaning that they show the same content (e.g. tree folder is expanded)
@@ -148,8 +141,8 @@ define([
 			var grid = this.grid;
 			var def = this.showItemInTree(item);
 			grid.selection.deselectAll();
+			grid.showMessage(grid.loadingMessage);
 			def.then(lang.hitch(this, function() {
-				grid.showMessage(grid.loadingMessage);
 				return this.showItemChildrenInGrid(item);
 			}));
 			return def;
@@ -332,6 +325,44 @@ define([
 				node = node.parentNode;
 			}
 			return obj;
+		},
+
+		/**
+		 * Sets the tree to its last state.
+		 * Reads the tree cookies to expand and set the tree selected and display the correct folder in the grid.
+		 */
+		_initState: function() {
+			var tree = this.tree, grid = this.grid;
+			var item, oreo, arr, id, paths = [];
+
+			grid.showMessage(grid.loadingMessage);
+
+			if (!tree.dndController.cookieName && tree.id) {
+				tree.dndController.cookieName = tree.id + "SaveSelectedCookie";
+			}
+			if (tree.persist) {
+				oreo = cookie(tree.dndController.cookieName);
+				if (oreo) {
+					array.forEach(oreo.split(','), function(path) {
+						paths.push(path.split('/'));
+					}, this);
+					tree.set('paths', paths);
+					// we only use last to set the folders in the grid (normally there would be one selection only anyway)
+					arr = paths[paths.length - 1];
+					id = arr[arr.length - 1];
+					Deferred.when(this.store.get(id), lang.hitch(this, function(item) {
+						this.showItemChildrenInGrid(item); // no return, since we don't have to wait for the grid to load
+						this.currentTreeItem = item;
+					}));
+				}
+			}
+			else {
+				item = tree.rootNode.item;
+				id = item.id;
+				this.display(item);
+			}
+
+			this.setHistory(id);   // do not set history in display() since history uses display too
 		}
 	});
 

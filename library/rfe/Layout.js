@@ -12,6 +12,7 @@ define([
 	'dojo/store/JsonRest',
 	'rfe/StoreFileCache',
 	'dijit/Tree',
+//	'rfe/Tree',
 	'dijit/tree/dndSource',
 	'rfe/Grid',
 	'rfe/dnd/GridSource',
@@ -59,7 +60,7 @@ define([
 			/**
 			 * Initializes the tree and tree dnd.
 			 * @param id
-			 * @param {rfe.StoreFileCache} store
+			 * @param {rfe/StoreFileCache} store
 			 */
 			initTree: function(id, store) {
 				var tree = new Tree({
@@ -68,17 +69,7 @@ define([
 					childrenAttrs: [store.childrenAttr],
 					openOnClick: false,
 					openOnDblClick: true,
-					persist: true,
-					showRoot: true,
-					/**
-					 * TODO: is not called when using set path in showItemInTree()
-					 */
-					_onNodeFocus: lang.hitch(this, function(item, node) {
-						this.inherited('_onNodeFocus', arguments)
-						var path = this.store.getPath(item);
-						console.log(path)
-						cookie(this.tree.id + this.cookieNameTreePath, path.join(','), {expires: 365})
-					})
+					showRoot: true
 				});
 				// add dnd to the tree
 				new TreeSource(tree, {
@@ -88,14 +79,13 @@ define([
 					persist: true
 				});
 
-
 				return tree;
 			},
 
 			/**
 			 * Initializes the grid and grid dnd.
 			 * @param {string} id
-			 * @param {dojo.store.Memory} store
+			 * @param {dojo/store/Memory} store
 			 */
 			initGrid: function(id, store) {
 				var grid = new Grid({
