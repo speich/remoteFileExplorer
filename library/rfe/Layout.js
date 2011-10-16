@@ -12,7 +12,6 @@ define([
 	'dojo/store/JsonRest',
 	'rfe/StoreFileCache',
 	'dijit/Tree',
-//	'rfe/Tree',
 	'dijit/tree/dndSource',
 	'rfe/Grid',
 	'rfe/dnd/GridSource',

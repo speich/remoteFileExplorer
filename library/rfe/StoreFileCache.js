@@ -261,8 +261,7 @@ define('rfe/StoreFileCache', [
 		},
 
 		fetch: function(args) {
-			console.log('fetching', args)
-			// this is only used by the grid
+			// this is used only by the grid
 			args = lang.delegate(args, args && args.queryOptions);
 			var self = this;
 			var scope = args.scope || self;

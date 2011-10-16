@@ -43,19 +43,19 @@ define([
 				//		Keeps track of current drop target.
 
 				var m = dndManager.manager(),
-				oldTarget = this.targetAnchor,			// the TreeNode corresponding to TreeNode mouse was previously over
-				newTarget = this.current; 					// TreeNode corresponding to TreeNode mouse is currently over
+				oldTarget = this.targetAnchor,	// the TreeNode corresponding to TreeNode mouse was previously over
+				newTarget = this.current; 			// TreeNode corresponding to TreeNode mouse is currently over
 
 				// calculate if user is indicating to drop the dragged node before, after, or over
 				// (i.e., to become a child of) the target node
 				if (newTarget != oldTarget) {
-/*			      if (oldTarget){
-						this._removeItemClass(oldTarget.rowNode, 'Over');
+			      if (oldTarget){
+     					this._removeItemClass(oldTarget.rowNode, 'Over');
 					}
 					if (newTarget){
 						this._addItemClass(newTarget.rowNode, 'Over');
-					}*/
-					// Check if it's ok to drop the dragged node on/before/after the target node.
+					}
+					// Check if it's ok to drop the dragged node on the target node.
 					if (m.source == this && (newTarget.id in this.selection)) {
 						// Guard against dropping onto yourself (TODO: guard against dropping onto your descendant, #7140)
 						m.canDrop(false);
@@ -84,40 +84,25 @@ define([
 			},
 
 			onDrop: function(source, nodes, copy, target) {
+				var i = 0, len = nodes.length;
+				var store = this.store;
+				var dndItem, item, oldParentItem, newParentItem;
+
+				newParentItem = this.targetAnchor.item;
+				for (; i < len; i++) {
+					dndItem = source.getItem(nodes[i].id);
+					item = dndItem.data.item;
+					oldParentItem = store.storeMemory.get(item.parId);
+					store.pasteItem(item, oldParentItem, newParentItem, copy);
+				}
+				/*
 				if (this != source) {
 					this.onDropExternal(source, nodes, copy, target);
 				}
 				else {
 					this.onDropInternal(source, nodes, copy, target);
 				}
-			},
-
-			onDropExternal: function(source, nodes, copy, target) {
-				// source == grid, target == tree
-				console.log('tree onDropExternal', source);
-				this.onDropInternal(source, nodes, copy, target);
-			},
-
-			onDropInternal: function(source, nodes, copy, target) {
-				var i = 0, len = nodes.length;
-				var store = this.store;
-				var dndItem, item, oldParentItem, newParentItem;
-				var dfd;
-
-				newParentItem = this.targetAnchor.item;
-
-				for (; i < len; i++) {
-					dndItem = source.getItem(nodes[i].id);
-					item = dndItem.data.item;
-					oldParentItem = store.storeMemory.get(item.parId);
-					dfd = store.pasteItem(item, oldParentItem, newParentItem, copy)
-					// TODO: fix scope for i
-					Deferred.when(dfd, lang.hitch(dndItem, function() {
-						// TODO: find better solution, e.g. generic
-						console.log('treeSource removeFromSelection', this, source.selection)
-						source.removeFromSelection(this.data.gridRowIndex);	// will call removeFromSelection
-					}))
-				}
+				*/
 			}
 
 		});

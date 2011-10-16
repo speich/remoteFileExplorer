@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -137,19 +137,20 @@ var dojoConfig = {
 			'name': 'original',
 			'location': 'dojo-trunk'
 		}
-	],
+	]/*,
 	// redirect the following modules to my own modules
 	paths: {
-//		'dijit/tree/_dndSelector': 'rfe/dnd/TreeSelector',
-//		'dijit/tree/dndSource': 'rfe/dnd/TreeSource'
+		'dijit/tree/_dndSelector': 'rfe/dnd/TreeSelector',
+		'dijit/tree/dndSource': 'rfe/dnd/TreeSource'
 	}
+	*/
 };
 
 </script>
-<script src="library/dojo-trunk/dojo/dojo.js"></script>
-<!-- <script src="http://ajax.googleapis.com/ajax/libs/dojo/1.6/dojo/dojo.xd.js" type="text/javascript"></script> -->
+<script type="text/javascript" src="library/dojo-trunk/dojo/dojo.js"></script>
 <script type="text/javascript">
-require(['rfe/dnd/Avatar', 'rfe/FileExplorer'], function() {
+//require(['rfe/dnd/Avatar', 'rfe/FileExplorer'], function() {
+require(['rfe/FileExplorer'], function() {
     new rfe.FileExplorer({
 		 id: 'remoteFileExplorer'
     });
