@@ -1,4 +1,5 @@
-<!doctype html>
+<!DOCTYPE html>
+<html>
 <head>
 <title>Tree test</title>
 <link rel="stylesheet" type="text/css" href="library/dojo-trunk/dijit/themes/claro/claro.css"/>
@@ -19,7 +20,7 @@ require(["dojo/data/ItemFileReadStore", 'dijit/tree/ForestStoreModel', "dijit/Tr
 	var tree = new Tree({
 		id: 'myTree',
 		showRoot: true,
-		persist: true,
+		persist: true	,
 		model: new ForestStoreModel({
 			id: 'continentModel',
 			store: new ItemFileReadStore({
@@ -33,7 +34,7 @@ require(["dojo/data/ItemFileReadStore", 'dijit/tree/ForestStoreModel', "dijit/Tr
 		})
 	}, 'treeCont');
 
-tree.set('path', ['continentRoot', 'NA', 'MX', 'Mexico City']);
+// tree.set('path', ['continentRoot', 'NA', 'MX', 'Mexico City']);
 
 });
 
