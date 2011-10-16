@@ -4,6 +4,7 @@ define([
 	'dojo/_base/declare',
 	'dojo/_base/Deferred',
 	'dojo/on',
+	'dojo/aspect',
 	'dojo/mouse',
 	'dojo/dom',
 	'dojo/dom-class',
@@ -11,12 +12,12 @@ define([
 	'dijit/Menu',
 	'dijit/MenuItem',
 	'dijit/PopupMenuItem'
-], function(lang, array, declare, Deferred, on, mouse, dom, domClass, registry, Menu, MenuItem, PopupMenuItem) {
+], function(lang, array, declare, Deferred, on, aspect, mouse, dom, domClass, registry, Menu, MenuItem, PopupMenuItem) {
 
 	return declare('rfe.Edit', null, {
-		edit: {
+		editor: {
 			contextMenu: null,   // reference to the context menu
-			contextWidget: null  // reference to the widget the context menu was created on (right clicked on)
+			context: null  // reference to the widget the context menu was created on (right clicked on)
 		},
 
 		/**
@@ -26,7 +27,7 @@ define([
 		initContextMenu: function() {
 			var menu = Menu({
 				id: 'rfeContextMenu',
-				targetNodeIds: ['rfeContentPaneTree','rfeGrid'],   // grid extends to same size as pane, tree not  
+				targetNodeIds: ['rfeContentPaneTree','rfeGrid'],   // grid extends to same size as pane, tree not
 				popUpDelay: 0
 			});
 			var subMenu = Menu();
@@ -34,41 +35,16 @@ define([
 			// Override to enable context menu, since grid stops this event by default
 			this.grid.onCellContextMenu = function() {};
 
+			// Enable/disable menu items before displaying it:
 			array.forEach(menu.targetNodeIds, function(id) {
-				var domNode = dom.byId(id);
+				var context, domNode = dom.byId(id);
 				on(domNode, 'mousedown', lang.hitch(this, function(evt) {
 					if (!mouse.isRight(evt)) {
 						return;
 					}
-
-					var isOnWidget = false;
-
-					var widget = registry.getEnclosingWidget(evt.target);
-					console.log(widget, evt.target, widget.item)
-					// TODO: find generic solution for this instead of using id
-					if (widget.id == 'rfeContentPaneTree') {
-						widget = this.tree
-					}
-					else {
-						widget = widget.grid || widget.tree;
-					}
-
-					this.edit.contextWidget = widget;
-					isOnWidget = widget && widget.dndController.getSelectedNodes().length > 0;
-					// If not clicked on a item (tree.node or grid.row), but below widget,
-					// and nothing is selected, then set all menuItems to disabled except create/upload
-					if (!isOnWidget) {
-						array.filter(menu.getChildren(), function(item) {
-							if (item.get('label') != 'New' && item.get('label') != 'Upload') {
-								item.set('disabled', true);
-							}
-						});
-					}
-					else {
-						array.forEach(menu.getChildren(), function(item) {
-							item.set('disabled', false);
-						});
-					}
+					context = this.getContext(evt);
+					this.enableContextMenuItems(menu, context);
+					this.editor.context = context;
 				}));
 			}, this);
 
@@ -79,7 +55,7 @@ define([
 			}));
 			menu.addChild(MenuItem({
 				label: 'Rename',
-				onClick: lang.hitch(this, this.renameItem)
+				onClick: lang.hitch(this, this.edit)
 			}));
 			menu.addChild(MenuItem({
 				label: 'Delete',
@@ -101,102 +77,61 @@ define([
 			}));
 
 			menu.startup();
-			this.edit.contextMenu = menu;
+			this.editor.contextMenu = menu;
 		},
 
 		/**
-		 * Delete selected item(s).
-		 * @return {dojo.DeferredList}
+		 * Enables or disables context menu items depending on the clicked context.
+		 * @param {dijit.Menu} menu
+		 * @param {object} context
 		 */
-		deleteItems: function() {
-			// Notes:
-			// A. When deleting from toolbar we only use selected items from the grid (or use focus?). Currently this
-			// happens from the different menu in layout.js -> move here?
-			// B. When deleting from context menu use source to decide which selected items to use
-			var store = this.store;
-			var dnd = this.edit.contextWidget.dndController;
-			var self = this;
-			var i = 0, item, dndItem, nodes, len;
-
-			// TODO: whould be nice if we didn't depend on dnd for editing.
-			// This is out of convenience to have one method to get the selected nodes instead of a widget specific
-			nodes = dnd.getSelectedNodes();
-			len = nodes.length;
-			for (; i < len; i++) {
-				dndItem = dnd.getItem(nodes[i].id);
-				item = dndItem.data.item;
-				Deferred.when(store.remove(item.id), function() {
-					self.removeHistory(item.id);
-					// When deleting folder in tree, grid is not updated by store.onDelete() since grid only contains folders children!
-					if (item.dir && self.edit.contextWidget == self.tree) {
-						self.grid._refresh();   // note: grid._refresh has a timeout, so it doesn't matter to call it in rapid succession
+		enableContextMenuItems: function(menu, context) {
+			// If not clicked on a item (tree.node or grid.row), but below widget and nothing is selected,
+			// then set all menuItems to disabled except create/upload
+			if (context.isOnTree || context.isOnTreePane) {
+				array.filter(menu.getChildren(), function(item) {
+					if (item.get('label') != 'New' && item.get('label') != 'Upload') {
+						item.set('disabled', true);
 					}
-				}, function(err) {
-					console.log(err);
+				});
+			}
+			else {
+				array.forEach(menu.getChildren(), function(item) {
+					item.set('disabled', false);
 				});
 			}
 		},
 
 		/**
-		 * Rename item
-		 * @param {object} item dojo.store.object
-		 * @return {object} dojo.Deferred
+		 * Delete selected item(s).
 		 */
-		renameItem: function() {
-			var self = this;
-			var store = this.store;
-			var grid = this.grid;
-			// TODO: do not hard code, find column from item.name since name might not always be first column
-			var cell = grid.getCell(0);
-			var item = this.getLastSelectedItem();
-			// grid calls editor.apply onBlur on the grid -> add id to row/cell?
-/*			var cnn = on(cell, 'onBlur', this, function() {
-				console.log('done editing')   
-				dojo.disconnect(cnn);
-				grid.edit.apply();
-				grid.edit.save();
-				cell.editable = false;
-			});*/
+		deleteItems: function() {
+            // TODO: return deferred list of all deleted items
+			// Notes:
+			// A. When deleting from toolbar we only use selected items from the grid (or use focus?). Currently this
+			// happens from the different menu in layout.js -> move here?
+			// B. When deleting from context menu use source to decide which selected items to use
+			var self = this, store = this.store;
+			var context = this.editor.context;
+			var i = 0, len;
+			var item, items, widget;
 
-			var cnns = [];
-			var i = 0;
-			cnns[cnns.length] = on(grid, 'onApplyCellEdit', function(value) {
-				if (item.name !== value) {	// user just pressed enter but didn't change the name
-					item.name = value;
-					item.mod = self.getDate();
-					console.log('applying edit')
-					Deferred.when(store.put(item), function() {
-						//grid.edit.apply();
-						//grid.store.save();
-						//	grid.edit.save();
-						cell.editable = false;
-					},
-					function(err) {
-						grid.edit.cancel();
-						cell.editable = false;
-					});
-				}
-				for (; i < cnns.length; i++) {
-					dojo.disconnect(cnns[i]);
-				}
-			});
-			cnns[cnns.length] = on(grid, 'onCancelEdit', function() {
-				for (; i < cnns.length; i++) {
-					dojo.disconnect(cnns[i]);
-				}
-			});
-			cnns[cnns.length] = on(dom.byId(this.id), 'mousedown', this, function(evt) {
-				console.log('cnnExtraCancel')
-				// editing is not canceled when clicking on the scrollbox
-				if (!domClass.contains(evt.target, 'dojoxGridCell')) {
-					grid.edit.cancel();
-				}
-			});
-
-			cell.editable = true;	// enable editing
-			grid.edit.setEditCell(cell, grid.getItemIndex(item));
-//			grid.doStartEdit(cell, grid.getItemIndex(item));
-			//grid.focus.setFocusCell(cell, grid.getItemIndex(item));
+			widget = context.isOnGrid || context.isOnGridPane ? this.grid : this.tree;
+            items = widget.selection.getSelected();	// TODO: make this work also for the tree which doesn't have the same selection object
+			len = items.length;
+			for (; i < len; i++) {
+				item = items[i];
+				Deferred.when(store.remove(item.id), function() {
+					self.removeHistory(item.id);
+					// When deleting folder in tree, grid is not updated by store.onDelete() since grid only contains folders children!
+					if (item.dir && (context.isOnTree || context.isOnTreePane)) {
+						console.log('deleteItems: refreshing grid');
+						self.grid._refresh();   // note: grid._refresh has a timeout, so it doesn't matter to call it in rapid succession (in a loop)
+					}
+				}, function(err) {
+					console.log(err);
+				});
+			}
 		},
 
 		/**
@@ -207,7 +142,6 @@ define([
 		createItem: function(itemProps) {
 			var store = this.store;
 			var parId = this.currentTreeItem.id;
-
 			var item = {
 				size: 0,
 				parId: parId,
@@ -230,21 +164,40 @@ define([
 		 * Create and rename an item
 		 * Creates a new item, selects it in the grid and switches to edit mode.
 		 * @param {object} itemProps
+         *
 		 */
 		createRenameItem: function(itemProps) {
-
+            // TODO: return item after it is renamed
 			// createItem makes the grid update all its rows -> we cant rename the new item right away since it's not rendered yet
 			// Connect to endUpdate to time it right
 			return Deferred.when(this.createItem(itemProps), lang.hitch(this, function(item) {
 				var grid = this.grid;
-				var rowIndex = grid.getItemIndex(item);
-				var cnn = on(grid, 'endUpdate', this, function() {
-					dojo.disconnect(cnn);
-					grid.selection.setSelected(rowIndex, true);	// new item in grid needs to be selected before it can be renamed
-					this.renameItem(item);
-				});
+				// store.add calls onNew() before returning. The grid listens to onNew() and calls grid._addItem() in turn.
+				// So item is added to internal grid index before it is rendered, e.g. rowIndex is available right away
+				var itemRowIndex = grid.getItemIndex(item);
+				var cnn = aspect.after(grid, 'renderRow', lang.hitch(this, function(rowIndex) {
+					if (rowIndex == itemRowIndex) {
+						cnn.remove();
+						grid.selection.setSelected(rowIndex, true);	// new item in grid needs to be selected before it can be renamed
+						this.currentGridItem = item;	// TODO use grid.selection instead ?
+                        this.edit();
+					}
+				}), true);
 			}))
-		}
+		},
+
+        /**
+         * Display grid's inline editor.
+         */
+        edit: function() {
+            // note: rfe.Grid.doApplyCellEdit() does the actual renaming, e.g. call store.put
+            var grid = this.grid, cell = grid.getCell(0); // TODO: get cell index from item.name instead
+            var item = this.getLastSelectedItem(); // rename item is either called through contextMenu or menu toolbar
+            cell.editable = true;
+            grid.edit.setEditCell(cell, grid.getItemIndex(item));
+        }
+
 	});
+
 
 });

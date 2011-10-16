@@ -1,12 +1,14 @@
 define([
 	'dojo/_base/lang',
-	"dojo/_base/declare",
+	'dojo/_base/array',
+	'dojo/_base/declare',
 	'dojo/_base/Deferred',
 	'dojo/on',
+	'dojo/topic',
 	'dojo/dom-class',
-	"rfe/dnd/GridSelector",
-	"dojo/dnd/Manager"
-], function(lang, declare, Deferred, on, domClass, GridSelector, Manager) {
+	'rfe/dnd/GridSelector',
+	'dojo/dnd/Manager'
+], function(lang, array, declare, Deferred, on, topic, domClass, GridSelector, Manager) {
 
 	return declare("rfe.dnd.GridSource", GridSelector, {
 		// summary: a Source object, which can be used as a DnD source, or a DnD target
@@ -17,11 +19,13 @@ define([
 
 		copyOnly: false,
 
-		constructor: function(grid, params) {
+		dragThreshold: 5,	// The move delay in pixels before detecting a drag
 
+		constructor: function(grid, params) {
 			lang.mixin(this, params || {});
 
-			var type = this.accept;	// create accepted types as properties of accept, which can be checkt in checkAcceptance
+			var type = params.accept instanceof Array ? params.accept : ['treeNode', 'gridNode'];
+			this.accept = null;
 			if (type.length){
 				this.accept = {};
 				for (var i = 0; i < type.length; ++i) {
@@ -29,23 +33,22 @@ define([
 				}
 			}
 
-			// class-specific variables
 			this.isDragging = false;
 			this.mouseDown = false;
 			this.targetAnchor = null;
+			this._lastX = 0;
+			this._lastY = 0;
 
-			// states
 			this.targetState = "";
-			
-			domClass.contains(this.domNode, "dojoDndSource");
-			domClass.contains(this.domNode, "dojoDndTarget");
+			this.sourceState = "";
+			domClass.add(this.domNode, "dojoDndSource");
+			domClass.add(this.domNode, "dojoDndTarget");
 
-			// set up events
 			this.topics = [
-				on("/dnd/source/over", lang.hitch(this, "onDndSourceOver")),
-				on("/dnd/start", lang.hitch(this, "onDndStart")),
-				on("/dnd/drop", lang.hitch(this, "onDndDrop")),
-				on("/dnd/cancel", lang.hitch(this, "onDndCancel"))
+				topic.subscribe("/dnd/source/over", lang.hitch(this, "onDndSourceOver")),
+				topic.subscribe("/dnd/start", lang.hitch(this, "onDndStart")),
+				topic.subscribe("/dnd/drop", lang.hitch(this, "onDndDrop")),
+				topic.subscribe("/dnd/cancel", lang.hitch(this, "onDndCancel"))
 			];
 			this.events.push(
 				on(this.domNode, "mousedown", lang.hitch(this, "onMouseDown")),
@@ -83,8 +86,11 @@ define([
 
 		destroy: function() {
 			// summary: prepares the object to be garbage-collected
+			var h;
 			this.inherited("destroy", arguments);
-			array.forEach(this.topics, remove);
+			while (h = this.topics.pop()) {
+				h.remove();
+			}
 			this.targetAnchor = null;
 		},
 
@@ -93,6 +99,12 @@ define([
 			// summary: event processor for onmousemove
 			// e: Event: mouse event
 			var m;
+
+			// do not allow dnd when editing
+			if (this.grid.edit.isEditing()) {
+				return;
+			}
+
 			if (this.isDragging && this.targetState == "Disabled") {
 				return;
 			}
@@ -104,7 +116,8 @@ define([
 				m.canDrop(this.canDrop());
 			}
 			else {
-				if (this.mouseDown && this.isSource && !this.grid.editMode) {
+				if (this.mouseDown && this.isSource && !this.grid.editMode &&
+				(Math.abs(e.pageX - this._lastX) >= this.dragThreshold || Math.abs(e.pageY - this._lastY) >= this.dragThreshold)) {
 					var selection = this.grid.selection;
 					if (!selection.selected[this.currentRowIndex]) {
 						// Also allow drag even when row is not selected
@@ -123,6 +136,8 @@ define([
 			// e: Event: mouse event
 			this.mouseDown = true;
 			this.mouseButton = e.button;
+			this._lastX = e.pageX;
+			this._lastY = e.pageY;
 			this.inherited("onMouseDown", arguments);
 		},
 
@@ -161,7 +176,6 @@ define([
 			//		Copy items, if true, move items otherwise
 			// tags:
 			//		private
-
 			if(this.isSource){
 				this._changeState("Source", this == source ? (copy ? "Copied" : "Moved") : "");
 			}
@@ -191,7 +205,7 @@ define([
 				this.onDrop(source, nodes, copy, target);
 			}
 			else if (this == source && !copy) {
-				console.log('inDndRop: dropped outside of grid')
+				console.log('inDndDrop: dropped outside of grid')
 			}
 			this.onDndCancel();
 		},
@@ -234,16 +248,10 @@ define([
 			}
 
 			for (i; i < len; i++) {
-				//item = nodes[i].data.item;	// TODO: ? instead of storing item in node in GridSelector.addToSelection, only use node.id to get item (note: tree uses node.item)
 				dndItem = source.getItem(nodes[i].id);
 				item = dndItem.data.item;
 				oldParentItem = store.storeMemory.get(item.parId);
-				dfd = store.pasteItem(item, oldParentItem, newParentItem, copy)
-				Deferred.when(dfd, lang.hitch(this, function() {
-					// TODO: find better solution, e.g. generic that can also be used in TreeSource.
-					console.log('gridSource removeFromSelection', dndItem.data.gridRowIndex, this.selection)
-					this.removeFromSelection(dndItem.data.gridRowIndex);
-				}));
+				store.pasteItem(item, oldParentItem, newParentItem, copy);  // note: when moving store calls onDelete which removes selection in the grid
 			}
 		},
 

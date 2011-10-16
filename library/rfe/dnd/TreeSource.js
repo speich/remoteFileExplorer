@@ -1,56 +1,28 @@
 define([
 	'dojo/_base/lang',
+	'dojo/_base/declare',
 	'dojo/_base/Deferred',
 	'dojo/on',
 	'dojo/dom-class',
 	'original/dijit/tree/dndSource',
 	'dojo/dnd/Manager'
-], function(lang, Deferred, on, domClass, dndSource, dndManager) {
+], function(lang, declare, Deferred, on, domClass, dndSource, dndManager) {
 
-		return dndSource.extend({
-
-			// accept: String[]
-			//		List of accepted types (text strings) for the Tree; defaults to
-			//		["text"]
-			accept: ['treeNode', 'gridNode'],
-
+		return declare(dndSource, {
 			constructor: function(tree, params) {
-				// summary:
-				//		a constructor of the Tree DnD Source
-				// tags:
-				//		private
 
 				lang.mixin(this, params || {});
 
-				var type = this.accept;	// create accepted types as properties of accept, which can be checkt in checkAcceptance()
+				var type = params.accept instanceof Array ? params.accept : ['treeNode', 'gridNode'];
+				this.accept = null;
 				if (type.length){
 					this.accept = {};
 					for (var i = 0; i < type.length; ++i) {
 						this.accept[type[i]] = 1;
 					}
 				}
-
-				// class-specific variables
-				this.isDragging = false;
-				this.mouseDown = false;
-				this.targetAnchor = null;	// DOMNode corresponding to the currently moused over TreeNode
-				this._lastX = 0;
-				this._lastY = 0;
-
-				this.targetState = "";
-				domClass.add(this.node, "dojoDndSource");
-				domClass.add(this.node, "dojoDndTarget");
-
-				// set up events
-				this.topics = [
-					on("/dnd/source/over", lang.hitch(this, "onDndSourceOver")),
-					on("/dnd/start", lang.hitch(this, "onDndStart")),
-					on("/dnd/drop", lang.hitch(this, "onDndDrop")),
-					on("/dnd/cancel", lang.hitch(this, "onDndCancel"))
-				];
 			},
 
-			// methods
 			checkAcceptance: function(source, nodes) {
 				var i = 0, len = nodes.length;
 				for (; i < len; ++i) {
@@ -72,11 +44,17 @@ define([
 
 				var m = dndManager.manager(),
 				oldTarget = this.targetAnchor,			// the TreeNode corresponding to TreeNode mouse was previously over
-				newTarget = this.current;//,				// TreeNode corresponding to TreeNode mouse is currently over
+				newTarget = this.current; 					// TreeNode corresponding to TreeNode mouse is currently over
 
 				// calculate if user is indicating to drop the dragged node before, after, or over
 				// (i.e., to become a child of) the target node
 				if (newTarget != oldTarget) {
+/*			      if (oldTarget){
+						this._removeItemClass(oldTarget.rowNode, 'Over');
+					}
+					if (newTarget){
+						this._addItemClass(newTarget.rowNode, 'Over');
+					}*/
 					// Check if it's ok to drop the dragged node on/before/after the target node.
 					if (m.source == this && (newTarget.id in this.selection)) {
 						// Guard against dropping onto yourself (TODO: guard against dropping onto your descendant, #7140)
@@ -88,8 +66,8 @@ define([
 					else {
 						m.canDrop(false);
 					}
-
 					this.targetAnchor = newTarget;
+					console.log('_onDragMouse', this, this.targetAnchor)
 				}
 			},
 
@@ -106,14 +84,6 @@ define([
 			},
 
 			onDrop: function(source, nodes, copy, target) {
-				// summary:
-				//		called only on the current target, when drop is performed
-				// source: Object
-				//		the source which provides items
-				// nodes: Array
-				//		the list of transferred items
-				// copy: Boolean
-				//		copy items, if true, move items otherwise
 				if (this != source) {
 					this.onDropExternal(source, nodes, copy, target);
 				}
@@ -124,11 +94,8 @@ define([
 
 			onDropExternal: function(source, nodes, copy, target) {
 				// source == grid, target == tree
-				var gridStore = source.grid.store;
 				console.log('tree onDropExternal', source);
 				this.onDropInternal(source, nodes, copy, target);
-				// TODO: remove from grid, but where in code and how
-				// console.log('tree: remove now from grid)
 			},
 
 			onDropInternal: function(source, nodes, copy, target) {

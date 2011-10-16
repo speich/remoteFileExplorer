@@ -2,15 +2,17 @@ define([
 	'dojo/_base/array',
 	'dojo/_base/lang',
 	'dojo/_base/declare',
+	'dojo/_base/event',
 	'dojo/aspect',
 	'dojo/on',
-	'dojo/_base/event',
+	'dojo/cookie',
 	'dojo/dom-construct',
 	'dojo/query',
 	'dojo/store/Memory',
 	'dojo/store/JsonRest',
 	'rfe/StoreFileCache',
 	'dijit/Tree',
+//	'rfe/Tree',
 	'dijit/tree/dndSource',
 	'rfe/Grid',
 	'rfe/dnd/GridSource',
@@ -29,10 +31,10 @@ define([
 	"dijit/form/Button",
 	"dijit/form/CheckBox",
 	"dijit/Dialog"
-], function(array, lang, declare, aspect, on, event, construct, query, Memory, JsonRest, StoreFileCache, Tree, TreeSource,
-									  Grid, GridSource, registry,
-									  BorderContainer, ContentPane, MenuBar, MenuBarItem, PopupMenuBarItem, Menu, MenuItem, MenuSeparator,
-									  PopupMenuItem, CheckedMenuItem, Toolbar, Button, CheckBox, Dialog) {
+], function(array, lang, declare, event, aspect, on, cookie, construct, query, Memory, JsonRest, StoreFileCache, Tree, TreeSource,
+				Grid, GridSource, registry,
+				BorderContainer, ContentPane, MenuBar, MenuBarItem, PopupMenuBarItem, Menu, MenuItem, MenuSeparator,
+				PopupMenuItem, CheckedMenuItem, Toolbar, Button, CheckBox, Dialog) {
 
 		return declare('rfe.Layout', null, {
 			store: null,
@@ -58,25 +60,23 @@ define([
 			/**
 			 * Initializes the tree and tree dnd.
 			 * @param id
-			 * @param store
+			 * @param {rfe/StoreFileCache} store
 			 */
 			initTree: function(id, store) {
-				var tree, dnd;
-
-				tree = new Tree({
+				var tree = new Tree({
 					id: id,
 					model: store,
 					childrenAttrs: [store.childrenAttr],
-					isEdited: false,
 					openOnClick: false,
 					openOnDblClick: true,
-					persist: true,
 					showRoot: true
 				});
-
+				// add dnd to the tree
 				new TreeSource(tree, {
+					accept: ['treeNode', 'gridNode'],
 					store: store,
-					singular: true
+					singular: true,
+					persist: true
 				});
 
 				return tree;
@@ -85,49 +85,17 @@ define([
 			/**
 			 * Initializes the grid and grid dnd.
 			 * @param {string} id
-			 * @param {dojo.store.Memory} store
+			 * @param {dojo/store/Memory} store
 			 */
 			initGrid: function(id, store) {
-				var grid, structure;
-
-				grid = new Grid({
+				var grid = new Grid({
 					id: id,
-					store: null
+					store: null	// set in FileExplorer.showItemChildrenInGrid() every time user clicks tree
 				});
-
-				structure = [{
-					name: "name",
-					field: 'name',
-					formatter: function(value, idx) {
-						var item = this.grid.getItem(idx);
-						return this.grid.formatImg(item);
-					},
-					width: '35%'},{
-						name: "size",
-						field: "size",
-						formatter: function(value) {
-							return this.grid.formatFileSize(value);
-						},
-						width: '20%'
-					},{
-						name: 'type',
-						field: 'dir',
-						formatter: function(value) {
-							return this.grid.formatType(value);
-						},
-						width: '20%'
-					},{
-						name: 'last modified',
-						field: 'mod',
-						width: '20%'
-				}];
-				grid.set('structure', structure);
-
 				// add drag and drop to the grid
 				grid.dndController = new GridSource(grid, {
 					store: store
 				});
-
 				return grid;
 			},
 
@@ -229,7 +197,7 @@ define([
 			 */
 			createMenus: function() {
 				// TODO: reuse menu from edit.js?
-				var menuBar, menuFile, menuView, menuHelp;
+				var menuBar, menuFile, menuView, menuHelp, menuTools;
 				var subMenuFile;
 
 				menuBar = new MenuBar({ id: 'rfeMenuBar' });
@@ -274,7 +242,7 @@ define([
 				}));
 				menuFile.addChild(new MenuItem({
 					label: 'Rename',
-					onClick: lang.hitch(this, this.renameItem)
+					onClick: lang.hitch(this, this.edit)
 				}));
 				menuFile.addChild(new MenuItem({
 					label: 'Delete',
@@ -312,7 +280,7 @@ define([
 					onClick: lang.hitch(this, this.toggleTreePane)
 				}));
 				on('rfe/menuView/setView', function() {
-					var el = registry.byId('rfeMenuItemFolders')
+					var el = registry.byId('rfeMenuItemFolders');
 					el.set('checked', true);
 				});
 

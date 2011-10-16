@@ -35,20 +35,6 @@ define([
 			];
 		},
 
-		// abstract access to the map
-		getItem: function(/*String*/ key) {
-			// summary: returns a data item by its key (id)
-
-			// note: key = id and not the same as rowIndex. Can be called by any other dnd source with node.id = key
-			var grid = this.grid;
-			var node = this.selection[key];
-			node.item = grid.getItem(node.gridRowIndex);
-			return {
-				data: node,
-				type: [this.dndType]
-			};
-		},
-
 		destroy: function() {
 			// summary: prepares the object to be garbage-collected
 			array.forEach(this.events, remove);
@@ -106,6 +92,12 @@ define([
 			// tags:
 			//		protected
 			this._changeState("Container", "");
+		},
+
+		_normalizedCreator: function(/*dojo.dnd.Item*/ item, /*String*/ hint){
+			var t = this.creator.call(this, item, hint);
+			dojo.addClass(t.node, "dojoDndItem");
+			return t;
 		}
 
 	});

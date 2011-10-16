@@ -1,14 +1,17 @@
 define([
 	'dojo/_base/lang',
+	'dojo/_base/array',
 	'dojo/_base/declare',
 	'dojo/_base/Deferred',
+   'dojo/cookie',
 	'dojo/keys',
 	'dojo/dom',
+	'dojo/dom-class',
 	'dojo/date/locale',
 	'dijit/registry',
 	'rfe/Layout',
 	'rfe/Edit'
-], function(lang, declare, Deferred, keys, dom, locale, registry, Layout, Edit) {
+], function(lang, array, declare, Deferred, cookie, keys, dom, domClass, locale, registry, Layout, Edit) {
 	/**
 	 * File explorer allows you to browse files.
 	 *
@@ -25,11 +28,11 @@ define([
 	 * @class
 	 */
 	return declare('rfe.FileExplorer', [Layout, Edit], {
-		version: '1.0',
-		versionDate: '2011',
-		currentTreeItem: null, 	// currently selected store object in tree, equals always parent of grid items
-		currentGridItem: null,  // currently (last, when multi-) selected store object in grid
-		currentWidget: null,    // currently selected widget, which is either tree or grid
+		version:'1.0',
+		versionDate:'2011',
+		currentTreeItem:null, // currently selected store object in tree, equals always parent of grid items
+		currentGridItem:null, // currently (last, when multi-) selected store object in grid
+		cookieNameTreePath: 'SavedTreePath',    // name of cookie to remember tree's selected path
 
 		history: {
 			steps: [],     // saves the steps
@@ -50,46 +53,34 @@ define([
 			lang.mixin(this, args);
 
 			// init tree events
-			tree.on('load', lang.hitch(this, function() {
-				var root = tree.rootNode;
-				var item = root.item;
-		//		root.setSelected(true); // root is never deselected again
-		//		tree.focusNode(root);
-				this.showItemChildrenInGrid(item);
-				this.setHistory(item.id);
-				this.currentTreeItem = item;
-			}));
-			tree.on('click', lang.hitch(this, function(item) {
-				if (item != this.currentTreeItem) { // prevent executing twice (dblclick)
-					grid.selection.clear(); // otherwise item in not-displayed folder is still selected or with same idx
-					this.showItemChildrenInGrid(item);	// only called, when store.openOnClick is set to false
+			tree.on('load', lang.hitch(this, this._initState));
+			tree.on('click', lang.hitch(this, function(item, node, evt) {
+				// note onClick is also fired when user uses keyboard navigation and hits space
+				if (item != this.currentTreeItem) {		// prevent executing twice (dblclick)
+					grid.selection.clear(); 				// otherwise item in not-displayed folder is still selected or with same idx
+					Deferred.when(this.showItemChildrenInGrid(item), function() {	// only called, when store.openOnClick is set to false
+						tree.focusNode(node);				// refocus node because it got moved to grid
+					});
 					this.setHistory(item.id);
 				}
 				this.currentTreeItem = item;
 			}));
-			tree.on('keyDown', lang.hitch(this, function(evt) {
-				if (evt.keyCode == keys.SPACE) {
-					var node = registry.getEnclosingWidget(evt.target);
-					tree.focusNode(node);
-					this.showItemChildrenInGrid(node.item);
-					this.setHistory(node.item.id);
-						 this.currentTreeItem = item;
-				}
-			}));
 
 			grid.on('rowMouseDown', lang.hitch(this, function(evt) {
-				// rowMouseDown also registeres right click
-				var item = grid.getItem(evt.rowIndex);
-				this.currentGridItem = item;
+				// rowMouseDown also registers right click
+				this.currentGridItem = grid.getItem(evt.rowIndex);     // TODO use grid.selection instead ?
 			}));
 			grid.on('rowDblClick', lang.hitch(this, function(evt) {
+				// cancel when editing
+				if (grid.edit.isEditing()) {
+					return;
+				}
 				var item = grid.getItem(evt.rowIndex);
 				if (item.dir) {
 					this.display(item);
 					this.setHistory(item.id);
 				}
 			}));
-
 			this.createLayout(this.id);
 			this.initContextMenu(dom.byId(this.id));
 		},
@@ -111,7 +102,7 @@ define([
 					grid.setStore(store, {
 						parId: item.id
 					});
-					// grid.setItems(items);	// this can not be used since it kills sorting
+					// grid.setItems(items); can not be used since it kills sorting
 				});
 			}
 			else {
@@ -140,29 +131,6 @@ define([
 		},
 
 		/**
-		 * Display parent directory.
-		 * @param {Object} [item] dojo.data.item
-		 */
-		goDirUp: function(item) {
-			var def;
-			if (!item) {
-				item = this.currentTreeItem;
-			}
-			if (item.parId) {
-				return Deferred.when(this.store.get(item.parId), lang.hitch(this, function(item) {
-					return this.display(item);
-				}), function(err) {
-					console.debug('Error occurred when going directory up', err);
-				});
-			}
-			else {
-				def = new Deferred();
-				def.resolve(false);
-				return def;
-			}
-		},
-
-		/**
 		 * Displays the data item (folder) in the tree and it's children in the grid.
 		 * The tree and the grid can either be in sync meaning that they show the same content (e.g. tree folder is expanded)
 		 * or the grid is one level down (e.g. tree folder is selected but not expanded).
@@ -173,12 +141,35 @@ define([
 			var grid = this.grid;
 			var def = this.showItemInTree(item);
 			grid.selection.deselectAll();
+			grid.showMessage(grid.loadingMessage);
 			def.then(lang.hitch(this, function() {
-				grid.showMessage(grid.loadingMessage);
-				this.showItemChildrenInGrid(item);
+				return this.showItemChildrenInGrid(item);
 			}));
 			return def;
 		},
+
+		/**
+		 * Display parent directory.
+		 * @param {Object} [item] dojo.data.item
+		 */
+		goDirUp: function(item) {
+            var def;
+            if (!item) {
+                item = this.currentTreeItem;
+            }
+            if (item.parId) {
+                return Deferred.when(this.store.get(item.parId), lang.hitch(this, function(item) {
+                    return this.display(item);
+                }), function(err) {
+                    console.debug('Error occurred when going directory up', err);
+                });
+            }
+            else {
+                def = new Deferred();
+                def.resolve(false);
+                return def;
+            }
+        },
 
 		/**
 		 * Reload current folder.
@@ -206,9 +197,9 @@ define([
 
 		/**
 		 * Adds current item id to history.
-		 * @param {string} resourceId id of JsonRestStore item
+		 * @param {string} itemId id of JsonRestStore item
 		 */
-		setHistory: function(resourceId) {
+		setHistory: function(itemId) {
 			var hist = this.history;
 
 			// first use: initialize history array
@@ -227,17 +218,17 @@ define([
 			if (hist.steps.length == hist.numSteps + 1) {
 				hist.steps.shift();
 			}
-			hist.steps.push(resourceId);
+			hist.steps.push(itemId);
 		},
 
 		/**
 		 * Remove item form history.
-		 * @param {string} resourceId
+		 * @param {string} itemId
 		 */
-		removeHistory: function(resourceId) {
+		removeHistory: function(itemId) {
 			var hist = this.history;
 			hist.steps = dojo.filter(hist.steps, function(item) {
-				return item !== resourceId;
+				return item !== itemId;
 			});
 			hist.curIdx--;
 		},
@@ -282,6 +273,8 @@ define([
 		 * Returns the last selected item of the focused widget.
 		 */
 		getLastSelectedItem: function() {
+            // widget.focused does not work when used from toolbar, since focus is moved to menu
+			// TODO use grid.selection and tree.selection instead ?
 			if (this.tree.focused || this.layout.panes.treePane.focused) {
 				return this.currentTreeItem;
 			}
@@ -289,10 +282,88 @@ define([
 				return this.currentGridItem;
 			}
 			else {
-				return null;
+				return this.currentGridItem || this.currentTreeItem;
 			}
-		}
+		},
 
+		/**
+		 * Returns an object describing on which part of the file explorer we are on
+		 * @param {Event} evt
+		 * @return {Object}
+		 */
+		getContext: function(evt) {
+			// find in which pane (of grid/tree) we are and if we are over the grid/tree or below
+			// TODO: find better solution for this
+			var obj = {
+				isOnGrid: false,
+				isOnTree: false,
+				isOnTreePane: false,
+				isOnGridPane: false,
+				widget: null
+			};
+			var node = evt.target || node;
+			while (node && node.tagName !== "BODY") {
+				if (domClass.contains(node, 'dijitTree')) {
+					obj.isOnTree = true;
+					obj.widget = this.tree;
+					break;
+				}
+				else if (domClass.contains(node, 'dojoxGridContent')) {
+					obj.isOnGrid = true;
+					obj.widget = this.grid;
+					break;
+				}
+				else if (domClass.contains(node, 'dijitContentPane')) {
+					if (node.id == 'rfeContentPaneTree') {
+						obj.isOnTreePane = true;
+					}
+					else if (node.id == 'rfeContentPaneGrid') {
+						obj.isOnGridPane = true;
+					}
+					break;
+				}
+				node = node.parentNode;
+			}
+			return obj;
+		},
+
+		/**
+		 * Sets the tree to its last state.
+		 * Reads the tree cookies to expand and set the tree selected and display the correct folder in the grid.
+		 */
+		_initState: function() {
+			var tree = this.tree, grid = this.grid;
+			var item, oreo, arr, id, paths = [];
+
+			grid.showMessage(grid.loadingMessage);
+
+			if (!tree.dndController.cookieName && tree.id) {
+				tree.dndController.cookieName = tree.id + "SaveSelectedCookie";
+			}
+			if (tree.persist) {
+				oreo = cookie(tree.dndController.cookieName);
+				if (oreo) {
+					array.forEach(oreo.split(','), function(path) {
+						paths.push(path.split('/'));
+					}, this);
+					tree.set('paths', paths);
+					// we only use last to set the folders in the grid (normally there would be one selection only anyway)
+					arr = paths[paths.length - 1];
+					id = arr[arr.length - 1];
+					Deferred.when(this.store.get(id), lang.hitch(this, function(item) {
+						this.showItemChildrenInGrid(item); // no return, since we don't have to wait for the grid to load
+						this.currentTreeItem = item;
+					}));
+				}
+			}
+			else {
+				item = tree.rootNode.item;
+				id = item.id;
+				this.display(item);
+			}
+
+			this.setHistory(id);   // do not set history in display() since history uses display too
+		}
 	});
 
 });

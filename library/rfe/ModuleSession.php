@@ -25,6 +25,9 @@ class ModuleSession extends FileExplorer {
 
 		1 => array('id' => 1, 'parId' => 'root', 'name' => 'folder 1', 'size' => 0, 'mod' => '21.03.2010', 'dir' => true),
 		2 => array('id' => 2, 'parId' => 'root', 'name' => 'folder 2', 'size' => 0, 'mod' => '23.03.2010', 'dir' => true),
+		50 => array('id' => 50, 'parId' => 'root', 'name' => 'folder 3', 'size' => 0, 'mod' => '23.03.2010', 'dir' => true),
+		51 => array('id' => 51, 'parId' => 'root', 'name' => 'folder 4', 'size' => 0, 'mod' => '23.03.2010', 'dir' => true),
+		52 => array('id' => 52, 'parId' => 'root', 'name' => 'folder 5', 'size' => 0, 'mod' => '23.03.2010', 'dir' => true),
 		3 => array('id' => 3, 'parId' => 'root', 'name' => 'texts', 'size' => 0, 'mod' => '20.04.2010', 'dir' => true),
 		4 => array('id' => 4, 'parId' => 'root', 'name' => 'photo03.jpg', 'size' => 79308, 'mod' => '27.07.2009'),
 		5 => array('id' => 5, 'parId' => 'root', 'name' => 'fenalet.jpg', 'size' => 321, 'mod' => '09.10.2002'),
@@ -112,7 +115,7 @@ class ModuleSession extends FileExplorer {
 	 */
 	public function getChildren($resource, $fs) {
 		$arr = array();
-		foreach ($fs as $key => $row) {
+		foreach ($fs as $row) {
 			if (array_key_exists('parId', $row) && $row['parId'] == $resource) {
 				$arr[] = $row;
 			}
