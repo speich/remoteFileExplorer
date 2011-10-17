@@ -32,7 +32,6 @@ define([
 		versionDate:'2011',
 		currentTreeItem:null, // currently selected store object in tree, equals always parent of grid items
 		currentGridItem:null, // currently (last, when multi-) selected store object in grid
-		cookieNameTreePath: 'SavedTreePath',    // name of cookie to remember tree's selected path
 
 		history: {
 			steps: [],     // saves the steps
@@ -82,7 +81,7 @@ define([
 				}
 			}));
 			this.createLayout(this.id);
-			this.initContextMenu(dom.byId(this.id));
+//			this.initContextMenu(dom.byId(this.id));
 		},
 
 		/**
@@ -340,21 +339,19 @@ define([
 			if (!tree.dndController.cookieName && tree.id) {
 				tree.dndController.cookieName = tree.id + "SaveSelectedCookie";
 			}
-			if (tree.persist) {
-				oreo = cookie(tree.dndController.cookieName);
-				if (oreo) {
-					array.forEach(oreo.split(','), function(path) {
-						paths.push(path.split('/'));
-					}, this);
-					tree.set('paths', paths);
-					// we only use last to set the folders in the grid (normally there would be one selection only anyway)
-					arr = paths[paths.length - 1];
-					id = arr[arr.length - 1];
-					Deferred.when(this.store.get(id), lang.hitch(this, function(item) {
-						this.showItemChildrenInGrid(item); // no return, since we don't have to wait for the grid to load
-						this.currentTreeItem = item;
-					}));
-				}
+			oreo = cookie(tree.dndController.cookieName);
+			if (tree.persist && oreo) {
+				array.forEach(oreo.split(','), function(path) {
+					paths.push(path.split('/'));
+				}, this);
+				tree.set('paths', paths);
+				// we only use last to set the folders in the grid (normally there would be one selection only anyway)
+				arr = paths[paths.length - 1];
+				id = arr[arr.length - 1];
+				Deferred.when(this.store.get(id), lang.hitch(this, function(item) {
+					this.showItemChildrenInGrid(item); // no return, since we don't have to wait for the grid to load
+					this.currentTreeItem = item;
+				}));
 			}
 			else {
 				item = tree.rootNode.item;

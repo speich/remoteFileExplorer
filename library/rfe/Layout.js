@@ -62,29 +62,28 @@ define([
 			 * @param {rfe/StoreFileCache} store
 			 */
 			initTree: function(id, store) {
-				var tree = new Tree({
+				return new Tree({
 					id: id,
 					model: store,
 					childrenAttrs: [store.childrenAttr],
 					openOnClick: false,
 					openOnDblClick: true,
-					showRoot: true
+					showRoot: true,
+					persist: true,
+					dndController: function(arg, params) {
+						return new TreeSource(arg, lang.mixin(params || {}, {
+							accept: ['treeNode', 'gridNode'],
+							store: store,
+							singular: true
+						}))
+					}
 				});
-				// add dnd to the tree
-				new TreeSource(tree, {
-					accept: ['treeNode', 'gridNode'],
-					store: store,
-					singular: true,
-					persist: true
-				});
-
-				return tree;
 			},
 
 			/**
 			 * Initializes the grid and grid dnd.
 			 * @param {string} id
-			 * @param {dojo/store/Memory} store
+			 * @param {dojo.store.Memory} store
 			 */
 			initGrid: function(id, store) {
 				var grid = new Grid({

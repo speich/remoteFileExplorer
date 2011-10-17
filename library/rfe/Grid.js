@@ -87,7 +87,7 @@ define([
 			strClass = item.dir ? 'dijitFolderClosed' : 'dijitLeaf';
 			var str = '<span>';
 			str += '<img class="dijitTreeIcon ' + strClass;
-			str += '" alt="" src="library/dojo/dojo/resources/blank.gif"/>' + item.name;
+			str += '" alt="" src="library/dojo-trunk/dojo/resources/blank.gif"/>' + item.name;
 			str += '</span>';
 			return str;
         },
