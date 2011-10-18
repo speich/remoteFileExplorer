@@ -10,8 +10,9 @@ define([
 	'dojo/date/locale',
 	'dijit/registry',
 	'rfe/Layout',
-	'rfe/Edit'
-], function(lang, array, declare, Deferred, cookie, keys, dom, domClass, locale, registry, Layout, Edit) {
+	'rfe/Edit',
+	'rfe/dnd/Avatar'
+], function(lang, array, declare, Deferred, cookie, keys, dom, domClass, locale, registry, Layout, Edit, dummy) {
 	/**
 	 * File explorer allows you to browse files.
 	 *

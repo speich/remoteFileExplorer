@@ -148,8 +148,8 @@ var dojoConfig = {
 </script>
 <script type="text/javascript" src="library/dojo-trunk/dojo/dojo.js"></script>
 <script type="text/javascript">
-require(['rfe/dnd/Avatar', 'rfe/FileExplorer'], function(FileExplorer) {
-    return new FileExplorer({
+require(['rfe/FileExplorer'], function(FileExplorer) {
+    new FileExplorer({
 		 id: 'remoteFileExplorer'
     });
 });
