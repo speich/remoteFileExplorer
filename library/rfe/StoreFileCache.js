@@ -51,8 +51,8 @@ define('rfe/StoreFileCache', [
 				self.onChange(item);	// notifies the tree (e.g. renamed an item)
 				// TODO: find out if this is necessary
 				//self.onChildrenChange(item, self.getChildren(item));	// do we need this?
-				console.log('calling onSet for the grid');
-				self.onSet(item);			// dojo.data.api
+				console.log('StoreFileCache.onSet()', item);
+				self.onSet(item);			// dojo.data.api (used by the grid only?)
 				return id;
 			}, function() {
 				self.revert();
@@ -74,6 +74,7 @@ define('rfe/StoreFileCache', [
 		remove: function(id) {
 			var self = this;
 			var item = this.get(id);
+			console.log(StoreFileCache.remove())
 			return Deferred.when(this.refDel.apply(this, arguments), function() {
 				self.onDelete(item);	// notifies tree and the grid
 			}, function() {
@@ -174,6 +175,8 @@ define('rfe/StoreFileCache', [
 			var dfd, self = this;
 			var newItem;
 
+			// TODO: return DeferredList instead
+
 			// copy item
 			if (copy) {
 				// create new item based on item and use same id -> when server sees POST with id this means copy (implicitly)
@@ -181,7 +184,7 @@ define('rfe/StoreFileCache', [
 				newItem = lang.clone(item);
 				newItem[this.parentAttr] = newParentItem.id;
 				dfd = this.add(newItem, {
-					incremental: true	// store JsonRest does POST instead of PUT even if object has an id
+					incremental: true	// otherwise store JsonRest does POST instead of PUT even if object has an id
 				});
 			}
 			// move item
@@ -189,30 +192,24 @@ define('rfe/StoreFileCache', [
 				// Update item's parent attribute to new parent
 	//			console.log('pasteItem', item)
 				item[this.parentAttr] = newParentItem.id;
-				dfd = this.put(item);
 
 				// update old parent in tree
-				Deferred.when(dfd, function() {
-	//				console.log('old', oldParentItem)
-					Deferred.when(self.getChildren(oldParentItem), function(children) {
-						self.onChildrenChange(oldParentItem, children);
-					});
-				})
+				Deferred.when(self.getChildren(oldParentItem), function(children) {
+					self.onChildrenChange(oldParentItem, children);
+				});
 
-				// update grid (and tree if skipWithNoChildren = true, not tested)
-				Deferred.when(dfd, lang.hitch(this, function() {
-					console.log('onDelete', item.name, item);
-					this.onDelete(item);
-				}));
+
+				// update grid (and tree, not tested if skipWithNoChildren = true)
+				console.log('pasteItem.onDelete', item);
+				this.onDelete(item);    // make grid remove row, even though we didn't remove anything from the store
+				dfd = this.put(item);
 			}
 
 			// update new parent in tree
-			Deferred.when(dfd, function() {
-	//			console.log('new', newParentItem)
-				Deferred.when(self.getChildren(newParentItem), function(children) {
-					self.onChildrenChange(newParentItem, children);
-				});
-			})
+			Deferred.when(self.getChildren(newParentItem), function(children) {
+				self.onChildrenChange(newParentItem, children);
+			});
+
 			return dfd;
 		},
 
@@ -339,8 +336,13 @@ define('rfe/StoreFileCache', [
 		},
 
 		getValue: function(item, attribute) {
+			//console.log('getValue \'', attribute, '\' of ', item);
 			var obj = this.storeMemory.get(item.id);
-			return obj[attribute];
+			if (!obj) {
+				console.log(item, ' not in storeMemory', this.storeMemory)
+				console.trace();
+			}
+			return attribute in obj ? obj[attribute] : undefined;
 		},
 
 		setValue: function(item, attribute, value) {
