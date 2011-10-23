@@ -200,12 +200,14 @@ define([
 			// copy: Boolean: copy items, if true, move items otherwise
 
 			// - onDndDrop() --> onDrop() --> onDropExternal()/onDropInternal()
-			if (this == target) {
+			if (this == target) {	// dropped onto grid
 				// note: this method is called from dnd.Manager. Make sure we only react if dropped on self (grid)
 				this.onDrop(source, nodes, copy, target);
 			}
-			else if (this == source && !copy) {
-				console.log('inDndDrop: dropped outside of grid')
+			else if (this == source) {	// dropped outside grid
+				console.log('grid onDndDrop: dropped outside of grid')
+				// do nothing since TreeSource.onDndDrop() takes care of removing item from grid by calling tree.store.pasteItem()
+				// TODO: remove from grid and from selection , but how do we know that store was successful?
 			}
 			this.onDndCancel();
 		},
@@ -294,12 +296,7 @@ define([
 			m = Manager.manager();
 			if (m.source == this) {
 				item = this.getStoreItem();
-				if (!item || !item.dir) {	// do nothing when dropping on file or same parent folder
-					return false;
-				}
-				else {
-					return true;
-				}
+				return item && item.dir;
 			}
 			else {
 				return true;

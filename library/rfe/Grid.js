@@ -1,9 +1,9 @@
 define([
-    'dojo/_base/lang',
+	'dojo/_base/lang',
 	'dojo/_base/declare',
-    'dojo/_base/Deferred',
-    'dojo/date/locale',
-    'dojox/grid/DataGrid'
+	'dojo/_base/Deferred',
+	'dojo/date/locale',
+	'dojox/grid/DataGrid'
 ], function(lang, declare, Deferred, locale, DataGrid) {
 
 	return declare('rfe.Grid', DataGrid, {
@@ -23,22 +23,19 @@ define([
 				formatter: function(value, idx) {
 					var item = this.grid.getItem(idx);
 					return this.grid.formatImg(item);
-				}},
-			{
-				name: "size",
-				field: "size",
+				}},{
+				name: 'size',
+				field: 'size',
 				width: '15%',
 				formatter: function(value) {
 					return this.grid.formatFileSize(value);
-				}},
-			{
+				}},{
 				name: 'type',
 				field: 'dir',
 				width: '20%',
 				formatter: function(value) {
 					return this.grid.formatType(value);
-				}},
-			{
+				}},{
 				name: 'last modified',
 				field: 'mod',
 				width: '30%'
@@ -46,6 +43,21 @@ define([
 
 		constructor: function(params) {
 			this.id = params.id;
+		},
+
+		_setStore: function(store) {
+			this.inherited('_setStore', arguments);
+			if (store) {
+				// delete item from grid after dnd external. There is no way to signal this from the store directly, since calling onDelete on the store would also notify the tree
+				this._store_connects[this._store_connects.length] = this.connect(store, 'onPasteItem', lang.hitch(this, function(itemId, copy) {
+					if (!copy) {
+						Deferred.when(store.get(itemId), lang.hitch(this, function(item) {
+							console.log('calling _onDelete', this, item)
+							this._onDelete(item);
+						}));
+					}
+				}));
+			}
 		},
 
 		onStyleRow: function(inRow) {
@@ -111,8 +123,7 @@ define([
                 this.onApplyCellEdit(value, rowIndex, attrName);
                 cell.editable = false;
             }));
-        }
-
+        },
 
 
         /*

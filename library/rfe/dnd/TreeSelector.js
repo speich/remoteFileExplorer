@@ -54,7 +54,6 @@ define([
 		/*** end patch ***/
 
 		onMouseDown: function(evt) {
-			console.log('onMouseDown: only called once now')
 			// note: Overriding to remove doing nothing on right click and also to remove stopping event (we need to bubble up
 			// to know where user clicked at in FileExplorer.getWidget
 			this._selectByMouse = true;

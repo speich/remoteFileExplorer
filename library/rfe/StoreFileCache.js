@@ -8,7 +8,8 @@ define('rfe/StoreFileCache', [
 	'dojo/_base/lang',
 	'dojo/_base/Deferred',
 	'dojo/_base/array',
-	'dojo/store/Cache'], function(regexp, declare, lang, Deferred, array, Cache) {
+	'dojo/DeferredList',
+	'dojo/store/Cache'], function(regexp, declare, lang, Deferred, array, DeferredList, Cache) {
 
 	return declare('rfe.StoreFileCache', null, {
 		// references for MonkeyPatching the store.Cache
@@ -74,7 +75,6 @@ define('rfe/StoreFileCache', [
 		remove: function(id) {
 			var self = this;
 			var item = this.get(id);
-			console.log(StoreFileCache.remove())
 			return Deferred.when(this.refDel.apply(this, arguments), function() {
 				self.onDelete(item);	// notifies tree and the grid
 			}, function() {
@@ -164,54 +164,78 @@ define('rfe/StoreFileCache', [
 
 		/**
 		 * Move or copy an item from one parent item to another.
-		 * Used in drag & drop by the tree and grid
+		 * Used in drag & drop by the tree and the grid.
 		 * @param {object} item dojo.store object
 		 * @param {object} oldParentItem dojo.store object
 		 * @param {object} newParentItem dojo.store object
 		 * @param {boolean} copy copy or move item
-		 * @return {dojo.Deferred}
+		 * @return {dojo/DeferredList}
 		 */
 		pasteItem: function(item, oldParentItem, newParentItem, copy) {
-			var dfd, self = this;
-			var newItem;
-
-			// TODO: return DeferredList instead
+			var dfds = [], dfd1, dfd2, dfd3;
+			var self = this, newItem;
+			var dl;
 
 			// copy item
 			if (copy) {
+				// TODO: test if copy works correctly
 				// create new item based on item and use same id -> when server sees POST with id this means copy (implicitly)
                 console.log('pasteItem copy', item, oldParentItem, newParentItem, copy)
+				// TODO: update date of item, but where? here or in onPasteItem callback?
 				newItem = lang.clone(item);
 				newItem[this.parentAttr] = newParentItem.id;
-				dfd = this.add(newItem, {
+				dfd1 = this.add(newItem, {
 					incremental: true	// otherwise store JsonRest does POST instead of PUT even if object has an id
 				});
+				dfds.push(dfd1);
+
 			}
 			// move item
 			else {
+				// TODO: Maybe I need to use the id instead of the items, because this.put calls remove on the cache and then
+				// re-indexes the cache. Items get a new index while newParent and oldParent use the old?
+
 				// Update item's parent attribute to new parent
 	//			console.log('pasteItem', item)
 				item[this.parentAttr] = newParentItem.id;
 
-				// update old parent in tree
-				Deferred.when(self.getChildren(oldParentItem), function(children) {
-					self.onChildrenChange(oldParentItem, children);
-				});
-
-
 				// update grid (and tree, not tested if skipWithNoChildren = true)
-				console.log('pasteItem.onDelete', item);
-				this.onDelete(item);    // make grid remove row, even though we didn't remove anything from the store
-				dfd = this.put(item);
+//				this.grid._onDelete(item);    // make grid remove row, even though we didn't remove anything from the store. Don't call onDelete since that would also call tree.onDelete
+				dfd1 = this.put(item);	// note: call onDelete before put (because it has to use old id?)
+
+				// update old parent in tree
+				dfd2 = Deferred.when(dfd1, function(id) {
+					return Deferred.when(self.getChildren(oldParentItem), function(children) {
+						self.onChildrenChange(oldParentItem, children);
+						return id;
+					});
+				});
+				dfds.push(dfd2);
 			}
 
 			// update new parent in tree
-			Deferred.when(self.getChildren(newParentItem), function(children) {
-				self.onChildrenChange(newParentItem, children);
+			dfd3 = Deferred.when(dfd1, function(id) {
+				return Deferred.when(self.getChildren(newParentItem), function(children) {
+					self.onChildrenChange(newParentItem, children);
+					return id;
+				});
 			});
+			dfds.push(dfd3);
 
-			return dfd;
+			dl = new DeferredList(dfds);
+			return Deferred.when(dl, function(results) {
+				console.log('calling onPasteItem with', results, copy)
+				if (results[0][0] && results[1][0]) {
+					self.onPasteItem(results[0][1], copy);
+				}
+			});
 		},
+
+		/**
+		 * Used by the grid, since we can't call onDelete to remove an item from the grid, because that would mess up the tree.
+		 * @param {dojo/DeferredList} deferred
+		 */
+		onPasteItem: function(itemId) {},
 
 		/************************************
 		 * Methods for dojo.data 				*
@@ -219,7 +243,6 @@ define('rfe/StoreFileCache', [
 
 		/**
 		 *	Check if object is an item form the store.
-		 * @param item
 		 */
 		isItem: function() {
 			// also used by the tree on drop
@@ -230,6 +253,10 @@ define('rfe/StoreFileCache', [
 			return true;
 		},
 
+		/**
+		 *
+		 * @param {dojo/store/object} item
+		 */
 		getLabel: function(item) {
 			// used by the tree
 			return item[this.labelAttr];
@@ -336,18 +363,16 @@ define('rfe/StoreFileCache', [
 		},
 
 		getValue: function(item, attribute) {
-			//console.log('getValue \'', attribute, '\' of ', item);
 			var obj = this.storeMemory.get(item.id);
 			if (!obj) {
-				console.log(item, ' not in storeMemory', this.storeMemory)
 				console.trace();
+				console.log(item, ' not in storeMemory ', this.storeMemory)
 			}
 			return attribute in obj ? obj[attribute] : undefined;
 		},
 
 		setValue: function(item, attribute, value) {
 			item[attribute] = value;
-			console.log('setValue', arguments)
 			this.put(item);
 		},
 
@@ -357,15 +382,12 @@ define('rfe/StoreFileCache', [
 
 		/**
 		 * Callback when an item has been deleted.
-		 * @param {object} parent parent item
+		 * Used by the tree and the grid.
+		 * @param {object} item parent item
 		 */
-		onDelete: function(item) {
-			// tree connects via _onItemDelete to this
-		},
+		onDelete: function(item) {},
 
 		revert: function() {},
-
-
 
 		/*********************************************
 		 * Methods below are used by the dijit.Tree	*

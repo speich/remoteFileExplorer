@@ -82,7 +82,7 @@ define([
 				}
 			}));
 			this.createLayout(this.id);
-//			this.initContextMenu(dom.byId(this.id));
+			this.initContextMenu(dom.byId(this.id));
 		},
 
 		/**
@@ -99,6 +99,7 @@ define([
 				store.skipWithNoChildren = false;
 				return Deferred.when(store.getChildren(item), function() {
 					store.skipWithNoChildren = true;
+					// TODO: use setQuery instead?
 					grid.setStore(store, {
 						parId: item.id
 					});

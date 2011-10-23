@@ -72,13 +72,14 @@ define([
 			},
 
 			onDndDrop: function(source, nodes, copy, target) {
-				if (this == target) {
+				console.log('onDndDrop', source, target)
+				if (this == target) {	// dropped on tree from tree
 					// note: this method is called from dnd.Manager. Make sure we only react if dropped on self (tree)
+					console.log('tree onDndDrop: dropped onto tree')
 					this.onDrop(source, nodes, copy, target);
 				}
-				else if (this == source && !copy) {
-					console.log('inDndRop: dropped outside of tree')
-					// TODO: remove from grid and from selection , but how do we not store was successful?
+				else if (this == source) { // dropped outside of tree
+					console.log('tree onDndDrop: dropped outside of tree')
 				}
 				this.onDndCancel();
 			},

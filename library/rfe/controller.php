@@ -40,7 +40,8 @@ switch($moduleType) {
 		break;
 }
 
-//sleep(2); // for testing async
+sleep(1); // for testing async
+
 switch($method) {
 	case 'GET':
 		$json = $rfe->get($resource);
