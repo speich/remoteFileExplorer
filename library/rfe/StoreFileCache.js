@@ -169,12 +169,11 @@ define('rfe/StoreFileCache', [
 		 * @param {object} oldParentItem dojo.store object
 		 * @param {object} newParentItem dojo.store object
 		 * @param {boolean} copy copy or move item
-		 * @return {dojo/DeferredList}
+		 * @return {dojo/_base/Deferred}
 		 */
 		pasteItem: function(item, oldParentItem, newParentItem, copy) {
-			var dfds = [], dfd1, dfd2, dfd3;
+			var dfd;
 			var self = this, newItem;
-			var dl;
 
 			// copy item
 			if (copy) {
@@ -184,11 +183,9 @@ define('rfe/StoreFileCache', [
 				// TODO: update date of item, but where? here or in onPasteItem callback?
 				newItem = lang.clone(item);
 				newItem[this.parentAttr] = newParentItem.id;
-				dfd1 = this.add(newItem, {
+				dfd = this.add(newItem, {
 					incremental: true	// otherwise store JsonRest does POST instead of PUT even if object has an id
 				});
-				dfds.push(dfd1);
-
 			}
 			// move item
 			else {
@@ -200,35 +197,26 @@ define('rfe/StoreFileCache', [
 				item[this.parentAttr] = newParentItem.id;
 
 				// update grid (and tree, not tested if skipWithNoChildren = true)
-//				this.grid._onDelete(item);    // make grid remove row, even though we didn't remove anything from the store. Don't call onDelete since that would also call tree.onDelete
-				dfd1 = this.put(item);	// note: call onDelete before put (because it has to use old id?)
+				dfd = this.put(item);
 
-				// update old parent in tree
-				dfd2 = Deferred.when(dfd1, function(id) {
+				// updates old parent in tree
+				Deferred.when(dfd, function(id) {
 					return Deferred.when(self.getChildren(oldParentItem), function(children) {
 						self.onChildrenChange(oldParentItem, children);
 						return id;
 					});
 				});
-				dfds.push(dfd2);
 			}
 
 			// update new parent in tree
-			dfd3 = Deferred.when(dfd1, function(id) {
+			Deferred.when(dfd, function(id) {
 				return Deferred.when(self.getChildren(newParentItem), function(children) {
 					self.onChildrenChange(newParentItem, children);
 					return id;
 				});
 			});
-			dfds.push(dfd3);
 
-			dl = new DeferredList(dfds);
-			return Deferred.when(dl, function(results) {
-				console.log('calling onPasteItem with', results, copy)
-				if (results[0][0] && results[1][0]) {
-					self.onPasteItem(results[0][1], copy);
-				}
-			});
+			return dfd;
 		},
 
 		/**

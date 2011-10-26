@@ -242,18 +242,32 @@ define([
 			var i = 0, len = nodes.length;
 			var store = this.store;
 			var dndItem, item, oldParentItem, newParentItem;
-			var dfd;
 
 			newParentItem = this.getStoreItem();
 			if (!newParentItem || !newParentItem.dir) {	// do nothing when dropping on file or same parent folder
 				return;
 			}
 
+// source.grid.updateDelay = 2000;
+
 			for (i; i < len; i++) {
 				dndItem = source.getItem(nodes[i].id);
 				item = dndItem.data.item;
 				oldParentItem = store.storeMemory.get(item.parId);
-				store.pasteItem(item, oldParentItem, newParentItem, copy);  // note: when moving store calls onDelete which removes selection in the grid
+				(function(rowNode) {	// make each looped item available to _onDelete when pasteItem resolves
+					store.pasteItem(item, oldParentItem, newParentItem, copy).then(function() {
+						// with multiple dndItems grid rows are shifted up, we have to reaccess the now rowindex here to get the internal item
+
+// grid.updateDelay might be the solution
+
+		// TODO: maybe I have to use a deferredList to collect all successfull and failed pasteItem requests and
+		// then loop through the array to call grid._onDelete on the succesful ones
+
+						var item = source.grid.getItem(rowNode.gridRowIndex);
+						console.log(rowNode, item, rowNode.gridRowIndex)
+						source.grid._onDelete(item);// note: call _onDelete with original item before store.pasteItem (e.g. store.put) modifies it, because grid uses internal array to keep track of items
+					});
+				})(dndItem.data);
 			}
 		},
 

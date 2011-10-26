@@ -175,12 +175,12 @@ define([
 				// store.add calls onNew() before returning. The grid listens to onNew() and calls grid._addItem() in turn.
 				// So item is added to internal grid index before it is rendered, e.g. rowIndex is available right away
 				var itemRowIndex = grid.getItemIndex(item);
-				var cnn = aspect.after(grid, 'renderRow', lang.hitch(this, function(rowIndex) {
+				var signal = aspect.after(grid, 'renderRow', lang.hitch(this, function(rowIndex) {
 					if (rowIndex == itemRowIndex) {
-						cnn.remove();
+						signal.remove();
 						grid.selection.setSelected(rowIndex, true);	// new item in grid needs to be selected before it can be renamed
 						this.currentGridItem = item;	// TODO use grid.selection instead ?
-                        this.edit();
+						this.edit();
 					}
 				}), true);
 			}))
