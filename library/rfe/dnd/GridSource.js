@@ -2,13 +2,14 @@ define([
 	'dojo/_base/lang',
 	'dojo/_base/array',
 	'dojo/_base/declare',
+	'dojo/_base/connect',
 	'dojo/_base/Deferred',
 	'dojo/on',
 	'dojo/topic',
 	'dojo/dom-class',
 	'rfe/dnd/GridSelector',
 	'dojo/dnd/Manager'
-], function(lang, array, declare, Deferred, on, topic, domClass, GridSelector, Manager) {
+], function(lang, array, declare, connect, Deferred, on, topic, domClass, GridSelector, Manager) {
 
 	return declare("rfe.dnd.GridSource", GridSelector, {
 		// summary: a Source object, which can be used as a DnD source, or a DnD target
@@ -125,7 +126,7 @@ define([
 					}
 					var nodes = this.getSelectedNodes();
 					if (nodes.length) {
-						m.startDrag(this, nodes, this.copyState(dojo.dnd.getCopyKeyState(e)));
+						m.startDrag(this, nodes, this.copyState(connect.isCopyKey(e)));
 					}
 				}
 			}
@@ -199,45 +200,31 @@ define([
 			// nodes: Array: the list of transferred items
 			// copy: Boolean: copy items, if true, move items otherwise
 
+			// note: this method is called from dnd.Manager.
+
 			// - onDndDrop() --> onDrop() --> onDropExternal()/onDropInternal()
-			if (this == target) {	// dropped onto grid
-				// note: this method is called from dnd.Manager. Make sure we only react if dropped on self (grid)
-				this.onDrop(source, nodes, copy, target);
+			if (this == target) {
+				if (this == source) {	// dropped onto grid from grid
+					console.log('grid onDndDrop: dropped onto grid from grid')
+					this.onDrop(source, nodes, copy, target);
+				}
+				else {	// dropped onto grid from external (tree)
+					console.log('grid onDropExternal: to be implemented', source, nodes, copy);
+				}
 			}
-			else if (this == source) {	// dropped outside grid
+			else if (this == source) {	// dropped outside of grid from grid
 				console.log('grid onDndDrop: dropped outside of grid')
 				// do nothing since TreeSource.onDndDrop() takes care of removing item from grid by calling tree.store.pasteItem()
 				// TODO: remove from grid and from selection , but how do we know that store was successful?
+			}
+			else {
+				// dropped outside of grid from grid
+				console.log('grid onDndDrop: dropped outside of grid from outside of grid')
 			}
 			this.onDndCancel();
 		},
 
 		onDrop: function(source, nodes, copy, target) {
-			// summary:
-			//		called only on the current target, when drop is performed
-			// source: Object
-			//		the source which provides items
-			// nodes: Array
-			//		the list of transferred items
-			// copy: Boolean
-			//		copy items, if true, move items otherwise
-			if (this != source) {
-				this.onDropExternal(source, nodes, copy, target);
-			}
-			else {
-				this.onDropInternal(source, nodes, copy, target);
-			}
-		},
-
-		// called by onDrop() which is called by onDndDrop()
-		onDropExternal: function(source, nodes, copy, target) {
-			console.log('grid onDropExternal: to be implemented', source, nodes, copy);
-			if (source.accept.treeNode) {
-				this.onDropFromTree(source, nodes, copy, target);
-			}
-		},
-
-		onDropInternal: function(source, nodes, copy) {
 			console.log('grid onDropInternal');
 			var i = 0, len = nodes.length;
 			var store = this.store;
@@ -248,28 +235,22 @@ define([
 				return;
 			}
 
-// source.grid.updateDelay = 2000;
-
 			for (i; i < len; i++) {
 				dndItem = source.getItem(nodes[i].id);
 				item = dndItem.data.item;
 				oldParentItem = store.storeMemory.get(item.parId);
-				(function(rowNode) {	// make each looped item available to _onDelete when pasteItem resolves
-					store.pasteItem(item, oldParentItem, newParentItem, copy).then(function() {
-						// with multiple dndItems grid rows are shifted up, we have to reaccess the now rowindex here to get the internal item
-
-// grid.updateDelay might be the solution
-
-		// TODO: maybe I have to use a deferredList to collect all successfull and failed pasteItem requests and
-		// then loop through the array to call grid._onDelete on the succesful ones
-
-						var item = source.grid.getItem(rowNode.gridRowIndex);
-						console.log(rowNode, item, rowNode.gridRowIndex)
-						source.grid._onDelete(item);// note: call _onDelete with original item before store.pasteItem (e.g. store.put) modifies it, because grid uses internal array to keep track of items
-					});
-				})(dndItem.data);
+				store.pasteItem(item, oldParentItem, newParentItem, copy);
 			}
 		},
+
+		// called by onDrop() which is called by onDndDrop()
+		onDropExternal: function(source, nodes, copy, target) {
+
+			if (source.accept.treeNode) {
+				this.onDropFromTree(source, nodes, copy, target);
+			}
+		},
+
 
 		onDndCancel: function() {
 			// summary: topic event processor for /dnd/cancel, called to cancel the DnD operation
@@ -329,7 +310,7 @@ define([
 			var trgItem = this.getStoreItem();
 			var newParentItem = trgItem && trgItem.dir ? trgItem : this.rfe.currentTreeItem;
 
-			array.forEach(nodes, function(node, idx) {
+			array.forEach(nodes, function(node) {
 				// Don't confuse the different use of items (DnD item versus store.object).
 				var dndItem = source.getItem(node.id);
 				var srcItem = dndItem.data.item;
@@ -404,6 +385,7 @@ define([
 			}
 			return node.id && ids[node.id];
 		}
+
 
 
 	});

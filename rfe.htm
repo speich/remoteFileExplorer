@@ -3,8 +3,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Remote File Explorer (rfe)</title>
-<link rel="stylesheet" type="text/css" href="library/dojo-trunk/dijit/themes/claro/claro.css"/>
-<link rel="stylesheet" type="text/css" href="library/dojo-trunk/dojox/grid/resources/claroGrid.css"/>
+<link rel="stylesheet" type="text/css" href="library/dojo/1.7/dijit/themes/claro/claro.css"/>
+<link rel="stylesheet" type="text/css" href="library/dojo/1.7/dojox/grid/resources/claroGrid.css"/>
 <style type="text/css">
 body {
 	font-family: Verdana, Helvetica, Arial, sans-serif;
@@ -120,33 +120,33 @@ body {
 // TODO: move this to a loader file
 var dojoConfig = {
 	async: true,
-	baseUrl: '/library/',
+	baseUrl: '/library/dojo/',
 	packages: [{
 			'name': 'dojo',
-			'location': 'dojo-trunk/dojo'
+			'location': '1.7/dojo'
 		},{
 			'name': 'dijit',
-			'location': 'dojo-trunk/dijit'
+			'location': '1.7/dijit'
 		},{
 			'name': 'dojox',
-			'location': 'dojo-trunk/dojox'
+			'location': '1.7/dojox'
 		},{
 			'name': 'rfe',
-			'location': "rfe"
+			'location': "../rfe"
 		},{
 			'name': 'original',
-			'location': 'dojo-trunk'
+			'location': '1.7'
 		}
 	],
 	// redirect the following modules to my own modules
 	paths: {
-		'dijit/tree/_dndSelector': 'rfe/dnd/TreeSelector',
-		'dijit/tree/dndSource': 'rfe/dnd/TreeSource'
+		'dijit/tree/_dndSelector': '../rfe/dnd/TreeSelector',
+		'dijit/tree/dndSource': '../rfe/dnd/TreeSource'
 	}
 };
 
 </script>
-<script type="text/javascript" src="library/dojo-trunk/dojo/dojo.js"></script>
+<script type="text/javascript" src="library/dojo/1.7/dojo/dojo.js"></script>
 <script type="text/javascript">
 require(['rfe/FileExplorer'], function(FileExplorer) {
     new FileExplorer({

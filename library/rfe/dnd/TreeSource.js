@@ -46,8 +46,6 @@ define([
 				oldTarget = this.targetAnchor,	// the TreeNode corresponding to TreeNode mouse was previously over
 				newTarget = this.current; 			// TreeNode corresponding to TreeNode mouse is currently over
 
-				// calculate if user is indicating to drop the dragged node before, after, or over
-				// (i.e., to become a child of) the target node
 				if (newTarget != oldTarget) {
 			      if (oldTarget){
      					this._removeItemClass(oldTarget.rowNode, 'Over');
@@ -72,14 +70,22 @@ define([
 			},
 
 			onDndDrop: function(source, nodes, copy, target) {
-				console.log('onDndDrop', source, target)
-				if (this == target) {	// dropped on tree from tree
-					// note: this method is called from dnd.Manager. Make sure we only react if dropped on self (tree)
-					console.log('tree onDndDrop: dropped onto tree')
-					this.onDrop(source, nodes, copy, target);
+				// note: this method is called from dnd.Manager.
+				if (this == target) {
+					if (this == source) {	// dropped on tree from tree
+						console.log('tree onDndDrop: dropped onto tree from tree')
+						this.onDrop(source, nodes, copy, target);
+					}
+					else {						// dropped on tree from grid
+						console.log('tree onDndDrop: dropped onto tree from external')
+					}
 				}
-				else if (this == source) { // dropped outside of tree
+				else if (this == source) { // dropped outside of tree from tree
 					console.log('tree onDndDrop: dropped outside of tree')
+					// let GridSource handle this ?
+				}
+				else {   						// dropped outside of tree from outside of tree
+					console.log('tree onDndDrop: dropped from outside of tree to outside of tree')
 				}
 				this.onDndCancel();
 			},
@@ -93,17 +99,11 @@ define([
 				for (; i < len; i++) {
 					dndItem = source.getItem(nodes[i].id);
 					item = dndItem.data.item;
-					oldParentItem = store.storeMemory.get(item.parId);
-					store.pasteItem(item, oldParentItem, newParentItem, copy);
+					if (item.parId != newParentItem.id) {	// do nothing when dropping child on current parent
+						oldParentItem = store.storeMemory.get(item.parId);
+						store.pasteItem(item, oldParentItem, newParentItem, copy);
+					}
 				}
-				/*
-				if (this != source) {
-					this.onDropExternal(source, nodes, copy, target);
-				}
-				else {
-					this.onDropInternal(source, nodes, copy, target);
-				}
-				*/
 			}
 
 		});
