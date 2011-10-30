@@ -82,10 +82,10 @@ class ModuleSession extends FileExplorer {
 	 */
 	public function __construct($rootDir) {
 		parent::__construct($rootDir);
-//		if (!isset($_SESSION['rfe'])) {
+		if (!isset($_SESSION['rfe'])) {
 			$_SESSION['rfe'][$rootDir] = serialize($this->fsDefault);
 			$_SESSION['rfe']['lastUsedItemId'] = count($this->fsDefault);
-//		}
+		}
 	}
 	
 	/**
