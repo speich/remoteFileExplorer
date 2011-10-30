@@ -48,13 +48,10 @@ define([
 		_setStore: function(store) {
 			this.inherited('_setStore', arguments);
 			if (store) {
-				// delete item from grid after dnd external. There is no way to signal this from the store directly, since calling onDelete on the store would also notify the tree
-				this._store_connects[this._store_connects.length] = this.connect(store, 'onPasteItem', lang.hitch(this, function(itemId, copy) {
+				// it's not possible to use store.onDelete since that would also notify the tree
+				this._store_connects[this._store_connects.length] = this.connect(store, 'onPasteItem', lang.hitch(this, function(item, copy) {
 					if (!copy) {
-						Deferred.when(store.get(itemId), lang.hitch(this, function(item) {
-							console.log('calling _onDelete', this, item)
-							this._onDelete(item);
-						}));
+						this._onDelete(item);
 					}
 				}));
 			}
@@ -95,11 +92,10 @@ define([
 		 * @param {string} item
 		 */
 		formatImg: function(item) {
-			var strClass;
-			strClass = item.dir ? 'dijitFolderClosed' : 'dijitLeaf';
+			var strClass = item.dir ? 'dijitFolderClosed' : 'dijitLeaf';
 			var str = '<span>';
 			str += '<img class="dijitTreeIcon ' + strClass;
-			str += '" alt="" src="library/dojo-trunk/dojo/resources/blank.gif"/>' + item.name;
+			str += '" alt="" src="' + require.toUrl("dojo/resources/blank.gif") + '"/>' + item.name;
 			str += '</span>';
 			return str;
         },
@@ -124,6 +120,11 @@ define([
                 cell.editable = false;
             }));
         },
+
+		removeItem: function(itemId) {
+			var item = this.store.get(itemId);
+			this._onDelete(item);// note: call _onDelete with original item before store.pasteItem (e.g. store.put) modifies it, because grid uses internal array to keep track of items
+		}
 
 
         /*
