@@ -8,8 +8,7 @@ define('rfe/StoreFileCache', [
 	'dojo/_base/lang',
 	'dojo/_base/Deferred',
 	'dojo/_base/array',
-	'dojo/DeferredList',
-	'dojo/store/Cache'], function(regexp, declare, lang, Deferred, array, DeferredList, Cache) {
+	'dojo/store/Cache'], function(regexp, declare, lang, Deferred, array, Cache) {
 
 	return declare('rfe.StoreFileCache', null, {
 		// references for MonkeyPatching the store.Cache
@@ -51,9 +50,9 @@ define('rfe/StoreFileCache', [
 			return Deferred.when(this.refPut.apply(this, arguments), function(id) {
 				self.onChange(item);	// notifies the tree (e.g. renamed an item)
 				// TODO: find out if this is necessary
-				//self.onChildrenChange(item, self.getChildren(item));	// do we need this?
-				console.log('StoreFileCache.onSet()', item);
-				self.onSet(item);			// dojo.data.api (used by the grid only?)
+				self.onChildrenChange(item, self.getChildren(item));	// do we need this?
+//				console.log('StoreFileCache.onSet()', item);
+				self.onSet(item);
 				return id;
 			}, function() {
 				self.revert();
@@ -195,35 +194,34 @@ define('rfe/StoreFileCache', [
 				// Update item's parent attribute to new parent
 	//			console.log('pasteItem', item)
 				item[this.parentAttr] = newParentItem.id;
-
-				// update grid (and tree, not tested if skipWithNoChildren = true)
 				dfd = this.put(item);
 
-				// updates old parent in tree
+				// notify grid to remove item. Note: we can't use onDelete since that would also notify tree
 				Deferred.when(dfd, function(id) {
-					return Deferred.when(self.getChildren(oldParentItem), function(children) {
+					Deferred.when(self.storeMemory.get(id), function(item) {
+						self.onPasteItem(item, copy)
+					});
+				});
+
+				// updates old parent in tree
+				Deferred.when(dfd, function() {
+					Deferred.when(self.getChildren(oldParentItem), function(children) {
 						self.onChildrenChange(oldParentItem, children);
-						return id;
 					});
 				});
 			}
 
 			// update new parent in tree
 			Deferred.when(dfd, function(id) {
-				return Deferred.when(self.getChildren(newParentItem), function(children) {
+				Deferred.when(self.getChildren(newParentItem), function(children) {
 					self.onChildrenChange(newParentItem, children);
-					return id;
 				});
 			});
 
 			return dfd;
 		},
 
-		/**
-		 * Used by the grid, since we can't call onDelete to remove an item from the grid, because that would mess up the tree.
-		 * @param {dojo/DeferredList} deferred
-		 */
-		onPasteItem: function(itemId) {},
+		onPasteItem: function(item, copy) {},
 
 		/************************************
 		 * Methods for dojo.data 				*
@@ -351,12 +349,7 @@ define('rfe/StoreFileCache', [
 		},
 
 		getValue: function(item, attribute) {
-			var obj = this.storeMemory.get(item.id);
-			if (!obj) {
-				console.trace();
-				console.log(item, ' not in storeMemory ', this.storeMemory)
-			}
-			return attribute in obj ? obj[attribute] : undefined;
+			return attribute in item ? item[attribute] : undefined;
 		},
 
 		setValue: function(item, attribute, value) {
