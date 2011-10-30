@@ -91,7 +91,6 @@ define([
 		 * @return {dojo.Deferred}
 		 */
 		showItemChildrenInGrid: function(item) {
-			// TODO: use on(store.getChildren) instead or even do it in getChildren?
 			var grid = this.grid;
 			var dfd = new Deferred();
 			var store = this.store;
@@ -99,11 +98,9 @@ define([
 				store.skipWithNoChildren = false;
 				return Deferred.when(store.getChildren(item), function() {
 					store.skipWithNoChildren = true;
-					// TODO: use setQuery instead?
-					grid.setStore(store, {
+					grid.setQuery({
 						parId: item.id
 					});
-					// grid.setItems(items); can not be used since it kills sorting
 				});
 			}
 			else {
@@ -351,6 +348,9 @@ define([
 				arr = paths[paths.length - 1];
 				id = arr[arr.length - 1];
 				Deferred.when(this.store.get(id), lang.hitch(this, function(item) {
+					grid.setStore(this.store, {
+						parId: item.id
+					});
 					this.showItemChildrenInGrid(item); // no return, since we don't have to wait for the grid to load
 					this.currentTreeItem = item;
 				}));
