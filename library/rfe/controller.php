@@ -40,7 +40,8 @@ switch($moduleType) {
 		break;
 }
 
-sleep(1); // for testing async
+//sleep(1); // for testing async
+time_nanosleep(0, 500000000);	// = 0.5 seconds
 
 switch($method) {
 	case 'GET':
