@@ -2,7 +2,7 @@
 <html>
 <head>
 <title>Tree test</title>
-<link rel="stylesheet" type="text/css" href="library/dojo-trunk/dijit/themes/claro/claro.css"/>
+<link rel="stylesheet" type="text/css" href="library/dojo/trunk/dijit/themes/claro/claro.css"/>
 </head>
 
 <body class="claro">
@@ -12,40 +12,35 @@ var dojoConfig = {
 	async: true
 }
 </script>
-<script type="text/javascript" src="library/dojo-trunk/dojo/dojo.js"></script>
+<script type="text/javascript" src="library/dojo/trunk/dojo/dojo.js"></script>
 <script type="text/javascript">
 
 require(["dojo/data/ItemFileWriteStore",
 	'dijit/tree/ForestStoreModel',
 	'dijit/tree/dndSource',
 	"dijit/Tree"],
-	function(ItemFileWriteStore, ForestStoreModel, dndSource, Tree) {
-	var tree = new Tree({
-		id: 'myTree',
-		showRoot: true,
-		persist: true,
-		openOnClick: false,
-		openOnDblClick: true,
-		model: new ForestStoreModel({
-			id: 'continentModel',
-			store: new ItemFileWriteStore	({
-				id: 'continentStore',
-				url: '/library/dojo-trunk/dijit/tests/_data/countries.json'
-			}),
-			query: {type: 'continent'},
-			rootId: 'continentRoot',
-			rootLabel: 'Continents',
-			childrenAttrs: ["children"],
-			dndController: "dijit/tree/dndSource",
-								singular: true
-		})
-	}, 'treeCont');
-
-
-
-// tree.set('path', ['continentRoot', 'NA', 'MX', 'Mexico City']);
-
-});
+	function(ItemFileWriteStore, ForestStoreModel, dndSource, Tree){
+		var tree = new Tree({
+			id: 'myTree',
+			showRoot: true,
+			persist: true,
+			openOnClick: false,
+			openOnDblClick: true,
+			model: new ForestStoreModel({
+				id: 'continentModel',
+				store: new ItemFileWriteStore({
+					id: 'continentStore',
+					url: '/library/dojo/trunk/dijit/tests/_data/countries.json'
+				}),
+				query: {type: 'continent'},
+				rootId: 'continentRoot',
+				rootLabel: 'Continents',
+				childrenAttrs: ["children"],
+				dndController: "dijit/tree/dndSource"
+			})
+		}, 'treeCont');
+	// tree.set('path', ['continentRoot', 'NA', 'MX', 'Mexico City']);
+	});
 
 </script>
 </body>
