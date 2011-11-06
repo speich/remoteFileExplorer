@@ -54,10 +54,11 @@ define([
 
 			// init tree events
 			tree.on('load', lang.hitch(this, this._initState));
-			tree.on('click', lang.hitch(this, function(item, node, evt) {
+			tree.on('click', lang.hitch(this, function(item, node) {
 				// note onClick is also fired when user uses keyboard navigation and hits space
 				if (item != this.currentTreeItem) {		// prevent executing twice (dblclick)
 					grid.selection.clear(); 				// otherwise item in not-displayed folder is still selected or with same idx
+					grid.showMessage(grid.loadingMessage);
 					Deferred.when(this.showItemChildrenInGrid(item), function() {	// only called, when store.openOnClick is set to false
 						tree.focusNode(node);				// refocus node because it got moved to grid
 					});
@@ -94,6 +95,13 @@ define([
 			var grid = this.grid;
 			var dfd = new Deferred();
 			var store = this.store;
+
+			if (!grid.store) {
+				grid.setStore(this.store, {
+					parId: item.id
+				});
+			}
+
 			if (item.dir) {
 				store.skipWithNoChildren = false;
 				return Deferred.when(store.getChildren(item), function() {
@@ -335,22 +343,16 @@ define([
 
 			grid.showMessage(grid.loadingMessage);
 
-			if (!tree.dndController.cookieName && tree.id) {
-				tree.dndController.cookieName = tree.id + "SaveSelectedCookie";
-			}
 			oreo = cookie(tree.dndController.cookieName);
 			if (tree.persist && oreo) {
-				array.forEach(oreo.split(','), function(path) {
-					paths.push(path.split('/'));
-				}, this);
+				paths = array.map(oreo.split(","), function(path){
+				   return path.split("/");
+				})
 				tree.set('paths', paths);
 				// we only use last to set the folders in the grid (normally there would be one selection only anyway)
 				arr = paths[paths.length - 1];
 				id = arr[arr.length - 1];
 				Deferred.when(this.store.get(id), lang.hitch(this, function(item) {
-					grid.setStore(this.store, {
-						parId: item.id
-					});
 					this.showItemChildrenInGrid(item); // no return, since we don't have to wait for the grid to load
 					this.currentTreeItem = item;
 				}));
