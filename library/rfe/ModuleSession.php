@@ -25,7 +25,7 @@ class ModuleSession extends FileExplorer {
 
 		1 => array('id' => 1, 'parId' => 'root', 'name' => 'folder 1', 'size' => 0, 'mod' => '21.03.2010', 'dir' => true),
 		2 => array('id' => 2, 'parId' => 'root', 'name' => 'folder 2', 'size' => 0, 'mod' => '23.03.2010', 'dir' => true),
-		50 => array('id' => 50, 'parId' => 'root', 'name' => 'folder 3', 'size' => 0, 'mod' => '23.03.2010', 'dir' => true),
+		24 => array('id' => 24, 'parId' => 'root', 'name' => 'folder 3', 'size' => 0, 'mod' => '23.03.2010', 'dir' => true),
 		3 => array('id' => 3, 'parId' => 'root', 'name' => 'texts', 'size' => 0, 'mod' => '20.04.2010', 'dir' => true),
 		4 => array('id' => 4, 'parId' => 'root', 'name' => 'photo03.jpg', 'size' => 79308, 'mod' => '27.07.2009'),
 		5 => array('id' => 5, 'parId' => 'root', 'name' => 'fenalet.jpg', 'size' => 321, 'mod' => '09.10.2002'),
@@ -56,8 +56,8 @@ class ModuleSession extends FileExplorer {
 		10 => array('id' => 10, 'parId' => 2, 'name' => 'file5.txt', 'size' => 1631, 'mod' => '06.11.1973'),
 		11 => array('id' => 11, 'parId' => 2, 'name' => 'file1.txt', 'size' => 9638, 'mod' => '27.01.2010'),
 		12 => array('id' => 12, 'parId' => 2, 'name' => 'subfolder 22', 'size' => 0, 'mod' => '27.03.2010', 'dir' => true),
-		45 => array('id' => 45, 'parId' => 2, 'name' => 'test dnd 1', 'size' => 1631, 'mod' => '06.11.1973'),
-		46 => array('id' => 46, 'parId' => 2, 'name' => 'test dnd 2', 'size' => 9638, 'mod' => '27.01.2010'),
+		25 => array('id' => 25, 'parId' => 2, 'name' => 'test dnd 1', 'size' => 1631, 'mod' => '06.11.1973'),
+		44 => array('id' => 44, 'parId' => 2, 'name' => 'test dnd 2', 'size' => 9638, 'mod' => '27.01.2010'),
 
 		13 => array('id' => 13, 'parId' => 3, 'name' => 'file3.pdf', 'size' => 8923, 'mod' => '27.03.2001'),
 		14 => array('id' => 14, 'parId' => 3, 'name' => 'file1.pdf', 'size' => 8925, 'mod' => '13.02.2002'),
@@ -84,7 +84,7 @@ class ModuleSession extends FileExplorer {
 		parent::__construct($rootDir);
 		if (!isset($_SESSION['rfe'])) {
 			$_SESSION['rfe'][$rootDir] = serialize($this->fsDefault);
-			$_SESSION['rfe']['lastUsedItemId'] = count($this->fsDefault);
+			$_SESSION['rfe']['lastUsedItemId'] = count($this->fsDefault);	// this is a very simple way which is not very robust // TODO: better way to create an id
 		}
 	}
 	
