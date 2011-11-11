@@ -5,36 +5,59 @@ define([
 	"dojo/_base/declare",
 	'dojo/_base/lang',
 	'dojo/_base/connect',
-	'dojo/aspect',
 	'dojo/mouse',
-	"dojo/dnd/common",
-	"rfe/dnd/GridContainer"
-], function(declare, lang, connect, aspect, mouse, common, GridContainer) {
+	'dojo/on',
+	'dojo/touch',
+	'dojo/dnd/common',
+	'rfe/dnd/GridContainer'
+], function(declare, lang, connect, mouse, on, touch, common, GridContainer) {
 
 
 	return declare("rfe.dnd.GridSelector", GridContainer, {
 		// note: grid rows (nodes) do not have an id attribute -> The grid.Selection uses the rowIndex instead
 
 		constructor: function() {
-			var sel = this.grid.selection;
+			var domNode = this.grid.domNode;
 
 			this.events.push(
-				aspect.after(sel, 'onSelected', lang.hitch(this, this.addIdToRow), true),
-
-			   // add selection also on right click context menu
-				this.grid.on('rowMouseDown', lang.hitch(this, function(evt) {
-					//var selection = this.grid.selection;
-					if (!mouse.isRight(evt)) {
-						return;
-					}
-					if ((!connect.isCopyKey(evt) && !evt.shiftKey) && !sel.selected[evt.rowIndex]) {
-						sel.deselectAll();
-					}
-					sel.setSelected(evt.rowIndex, true);
-				}))
+				on(domNode, touch.press, lang.hitch(this,'onMouseDown')),
+				on(domNode, touch.release, lang.hitch(this,'onMouseUp')),
+				on(domNode, touch.move, lang.hitch(this,'onMouseMove'))
 			);
 		},
 
+		/**
+		 * Event processor for onmousedown/ontouchstart
+		 * @param {Event} e Decorated event object that contains reference to grid, cell, and rowIndex.
+ 		 */
+		onMouseDown: function(e) {
+			if (e.rowIndex == -1) {
+				return;
+			}
+
+			// add selection also on right click context menu
+			var sel = this.grid.selection;
+			if(mouse.isRight(e)){
+				if((!connect.isCopyKey(evt) && !e.shiftKey) && !sel.selected[e.rowIndex]){
+					sel.deselectAll();
+				}
+				sel.setSelected(e.rowIndex, true);
+			}
+		},
+
+		onMouseUp: function(e) {},
+
+		onMouseMove: function(e) {},
+
+		/**
+		 * Return dnd item.
+		 * object = {
+		 * 		data: {rowNode},
+		 * 		type: {dndType}
+		 * 	}
+		 * @param key
+		 * @return {object}
+		 */
 		getItem: function(key) {
 			// summary: returns a data item by its key (id)
 			// note: key == id and not the same as rowIdx. Can be called by any other dnd source with node.id = key
@@ -61,26 +84,6 @@ define([
 				}
 			}
 			return nodes;
-		},
-
-		/**
-		 * Add node to selection map.
-		 * @param {number} rowIndex
-		 */
-		addIdToRow: function(rowIndex) {
-			var grid = this.grid;
-			var item, node;
-
-			if (rowIndex == -1) {
-				return;
-			}
-			node = grid.getRowNode(rowIndex);
-			if (!node.id) {
-				// Grid rows don't have an id. But we need one to be able to return the corresponding
-		 		// dnd.item (other dnd sources use source.getItem(id), which is expected to return a dnd.item.
-				item = grid.getItem(rowIndex);
-				node.id = this.dndType + '_' + item.id;
-			}
 		}
 	});
 

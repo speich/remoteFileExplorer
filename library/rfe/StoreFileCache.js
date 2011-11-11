@@ -221,7 +221,7 @@ define('rfe/StoreFileCache', [
 			return dfd;
 		},
 
-		onPasteItem: function(item, copy) {},
+		onPasteItem: function(item, copy) {},	// callback event for grid
 
 		/************************************
 		 * Methods for dojo.data 				*

@@ -19,19 +19,16 @@ define([
 
 			lang.mixin(this, params);
 
-			this.currentRowNode = null;
 			this.currentRowIndex = -1;
 
-			// states
 			this.containerState = "";
 			domClass.contains(this.domNode, "dojoDndContainer");
 
-			// set up events
 			this.events = [
-				on(this.grid.domNode, mouse.enter, lang.hitch(this, "onOverEvent")),
-			   on(this.grid.domNode, mouse.leave, lang.hitch(this, "onOutEvent")),
-				this.grid.on("rowMouseOver", lang.hitch(this, "onMouseOver")),
-				this.grid.on("rowMouseOut", lang.hitch(this, "onMouseOut"))
+				on(grid.domNode, mouse.enter, lang.hitch(this, "onOverEvent")),
+				on(grid.domNode, mouse.leave, lang.hitch(this, "onOutEvent")),
+				on(grid, "rowMouseOver", lang.hitch(this, "onMouseOver")),
+				on(grid, "rowMouseOut", lang.hitch(this, "onMouseOut"))
 			];
 		},
 
@@ -41,16 +38,20 @@ define([
 		},
 
 		/**
-		 * Keep track on which row the mouse is over
-		 * @param e
+		 * Called when mouse is over a RowNode.
+		 * Adds the properties item and id to the row to make it equal with tree for easy processing.
+		 * @param {Event} e Decorated event object that contains reference to grid, cell, and rowIndex.
 		 */
 		onMouseOver: function(e) {
-			this.currentRowNode = e.rowNode;
+			this.addIdToRow(e.rowIndex);
 			this.currentRowIndex = e.rowIndex;
 		},
 
+		/**
+		 * Called when mouse moves away from rowNode.
+		 * @param {Event} e Decorated event object that contains reference to grid, cell, and rowIndex.
+		 */
 		onMouseOut: function(e) {
-			this.currentRowNode = null;
 			this.currentRowIndex = -1;
 		},
 
@@ -98,6 +99,24 @@ define([
 			var t = this.creator.call(this, item, hint);
 			dojo.addClass(t.node, "dojoDndItem");
 			return t;
+		},
+
+		/**
+		 * Add store object's id to row node.
+		 * @param {number} rowIndex
+		 */
+		addIdToRow: function(rowIndex) {
+			// add id to rowNode since it's needed for the dnd.getItem() method and rowNodes only have a rowIndex
+			var grid = this.grid;
+			var item, node;
+
+			node = grid.getRowNode(rowIndex);
+			if (!node.id) {
+				// Grid rows don't have an id. But we need one to be able to return the corresponding
+		 		// dnd.item (other dnd sources use source.getItem(id), which is expected to return a dnd.item.
+				item = grid.getItem(rowIndex);	// != this.getItem(key)
+				node.id = this.dndType + '_' + item.id;
+			}
 		}
 
 	});

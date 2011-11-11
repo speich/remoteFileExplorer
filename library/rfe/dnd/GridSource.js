@@ -7,9 +7,10 @@ define([
 	'dojo/on',
 	'dojo/topic',
 	'dojo/dom-class',
+	'dojo/dnd/Manager',
 	'rfe/dnd/GridSelector',
-	'dojo/dnd/Manager'
-], function(lang, array, declare, connect, Deferred, on, topic, domClass, GridSelector, Manager) {
+	'rfe/dnd/Drop'
+], function(lang, array, declare, connect, Deferred, on, topic, domClass, Manager, GridSelector, Drop) {
 
 	return declare("rfe.dnd.GridSource", GridSelector, {
 		// summary: a Source object, which can be used as a DnD source, or a DnD target
@@ -24,6 +25,7 @@ define([
 
 		constructor: function(grid, params) {
 			lang.mixin(this, params || {});
+			lang.mixin(this, Drop);
 
 			var type = params.accept instanceof Array ? params.accept : ['treeNode', 'gridNode'];
 			this.accept = null;
@@ -37,7 +39,7 @@ define([
 			this.isDragging = false;
 			this.mouseDown = false;
 			this.targetAnchor = null;
-			this._lastX = 0;
+			this._lastX = 0;	// enables detecting drag after a treshold
 			this._lastY = 0;
 
 			this.targetState = "";
@@ -51,11 +53,6 @@ define([
 				topic.subscribe("/dnd/drop", lang.hitch(this, "onDndDrop")),
 				topic.subscribe("/dnd/cancel", lang.hitch(this, "onDndCancel"))
 			];
-			this.events.push(
-				on(this.domNode, "mousedown", lang.hitch(this, "onMouseDown")),
-				on(this.domNode, "mousemove", lang.hitch(this, "onMouseMove")),
-				on(this.domNode, "mouseup", lang.hitch(this, "onMouseUp"))
-			);
 		},
 
 		/**
@@ -109,6 +106,7 @@ define([
 			if (this.isDragging && this.targetState == "Disabled") {
 				return;
 			}
+
 			this.inherited("onMouseMove", arguments);
 
 			m = Manager.manager();
@@ -117,7 +115,7 @@ define([
 				m.canDrop(this.canDrop());
 			}
 			else {
-				if (this.mouseDown && this.isSource && !this.grid.editMode &&
+				if (this.mouseDown && this.isSource &&
 				(Math.abs(e.pageX - this._lastX) >= this.dragThreshold || Math.abs(e.pageY - this._lastY) >= this.dragThreshold)) {
 					var selection = this.grid.selection;
 					if (!selection.selected[this.currentRowIndex]) {
@@ -203,13 +201,19 @@ define([
 			// note: this method is called from dnd.Manager.
 
 			// - onDndDrop() --> onDrop() --> onDropExternal()/onDropInternal()
+			var parentItem;
+			// TODO: isParentChildDrop()
 			if (this == target) {
+				parentItem = this.grid.getItem(this.currentRowIndex);
 				if (this == source) {	// dropped onto grid from grid
 					console.log('grid onDndDrop: dropped onto grid from grid')
-					this.onDrop(source, nodes, copy, target);
 				}
 				else {	// dropped onto grid from external (tree)
 					console.log('grid onDropExternal: to be implemented', source, nodes, copy);
+				}
+
+				if (parentItem && parentItem.dir) {	// do nothing when dropping on file or same parent folder
+					this.onDrop(source, nodes, copy, target, parentItem);
 				}
 			}
 			else if (this == source) {	// dropped outside of grid from grid
@@ -223,34 +227,6 @@ define([
 			}
 			this.onDndCancel();
 		},
-
-		onDrop: function(source, nodes, copy, target) {
-			console.log('grid onDropInternal');
-			var i = 0, len = nodes.length;
-			var store = this.store;
-			var dndItem, item, oldParentItem, newParentItem;
-
-			newParentItem = this.getStoreItem();
-			if (!newParentItem || !newParentItem.dir) {	// do nothing when dropping on file or same parent folder
-				return;
-			}
-
-			for (i; i < len; i++) {
-				dndItem = source.getItem(nodes[i].id);
-				item = dndItem.data.item;
-				oldParentItem = store.storeMemory.get(item.parId);
-				store.pasteItem(item, oldParentItem, newParentItem, copy);
-			}
-		},
-
-		// called by onDrop() which is called by onDndDrop()
-		onDropExternal: function(source, nodes, copy, target) {
-
-			if (source.accept.treeNode) {
-				this.onDropFromTree(source, nodes, copy, target);
-			}
-		},
-
 
 		onDndCancel: function() {
 			// summary: topic event processor for /dnd/cancel, called to cancel the DnD operation
@@ -290,104 +266,13 @@ define([
 			var m, item;
 			m = Manager.manager();
 			if (m.source == this) {
-				item = this.getStoreItem();
+				item = this.grid.getItem(this.currentRowIndex);
 				return item && item.dir;
 			}
 			else {
 				return true;
 			}
-		},
-
-		/**
-		 * Process dnd item(s) dropped externally from tree onto grid.
-		 * @param source
-		 * @param nodes
-		 * @param copy
-		 */
-		onDropFromTree: function(source, nodes, copy) {
-			var grid = this.rfe.grid, tree = this.rfe.grid;
-			var store = this.rfe.store;
-			var trgItem = this.getStoreItem();
-			var newParentItem = trgItem && trgItem.dir ? trgItem : this.rfe.currentTreeItem;
-
-			array.forEach(nodes, function(node) {
-				// Don't confuse the different use of items (DnD item versus store.object).
-				var dndItem = source.getItem(node.id);
-				var srcItem = dndItem.data.item;
-				var oldParentItem = dndItem.data.getParent().item;
-
-				// add item to grid (store) if not dropped on folder in grid
-				if (!trgItem || !trgItem.dir) {
-					grid.store.add(srcItem);
-				}
-
-				// add new item and remove old from old tree location by updating the store
-				store.pasteItem(srcItem, oldParentItem, newParentItem, copy);
-
-			}, this);
-
-		},
-
-		/**
-		 * Returns store object from dnd node.
-		 * @param source dnd source
-		 * @param node dnd node
-		 */
-		getStoreItemFromTree: function(source, node) {
-			var item = source.getItem(node.id);
-			return item.data.item;
-		},
-
-		/**
-		 * Returns store object.
-		 */
-		getStoreItem: function() {
-			var item, id;
-			var grid = this.grid;
-			if (arguments[0]) {
-				item = arguments[0];
-			}
-			else if (this.currentRowIndex !== -1) {
-				item = grid.getItem(this.currentRowIndex);
-			}
-			if (item) {
-				id = grid.store.getValue(item, 'id');
-				item = this.store.storeMemory.get(id);	// use memory store instead of grid's ItemWriteStore for direct property access and to always have same item format
-			}
-			return item;
-		},
-
-		/**
-		 * Note: Copied from tree/dndSource.js _isParentChildDrop
-		 * @param source
-		 * @param targetRow
-		 */
-		checkParentChildDrop: function(source, targetRow) {
-			// summary:
-			//		Checks whether the dragged items are parent rows in the tree which are being dragged into their own children.
-			//
-			// source:
-			//		The DragSource object.
-			//
-			// targetRow:
-			//		The tree row onto which the dragged nodes are being dropped.
-			//
-			// If the dragged object is not coming from the tree this widget belongs to,
-			// it cannot be invalid.
-			var root = source.grid.domNode;
-			var ids = source.selection;
-			var node = targetRow.parentNode;
-
-			// Iterate up the DOM hierarchy from the target drop row,
-			// checking of any of the dragged nodes have the same ID.
-			while (node != root && !ids[node.id]) {
-				node = node.parentNode;
-			}
-			return node.id && ids[node.id];
 		}
-
-
-
 	});
 
 });

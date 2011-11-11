@@ -5,13 +5,15 @@ define([
 	'dojo/on',
 	'dojo/dom-class',
 	'original/dijit/tree/dndSource',
-	'dojo/dnd/Manager'
-], function(lang, declare, Deferred, on, domClass, dndSource, dndManager) {
+	'dojo/dnd/Manager',
+	'rfe/dnd/Drop'
+], function(lang, declare, Deferred, on, domClass, dndSource, dndManager, Drop) {
 
-		return declare(dndSource, {
+		return declare([dndSource], {
 			constructor: function(tree, params) {
 
 				lang.mixin(this, params || {});
+				lang.mixin(this, Drop);
 
 				var type = params.accept instanceof Array ? params.accept : ['treeNode', 'gridNode'];
 				this.accept = null;
@@ -23,28 +25,16 @@ define([
 				}
 			},
 
-			checkAcceptance: function(source, nodes) {
-				var i = 0, len = nodes.length;
-				for (; i < len; ++i) {
-					var type = source.getItem(nodes[i].id).type;
-					var j = 0, lenJ = type.length;
-					for (; j < lenJ; ++j){
-						if (type[j] in this.accept){
-							return true;
-						}
-					}
-				}
-				return false;
-			},
-
 			_onDragMouse: function(e) {
+				// called by dndSource.onMouseMove()
+
 				// summary:
 				//		Helper method for processing onmousemove/onmouseover events while drag is in progress.
 				//		Keeps track of current drop target.
 
 				var m = dndManager.manager(),
-				oldTarget = this.targetAnchor,	// the TreeNode corresponding to TreeNode mouse was previously over
-				newTarget = this.current; 			// TreeNode corresponding to TreeNode mouse is currently over
+				oldTarget = this.targetAnchor,	// TreeNode corresponding to TreeNode mouse was previously over
+				newTarget = this.current; 		// TreeNode corresponding to TreeNode mouse is currently over
 
 				if (newTarget != oldTarget) {
 			      if (oldTarget){
@@ -65,7 +55,6 @@ define([
 						m.canDrop(false);
 					}
 					this.targetAnchor = newTarget;
-					console.log('_onDragMouse', this, this.targetAnchor)
 				}
 			},
 
@@ -74,7 +63,8 @@ define([
 				if (this == target) {
 					if (this == source) {	// dropped on tree from tree
 						console.log('tree onDndDrop: dropped onto tree from tree')
-						this.onDrop(source, nodes, copy, target);
+						var newParentItem = this.current.item;
+						this.onDrop(source, nodes, copy, target, newParentItem);
 					}
 					else {						// dropped on tree from grid
 						console.log('tree onDndDrop: dropped onto tree from external')
@@ -85,25 +75,9 @@ define([
 					// let GridSource handle this ?
 				}
 				else {   						// dropped outside of tree from outside of tree
-					console.log('tree onDndDrop: dropped from outside of tree to outside of tree')
+					console.log('tree onDndDrop: dropped outside of tree from outside of tree')
 				}
 				this.onDndCancel();
-			},
-
-			onDrop: function(source, nodes, copy, target) {
-				var i = 0, len = nodes.length;
-				var store = this.store;
-				var dndItem, item, oldParentItem, newParentItem;
-
-				newParentItem = this.targetAnchor.item;
-				for (; i < len; i++) {
-					dndItem = source.getItem(nodes[i].id);
-					item = dndItem.data.item;
-					if (item.parId != newParentItem.id) {	// do nothing when dropping child on current parent
-						oldParentItem = store.storeMemory.get(item.parId);
-						store.pasteItem(item, oldParentItem, newParentItem, copy);
-					}
-				}
 			}
 
 		});
