@@ -1,4 +1,4 @@
-define([
+	define([
 	'dojo/_base/lang',
 	'dojo/_base/window',
 	'dojo/_base/array',

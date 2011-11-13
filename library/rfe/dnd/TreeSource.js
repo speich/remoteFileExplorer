@@ -27,7 +27,6 @@ define([
 
 			_onDragMouse: function(e) {
 				// called by dndSource.onMouseMove()
-
 				// summary:
 				//		Helper method for processing onmousemove/onmouseover events while drag is in progress.
 				//		Keeps track of current drop target.
@@ -53,6 +52,7 @@ define([
 					}
 					else {
 						m.canDrop(false);
+						console.log('tree._onDragMouse')
 					}
 					this.targetAnchor = newTarget;
 				}

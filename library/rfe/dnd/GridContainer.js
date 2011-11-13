@@ -2,11 +2,12 @@ define([
 	"dojo/_base/lang",
 	'dojo/_base/array',
 	'dojo/_base/declare',
+	'dojo/_base/event',
 	'dojo/on',
 	'dojo/mouse',
 	'dojo/dom-class',
 	"dojo/dnd/Container"
-], function(lang, array, declare, on, mouse, domClass, Container) {
+], function(lang, array, declare, event, on, mouse, domClass, Container) {
 
 	return declare("rfe.dnd.GridContainer", null, {
 
@@ -14,7 +15,7 @@ define([
 			// summary: a constructor of the Container modeled after dijit.tree._dndContainer
 			// params: Object: a dict of parameters, which gets mixed into the object
 			this.grid = grid;
-			this.domNode = this.grid.domNode;
+			this.node = this.grid.domNode;
 			this.dndType = 'gridNode';
 
 			lang.mixin(this, params);
@@ -22,19 +23,26 @@ define([
 			this.currentRowIndex = -1;
 
 			this.containerState = "";
-			domClass.contains(this.domNode, "dojoDndContainer");
+			domClass.add(this.node, "dojoDndContainer");
 
 			this.events = [
-				on(grid.domNode, mouse.enter, lang.hitch(this, "onOverEvent")),
-				on(grid.domNode, mouse.leave, lang.hitch(this, "onOutEvent")),
-				on(grid, "rowMouseOver", lang.hitch(this, "onMouseOver")),
-				on(grid, "rowMouseOut", lang.hitch(this, "onMouseOut"))
+				// container events
+				on(this.node, mouse.enter, lang.hitch(this, "onOverEvent")),
+				on(this.node, mouse.leave, lang.hitch(this, "onOutEvent")),
+				// row events
+				on(this.grid, "rowMouseOver", lang.hitch(this, "onMouseOver")),
+				on(this.grid, "rowMouseOut", lang.hitch(this, "onMouseOut")),
+
+				// cancel text selection and text dragging
+				on(this.node, "dragstart", lang.hitch(event, "stop")),
+				on(this.node, "selectstart", lang.hitch(event, "stop"))
 			];
 		},
 
 		destroy: function() {
 			// summary: prepares the object to be garbage-collected
 			array.forEach(this.events, remove);
+			this.node = this.parent = null;
 		},
 
 		/**
@@ -61,7 +69,7 @@ define([
 			// newState: String: new state
 			var prefix = "dojoDnd" + type;
 			var state = type.toLowerCase() + "State";
-			domClass.replace(this.domNode, prefix + newState, prefix + this[state]);
+			domClass.replace(this.node, prefix + newState, prefix + this[state]);
 			this[state] = newState;
 		},
 
@@ -93,12 +101,6 @@ define([
 			// tags:
 			//		protected
 			this._changeState("Container", "");
-		},
-
-		_normalizedCreator: function(/*dojo.dnd.Item*/ item, /*String*/ hint){
-			var t = this.creator.call(this, item, hint);
-			dojo.addClass(t.node, "dojoDndItem");
-			return t;
 		},
 
 		/**

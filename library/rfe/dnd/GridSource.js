@@ -44,8 +44,8 @@ define([
 
 			this.targetState = "";
 			this.sourceState = "";
-			domClass.add(this.domNode, "dojoDndSource");
-			domClass.add(this.domNode, "dojoDndTarget");
+			domClass.add(this.node, "dojoDndSource");
+			domClass.add(this.node, "dojoDndTarget");
 
 			this.topics = [
 				topic.subscribe("/dnd/source/over", lang.hitch(this, "onDndSourceOver")),
@@ -92,12 +92,11 @@ define([
 			this.targetAnchor = null;
 		},
 
-		// mouse event processors
+		/**
+		 * Event processor for mousemove
+		 * @param {Event} e mouse event
+		 */
 		onMouseMove: function(e) {
-			// summary: event processor for onmousemove
-			// e: Event: mouse event
-			var m;
-
 			// do not allow dnd when editing
 			if (this.grid.edit.isEditing()) {
 				return;
@@ -109,10 +108,15 @@ define([
 
 			this.inherited("onMouseMove", arguments);
 
-			m = Manager.manager();
+			var m = Manager.manager();
 
 			if (this.isDragging) {
-				m.canDrop(this.canDrop());
+				if (this.canDrop()) {
+					m.canDrop(true);
+				}
+				else {
+					m.canDrop(false);
+				}
 			}
 			else {
 				if (this.mouseDown && this.isSource &&
@@ -179,13 +183,11 @@ define([
 				this._changeState("Source", this == source ? (copy ? "Copied" : "Moved") : "");
 			}
 			var accepted = this.checkAcceptance(source, nodes);
-
 			this._changeState("Target", accepted ? "" : "Disabled");
-
+			                   console.log('grid.onDndStart', this, source)
 			if (this == source){
 				Manager.manager().overSource(this);
 			}
-
 			this.isDragging = true;
 		},
 
@@ -202,19 +204,28 @@ define([
 
 			// - onDndDrop() --> onDrop() --> onDropExternal()/onDropInternal()
 			var parentItem;
-			// TODO: isParentChildDrop()
+
+			// TODO: update cookie that saves selection state.
 			if (this == target) {
-				parentItem = this.grid.getItem(this.currentRowIndex);
-				if (this == source) {	// dropped onto grid from grid
+				if (this.currentRowIndex == -1) {		// dragged below grid rows, but still in grid view
+					parentItem = this.grid.getItem(0);	// we can use the parent of any row
+				}
+				else {
+					parentItem = this.grid.getItem(this.currentRowIndex);
+				}
+
+				if (this == source) {	// dropped onto grid from grid, do nothing when dropping on file
 					console.log('grid onDndDrop: dropped onto grid from grid')
+					this.onDrop(source, nodes, copy, target, parentItem);
+
 				}
 				else {	// dropped onto grid from external (tree)
 					console.log('grid onDropExternal: to be implemented', source, nodes, copy);
+					// TODO: check isParentChildDrop()
+
 				}
 
-				if (parentItem && parentItem.dir) {	// do nothing when dropping on file or same parent folder
-					this.onDrop(source, nodes, copy, target, parentItem);
-				}
+
 			}
 			else if (this == source) {	// dropped outside of grid from grid
 				console.log('grid onDndDrop: dropped outside of grid')
@@ -258,20 +269,73 @@ define([
 		},
 		
 		/**
-		 * Check if nodes can be dropped from source onto this target.
-		 * @param source
-		 * @param nodes
+		 * Check if nodes can be dropped from source onto the grid.
 		 */
-		canDrop: function(source, nodes) {
-			var m, item;
-			m = Manager.manager();
+		canDrop: function() {
+			var node, item;
+			var grid = this.grid;
+			var m = Manager.manager();
 			if (m.source == this) {
-				item = this.grid.getItem(this.currentRowIndex);
+				item = grid.getItem(this.currentRowIndex);
+				console.log('gridSource.canDrop',item, this.currentRowIndex)
 				return item && item.dir;
 			}
 			else {
+				item = grid.getItem(0);	// we can use any row to get the parent
+				item = grid.store.get(item.parId);
+				node = m.source.tree.getNodesByItem(item);
+				node = node[0].rowNode;
 				return true;
+//				return !m.source._isParentChildDrop(m.source, node);
 			}
+		},
+
+		/**
+		 * Checks whether dragged items are parent being dragged into their own children.
+		 */
+		isParentChildDrop: function() {
+			var m = Manager.manager();
+			var id;
+			var grid = this.grid;
+			var nodes = m.source.getSelectedNodes();
+			var i = 0, len = nodes.length;
+
+			var parent = grid.store.get(grid.getItem(0).parId);	// we can use any row to get the parent
+
+			return m.source._isParentChildDrop(m.source, parent)
+
+			//var node = nodes[0];	// tree.dndController.singular = true has to be set. selected node in tree is parent
+									// of all items being displayed in the grid (also only works if dnd does not set a node to selected)
+
+//			return false;
+			             /*
+			// Iterate up the DOM hierarchy from the target drop row,
+			// checking of any of the dragged nodes have the same ID.
+			while(node != tree.rootNode && !ids[node.id]){
+				node = node.parentNode;
+			}
+
+			return node.id && ids[node.id];
+
+*/
+			var ids = m.source.selection;
+
+			while (parent) {
+
+			}
+
+			!ids[node.id]
+
+			console.log(m.source.selection)
+			for (; i < len; i++) {
+				console.log(nodes[i].item.id,' == ',parent.id)
+
+				if (nodes[i].item.id == parent.id) {
+					return false;
+				}
+			}
+			return true;
+
 		}
 	});
 

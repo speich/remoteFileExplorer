@@ -38,7 +38,7 @@ define([
 			// add selection also on right click context menu
 			var sel = this.grid.selection;
 			if(mouse.isRight(e)){
-				if((!connect.isCopyKey(evt) && !e.shiftKey) && !sel.selected[e.rowIndex]){
+				if((!connect.isCopyKey(e) && !e.shiftKey) && !sel.selected[e.rowIndex]){
 					sel.deselectAll();
 				}
 				sel.setSelected(e.rowIndex, true);
