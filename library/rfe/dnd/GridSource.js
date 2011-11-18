@@ -10,7 +10,7 @@ define([
 	'dojo/dnd/Manager',
 	'rfe/dnd/GridSelector',
 	'rfe/dnd/Drop'
-], function(lang, array, declare, connect, Deferred, on, topic, domClass, Manager, GridSelector, Drop) {
+], function(lang, array, declare, connect, Deferred, on, topic, domClass, dndManager, GridSelector, Drop) {
 
 	return declare("rfe.dnd.GridSource", GridSelector, {
 		// summary: a Source object, which can be used as a DnD source, or a DnD target
@@ -108,7 +108,7 @@ define([
 
 			this.inherited("onMouseMove", arguments);
 
-			var m = Manager.manager();
+			var m = dndManager.manager();
 
 			if (this.isDragging) {
 				if (this.canDrop()) {
@@ -163,7 +163,7 @@ define([
 				this.mouseDown = false;
 			}
 			else if (this.isDragging) {
-				var m = Manager.manager();
+				var m = dndManager.manager();
 				m.canDrop(false);
 			}
 		},
@@ -186,7 +186,7 @@ define([
 			this._changeState("Target", accepted ? "" : "Disabled");
 			                   console.log('grid.onDndStart', this, source)
 			if (this == source){
-				Manager.manager().overSource(this);
+				dndManager.manager().overSource(this);
 			}
 			this.isDragging = true;
 		},
@@ -200,7 +200,7 @@ define([
 			// nodes: Array: the list of transferred items
 			// copy: Boolean: copy items, if true, move items otherwise
 
-			// note: this method is called from dnd.Manager.
+			// note: this method is called from dnd.dndManager.
 
 			// - onDndDrop() --> onDrop() --> onDropExternal()/onDropInternal()
 			var parentItem;
@@ -254,13 +254,13 @@ define([
 		onOverEvent: function() {
 			// summary: this function is called once, when mouse is over our container
 			this.inherited(arguments);
-			Manager().overSource(this);
+			dndManager.manager().overSource(this);
 		},
 
 		onOutEvent: function() {
 			// summary: this function is called once, when mouse is out of our container
 			this.inherited(arguments);
-			Manager().outSource(this);
+			dndManager.manager().outSource(this);
 		},
 
 		_markDndStatus: function(copy) {
@@ -274,7 +274,7 @@ define([
 		canDrop: function() {
 			var node, item;
 			var grid = this.grid;
-			var m = Manager.manager();
+			var m = dndManager.manager();
 			if (m.source == this) {
 				item = grid.getItem(this.currentRowIndex);
 				console.log('gridSource.canDrop',item, this.currentRowIndex)
@@ -294,7 +294,7 @@ define([
 		 * Checks whether dragged items are parent being dragged into their own children.
 		 */
 		isParentChildDrop: function() {
-			var m = Manager.manager();
+			var m = dndManager.manager();
 			var id;
 			var grid = this.grid;
 			var nodes = m.source.getSelectedNodes();
