@@ -86,16 +86,27 @@ define([
 		 * @param {object} context
 		 */
 		enableContextMenuItems: function(menu, context) {
+			// TODO: this does not work with i18n since it uses the labels...
 			// If not clicked on a item (tree.node or grid.row), but below widget and nothing is selected,
 			// then set all menuItems to disabled except create/upload
+			var label = '';
 			if (context.isOnTree || context.isOnTreePane) {
 				array.filter(menu.getChildren(), function(item) {
-					if (item.get('label') != 'New' && item.get('label') != 'Upload') {
+					label = item.get('label');
+					if (label != 'New' && label != 'Upload') {
 						item.set('disabled', true);
 					}
 				});
 			}
-			else {
+			else if (context.isOnGridPane) {
+				array.filter(menu.getChildren(), function(item) {
+					label = item.get('label');
+					if (label == 'Rename' || label == 'Delete') {
+						item.set('disabled', true);
+					}
+				});
+			}
+			else if (context.isOnGrid) {
 				array.forEach(menu.getChildren(), function(item) {
 					item.set('disabled', false);
 				});
@@ -186,10 +197,10 @@ define([
 			}))
 		},
 
-        /**
+      /**
          * Display grid's inline editor.
          */
-        edit: function() {
+      edit: function() {
             // note: rfe.Grid.doApplyCellEdit() does the actual renaming, e.g. call store.put
             var grid = this.grid, cell = grid.getCell(0); // TODO: get cell index from item.name instead
             var item = this.getLastSelectedItem(); // rename item is either called through contextMenu or menu toolbar
