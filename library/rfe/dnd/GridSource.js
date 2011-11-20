@@ -9,23 +9,20 @@ define([
 	'dojo/dom-class',
 	'dojo/dnd/Manager',
 	'rfe/dnd/GridSelector',
-	'rfe/dnd/Drop'
-], function(lang, array, declare, connect, Deferred, on, topic, domClass, dndManager, GridSelector, Drop) {
+	'rfe/dnd/drop'
+], function(lang, array, declare, connect, Deferred, on, topic, domClass, dndManager, GridSelector, drop) {
 
 	return declare("rfe.dnd.GridSource", GridSelector, {
 		// summary: a Source object, which can be used as a DnD source, or a DnD target
 
 		isSource: true,
-
+		generateText: true,
 		accept: ['treeNode', 'gridNode'],
-
 		copyOnly: false,
-
 		dragThreshold: 5,	// The move delay in pixels before detecting a drag
 
 		constructor: function(grid, params) {
 			lang.mixin(this, params || {});
-			lang.mixin(this, Drop);
 
 			var type = params.accept instanceof Array ? params.accept : ['treeNode', 'gridNode'];
 			this.accept = null;
@@ -111,12 +108,7 @@ define([
 			var m = dndManager.manager();
 
 			if (this.isDragging) {
-				if (this.canDrop()) {
-					m.canDrop(true);
-				}
-				else {
-					m.canDrop(false);
-				}
+				m.canDrop(this.canDrop());
 			}
 			else {
 				if (this.mouseDown && this.isSource &&
@@ -127,7 +119,7 @@ define([
 						selection.select(this.currentRowIndex);
 					}
 					var nodes = this.getSelectedNodes();
-					if (nodes.length) {
+					if (nodes.length > 0) {
 						m.startDrag(this, nodes, this.copyState(connect.isCopyKey(e)));
 					}
 				}
@@ -184,7 +176,7 @@ define([
 			}
 			var accepted = this.checkAcceptance(source, nodes);
 			this._changeState("Target", accepted ? "" : "Disabled");
-			                   console.log('grid.onDndStart', this, source)
+			       console.log('grid.onDndStart', this, source)
 			if (this == source){
 				dndManager.manager().overSource(this);
 			}
@@ -200,48 +192,48 @@ define([
 			// nodes: Array: the list of transferred items
 			// copy: Boolean: copy items, if true, move items otherwise
 
-			// note: this method is called from dnd.dndManager.
+			// Note: this method is called from dnd.dndManager. It handles dropping
+			// when target is the grid (grid -> grid, tree -> grid). When target
+			// is the tree (grid -> tree, tree -> tree), it is handled in TreeSource.onDndDrop()
 
-			// - onDndDrop() --> onDrop() --> onDropExternal()/onDropInternal()
 			var parentItem;
 
-			// TODO: update cookie that saves selection state.
-			if (this == target) {
-				if (this.currentRowIndex == -1) {		// dragged below grid rows, but still in grid view
-					parentItem = this.grid.getItem(0);	// we can use the parent of any row
+			if (this.containerState == "Over"){
+				this.isDragging = false;
+				// TODO: update cookie that saves selection state.
+				if (this == target) {
+					if (this.currentRowIndex == -1) {		// dragged below grid rows, but still in grid view
+						parentItem = this.grid.getItem(0);	// we can use the parent of any row
+					}
+					else {
+						parentItem = this.grid.getItem(this.currentRowIndex);
+					}
+					if (this == source) {	// dropped onto grid from grid
+						console.log('grid onDndDrop: dropped onto grid from grid')
+						drop.onGridGrid(source, nodes, copy, parentItem);
+					}
+					else {	// dropped onto grid from external (tree)
+						console.log('grid onDropExternal: to be implemented', source, nodes, copy);
+						drop.onTreeGrid(source, nodes, copy, parentItem);
+					}
+
+
+				}
+				else if (this == source) {	// dropped outside of grid from grid
+					console.log('grid onDndDrop: dropped outside of grid')
+					// do nothing since TreeSource.onDndDrop() takes care of removing item from grid by calling tree.store.pasteItem()
+					// TODO: remove from grid and from selection , but how do we know that store was successful?
 				}
 				else {
-					parentItem = this.grid.getItem(this.currentRowIndex);
+					// dropped outside of grid from grid
+					console.log('grid onDndDrop: dropped outside of grid from outside of grid')
 				}
-
-				if (this == source) {	// dropped onto grid from grid, do nothing when dropping on file
-					console.log('grid onDndDrop: dropped onto grid from grid')
-					this.onDrop(source, nodes, copy, target, parentItem);
-
-				}
-				else {	// dropped onto grid from external (tree)
-					console.log('grid onDropExternal: to be implemented', source, nodes, copy);
-					// TODO: check isParentChildDrop()
-
-				}
-
-
-			}
-			else if (this == source) {	// dropped outside of grid from grid
-				console.log('grid onDndDrop: dropped outside of grid')
-				// do nothing since TreeSource.onDndDrop() takes care of removing item from grid by calling tree.store.pasteItem()
-				// TODO: remove from grid and from selection , but how do we know that store was successful?
-			}
-			else {
-				// dropped outside of grid from grid
-				console.log('grid onDndDrop: dropped outside of grid from outside of grid')
 			}
 			this.onDndCancel();
 		},
 
 		onDndCancel: function() {
 			// summary: topic event processor for /dnd/cancel, called to cancel the DnD operation
-//			this.before = true;
 			this.isDragging = false;
 			this.mouseDown = false;
 			delete this.mouseButton;
@@ -275,25 +267,42 @@ define([
 			var node, item;
 			var grid = this.grid;
 			var m = dndManager.manager();
-			if (m.source == this) {
+			var sel, i = 0, len;
+			if (m.source == this) {	// grid is source
+
 				item = grid.getItem(this.currentRowIndex);
-				console.log('gridSource.canDrop',item, this.currentRowIndex)
+				sel = this.grid.selection.getSelected();
+				len = sel.length;
+				// Guard against dropping onto yourself
+				for (; i < len; i++) {
+					if (item.id === sel[i].id) {
+						return false;
+					}
+				}
+
 				return item && item.dir;
 			}
-			else {
-				item = grid.getItem(0);	// we can use any row to get the parent
-				item = grid.store.get(item.parId);
-				node = m.source.tree.getNodesByItem(item);
-				node = node[0].rowNode;
+			else  {	// tree is source
+				/*
+				Checked in store.pasteItem
+				if (grid.rowCount > 0) {
+					item = grid.getItem(0);	// we can use any row to get the parent
+					node = m.source.tree.getNodesByItem(item);
+					node = node[0].rowNode;
+					return !m.source._isParentChildDrop(m.source, node);
+				}
+				else {
+					return true;	// empty folder
+				}
+				*/
 				return true;
-//				return !m.source._isParentChildDrop(m.source, node);
 			}
 		},
 
 		/**
 		 * Checks whether dragged items are parent being dragged into their own children.
 		 */
-		isParentChildDrop: function() {
+		isParentChildDrop_unused: function() {
 			var m = dndManager.manager();
 			var id;
 			var grid = this.grid;
@@ -302,7 +311,7 @@ define([
 
 			var parent = grid.store.get(grid.getItem(0).parId);	// we can use any row to get the parent
 
-			return m.source._isParentChildDrop(m.source, parent)
+			return m.source._isParentChildDrop(m.source, parent);
 
 			//var node = nodes[0];	// tree.dndController.singular = true has to be set. selected node in tree is parent
 									// of all items being displayed in the grid (also only works if dnd does not set a node to selected)
