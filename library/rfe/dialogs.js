@@ -30,7 +30,7 @@ define([
 		 * @param {object} args
 		 */
 		get: function(type, args) {
-			var dialog = !registry.byId('dialog' + this.ucfirst(type));
+			var dialog = registry.byId('dialog' + this.ucfirst(type));
 			if (!dialog) {
 				args.id = 'dialog' + this.ucfirst(type);
 				dialog = new DialogConfirm(args);

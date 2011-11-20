@@ -28,10 +28,11 @@ define([
 					// TODO: check parentChildDrop if dir, etc.
 					dfds[i + 1] = dfds[i].then(function() {
 						var dfd, oldParentItem;
-						console.log(i, nodes)
+
 						var dndItem = source.getItem(nodes[i].id);
 						var item = dndItem.data.item;
-						if (item.parId == newParentItem.id) {	// do nothing when dropping child on current parent
+						console.log(item, newParentItem)
+						if (item.id == newParentItem.id) {	// do nothing when dropping child on current parent
 							return dialogs.show('sameFolder', copy);
 						}
 						else {

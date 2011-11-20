@@ -1,5 +1,6 @@
 /**
  * Modeled after dijit.tree._dndSelector
+ * Does not use own selection object. Uses the grid's selection instead
  */
 define([
 	"dojo/_base/declare",

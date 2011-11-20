@@ -19,14 +19,14 @@ define([
 		generateText: true,
 		accept: ['treeNode', 'gridNode'],
 		copyOnly: false,
-		dragThreshold: 5,	// The move delay in pixels before detecting a drag
+		dragThreshold: 5, // The move delay in pixels before detecting a drag
 
 		constructor: function(grid, params) {
 			lang.mixin(this, params || {});
 
 			var type = params.accept instanceof Array ? params.accept : ['treeNode', 'gridNode'];
 			this.accept = null;
-			if (type.length){
+			if (type.length) {
 				this.accept = {};
 				for (var i = 0; i < type.length; ++i) {
 					this.accept[type[i]] = 1;
@@ -63,8 +63,8 @@ define([
 			for (; i < len; ++i) {
 				var type = source.getItem(nodes[i].id).type;
 				var j = 0, lenJ = type.length;
-				for (; j < lenJ; ++j){
-					if (type[j] in this.accept){
+				for (; j < lenJ; ++j) {
+					if (type[j] in this.accept) {
 						return true;
 					}
 				}
@@ -149,7 +149,7 @@ define([
 		onDndSourceOver: function(source) {
 			// summary: topic event processor for /dnd/source/over, called when detected a current source
 			// source: Object: the source which has the mouse over it
-			
+
 			//note: this is called on any detected dnd source (e.g. also when over the tree) and not only when over the grid
 			if (this != source) {
 				this.mouseDown = false;
@@ -171,13 +171,13 @@ define([
 			//		Copy items, if true, move items otherwise
 			// tags:
 			//		private
-			if(this.isSource){
+			if (this.isSource) {
 				this._changeState("Source", this == source ? (copy ? "Copied" : "Moved") : "");
 			}
 			var accepted = this.checkAcceptance(source, nodes);
 			this._changeState("Target", accepted ? "" : "Disabled");
-			       console.log('grid.onDndStart', this, source)
-			if (this == source){
+			console.log('grid.onDndStart', this, source)
+			if (this == source) {
 				dndManager.manager().overSource(this);
 			}
 			this.isDragging = true;
@@ -196,28 +196,28 @@ define([
 			// when target is the grid (grid -> grid, tree -> grid). When target
 			// is the tree (grid -> tree, tree -> tree), it is handled in TreeSource.onDndDrop()
 
-			var parentItem;
+			var parentItem, grid = this.grid;
 
-			if (this.containerState == "Over"){
+			if (this.containerState == "Over") {
 				this.isDragging = false;
 				// TODO: update cookie that saves selection state.
 				if (this == target) {
-					if (this.currentRowIndex == -1) {		// dragged below grid rows, but still in grid view
-						parentItem = this.grid.getItem(0);	// we can use the parent of any row
+					if (this.currentRowIndex == -1) {		// dropped onto grid , but not grid rows
+						parentItem = grid.getItem(0);	// we can use the parent of any row
 					}
 					else {
-						parentItem = this.grid.getItem(this.currentRowIndex);
+						parentItem = grid.getItem(this.currentRowIndex);
 					}
-					if (this == source) {	// dropped onto grid from grid
-						console.log('grid onDndDrop: dropped onto grid from grid')
-						drop.onGridGrid(source, nodes, copy, parentItem);
-					}
-					else {	// dropped onto grid from external (tree)
-						console.log('grid onDropExternal: to be implemented', source, nodes, copy);
-						drop.onTreeGrid(source, nodes, copy, parentItem);
-					}
-
-
+					Deferred.when(grid.store.get(parentItem.parId), function(parentItem) {
+						if (this == source) {	// dropped onto grid from grid
+							console.log('grid onDndDrop: dropped onto grid from grid')
+							drop.onGridGrid(source, nodes, copy, parentItem);
+						}
+						else {	// dropped onto grid from external (tree)
+							console.log('grid onDropExternal: to be implemented', source, nodes, copy);
+							drop.onTreeGrid(source, nodes, copy, parentItem);
+						}
+					});
 				}
 				else if (this == source) {	// dropped outside of grid from grid
 					console.log('grid onDndDrop: dropped outside of grid')
@@ -259,7 +259,7 @@ define([
 			// summary: changes source's state based on "copy" status
 			this._changeState("Source", copy ? "Copied" : "Moved");
 		},
-		
+
 		/**
 		 * Check if nodes can be dropped from source onto the grid.
 		 */
@@ -269,9 +269,11 @@ define([
 			var m = dndManager.manager();
 			var sel, i = 0, len;
 			if (m.source == this) {	// grid is source
-
+				if (this.currentRowIndex === -1) {	// dropped onto grid but not onto grid row
+					return false;
+				}
 				item = grid.getItem(this.currentRowIndex);
-				sel = this.grid.selection.getSelected();
+				sel = grid.selection.getSelected();
 				len = sel.length;
 				// Guard against dropping onto yourself
 				for (; i < len; i++) {
@@ -279,22 +281,21 @@ define([
 						return false;
 					}
 				}
-
 				return item && item.dir;
 			}
-			else  {	// tree is source
+			else {	// tree is source
 				/*
-				Checked in store.pasteItem
-				if (grid.rowCount > 0) {
-					item = grid.getItem(0);	// we can use any row to get the parent
-					node = m.source.tree.getNodesByItem(item);
-					node = node[0].rowNode;
-					return !m.source._isParentChildDrop(m.source, node);
-				}
-				else {
-					return true;	// empty folder
-				}
-				*/
+				 Checked in store.pasteItem
+				 if (grid.rowCount > 0) {
+				 item = grid.getItem(0);	// we can use any row to get the parent
+				 node = m.source.tree.getNodesByItem(item);
+				 node = node[0].rowNode;
+				 return !m.source._isParentChildDrop(m.source, node);
+				 }
+				 else {
+				 return true;	// empty folder
+				 }
+				 */
 				return true;
 			}
 		},
@@ -314,19 +315,19 @@ define([
 			return m.source._isParentChildDrop(m.source, parent);
 
 			//var node = nodes[0];	// tree.dndController.singular = true has to be set. selected node in tree is parent
-									// of all items being displayed in the grid (also only works if dnd does not set a node to selected)
+			// of all items being displayed in the grid (also only works if dnd does not set a node to selected)
 
 //			return false;
-			             /*
-			// Iterate up the DOM hierarchy from the target drop row,
-			// checking of any of the dragged nodes have the same ID.
-			while(node != tree.rootNode && !ids[node.id]){
-				node = node.parentNode;
-			}
+			/*
+			 // Iterate up the DOM hierarchy from the target drop row,
+			 // checking of any of the dragged nodes have the same ID.
+			 while(node != tree.rootNode && !ids[node.id]){
+			 node = node.parentNode;
+			 }
 
-			return node.id && ids[node.id];
+			 return node.id && ids[node.id];
 
-*/
+			 */
 			var ids = m.source.selection;
 
 			while (parent) {
@@ -337,7 +338,7 @@ define([
 
 			console.log(m.source.selection)
 			for (; i < len; i++) {
-				console.log(nodes[i].item.id,' == ',parent.id)
+				console.log(nodes[i].item.id, ' == ', parent.id)
 
 				if (nodes[i].item.id == parent.id) {
 					return false;

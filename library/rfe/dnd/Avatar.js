@@ -1,20 +1,26 @@
-	define([
+define([
 	'dojo/_base/lang',
 	'dojo/_base/window',
 	'dojo/_base/array',
+	'dojo/_base/declare',
 	'dojo/dom-construct',
 	'dojo/dom-class',
 	'dojo/dom-attr',
-	'dojo/dnd/Avatar'], function(lang, window, array, construct, domClass, attr, Avatar) {
+	'dojo/query',
+	'dojo/dnd/Avatar'],
+function (lang, window, array, declare, construct, domClass, attr, query, Avatar) {
 
-		Avatar.prototype.construct = function() {
+	return declare('dojo.dnd.Avatar', Avatar, {
+
+		construct: function () {
 			// preload icons
-			this.images = {};
-			this.images.folder = new Image();
+			this.images = {
+				folder: new Image(),
+				files: new Image(),
+				file: new Image()
+			};
 			this.images.folder.src = '/library/rfe/resources/images/folder_yellow.png';
-			this.images.files = new Image();
 			this.images.files.src = '/library/rfe/resources/images/files.png';
-			this.images.file = new Image();
 			this.images.file.src = '/library/rfe/resources/images/file.png';
 
 			this.isA11y = domClass.contains(window.body(), "dijit_a11y");
@@ -22,8 +28,8 @@
 				"class": "dojoDndAvatar",
 				style: {
 					position: "absolute",
-					zIndex:	"1999",
-					margin:	"0px"
+					zIndex: "1999",
+					margin: "0px"
 				}
 			}),
 			source = this.manager.source, node,
@@ -31,8 +37,8 @@
 			tr = construct.create("tr", null, b),
 			td = construct.create("td", null, tr),
 			icon = this.isA11y ? construct.create("span", {
-				id : "a11yIcon",
-				innerHTML : this.manager.copy ? '+' : "<"
+				id: "a11yIcon",
+				innerHTML: this.manager.copy ? '+' : "<"
 			}, td) : null,
 			span = construct.create("span", {
 				innerHTML: source.generateText ? this._generateText() : ""
@@ -45,7 +51,7 @@
 			});
 
 			node = construct.create('div');
-			node.appendChild(createIcon.call(this));
+			node.appendChild(this.createIcon());
 			node.id = "";
 			tr = construct.create("tr", null, b);
 			td = construct.create("td", null, tr);
@@ -56,12 +62,12 @@
 			});
 
 			this.node = a;
-		};
+		},
 
-	   function createIcon() {
+		createIcon: function () {
 			var img, nodes = this.manager.nodes;
 			var source = this.manager.source;
-			var isDir = array.some(nodes, function(node) {
+			var isDir = array.some(nodes, function (node) {
 				var item = source.getItem(node.id);
 				return item.data.item.dir;
 			}, this);
@@ -75,14 +81,14 @@
 				img = this.images.file;
 			}
 			return img;
-		}
+		},
 
-		Avatar.prototype._generateText = function() {
+		_generateText: function () {
 			// summary: generates a proper text to reflect copying or moving of items
 			var numItems = this.manager.nodes.length.toString();
-			var action = this.manager.copy ? 'Copy' : 'Move';
+			var action = this.manager.copy ? 'Copy to' : 'Move to';
 			return numItems + ', ' + action;
-		};
+		}
+	});
 
-	return Avatar;
 });

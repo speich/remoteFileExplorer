@@ -10,6 +10,9 @@ define([
 ], function(lang, declare, Deferred, on, domClass, dndSource, dndManager, Drop) {
 
 		return declare([dndSource], {
+
+			generateText: true,	// can be removed as soon as bug# is fixed
+
 			constructor: function(tree, params) {
 
 				lang.mixin(this, params || {});
@@ -26,7 +29,7 @@ define([
 			},
 
 			_onDragMouse: function(e) {
-				// called by dndSource.onMouseMove()
+				// called by dndSource.onMouseMove() if isDragging is true
 				// summary:
 				//		Helper method for processing onmousemove/onmouseover events while drag is in progress.
 				//		Keeps track of current drop target.
@@ -34,6 +37,7 @@ define([
 				var m = dndManager.manager(),
 				oldTarget = this.targetAnchor,	// TreeNode corresponding to TreeNode mouse was previously over
 				newTarget = this.current; 		// TreeNode corresponding to TreeNode mouse is currently over
+				var droppable = false;
 
 				if (newTarget != oldTarget) {
 			      if (oldTarget){
@@ -43,41 +47,93 @@ define([
 						this._addItemClass(newTarget.rowNode, 'Over');
 					}
 					// Check if it's ok to drop the dragged node on the target node.
-					if (m.source == this && (newTarget.id in this.selection)) {
-						// Guard against dropping onto yourself (TODO: guard against dropping onto your descendant, #7140)
-						m.canDrop(false);
+					if (m.source == this) {
+						if (newTarget.id in this.selection) {
+							// Guard against dropping onto yourself
+							droppable = false;
+						}
+						else {
+							droppable = !this._isParentChildDrop(m.source, newTarget.rowNode);
+						}
 					}
-					else if (!this._isParentChildDrop(m.source, newTarget.rowNode)) {
-						m.canDrop(true);
+					else if (m.source.grid) {
+						// Note: To simplify things we (currently) do not differentiate between file or folder before
+						// dropping even though files (but not folders) could be dropped independent of the hierarchy.
+						// But in case of dropping multiple items (files and folders at the same time) it wouldn't make
+						// sense to show the (-)avatar anymore. Windows Explorer does not prevent parentChildDrops but
+						// instead displays a warning message for each dropped file/folder afterwards.
+						var grid = m.source.grid;
+						var node, item = grid.getItem(0);	// we can use any row to get the parent
+						node = this.tree.getNodesByItem(item);
+						node = node[0].rowNode;
+						droppable = !this._isParentChildDrop(m.target, node);
+						console.log('tree.canDrop', droppable, m.target)
 					}
-					else {
-						m.canDrop(false);
-						console.log('tree._onDragMouse')
-					}
+					m.canDrop(droppable);
 					this.targetAnchor = newTarget;
 				}
 			},
 
 			onDndDrop: function(source, nodes, copy, target) {
-				// note: this method is called from dnd.Manager.
-				if (this == target) {
-					if (this == source) {	// dropped on tree from tree
-						console.log('tree onDndDrop: dropped onto tree from tree')
-						var newParentItem = this.current.item;
-						this.onDrop(source, nodes, copy, target, newParentItem);
+				// note: this method is called from dnd.Manager topic /dnd/drop
+				if (this.containerState == "Over"){
+					this.isDragging = false;
+					if (this == target) {
+						if (this == source) {	// dropped on tree from tree
+							console.log('tree onDndDrop: dropped onto tree from tree')
+							var newParentItem = this.current.item;
+							this.onDrop(source, nodes, copy, target, newParentItem);
+						}
+						else {						// dropped on tree from grid
+							console.log('tree onDndDrop: dropped onto tree from external')
+						}
 					}
-					else {						// dropped on tree from grid
-						console.log('tree onDndDrop: dropped onto tree from external')
+					else if (this == source) { // dropped outside of tree from tree
+						console.log('tree onDndDrop: dropped outside of tree')
+						// let GridSource handle this ?
 					}
-				}
-				else if (this == source) { // dropped outside of tree from tree
-					console.log('tree onDndDrop: dropped outside of tree')
-					// let GridSource handle this ?
-				}
-				else {   						// dropped outside of tree from outside of tree
-					console.log('tree onDndDrop: dropped outside of tree from outside of tree')
+					else {   						// dropped outside of tree from outside of tree
+						console.log('tree onDndDrop: dropped outside of tree from outside of tree')
+					}
 				}
 				this.onDndCancel();
+			},
+
+			_isParentChildDrop: function(source, targetRow){
+				// summary:
+				//		Checks whether the dragged items are parent rows in the tree which are being
+				//		dragged into their own children.
+				//
+				// source:
+				//		The DragSource object.
+				//
+				// targetRow:
+				//		The tree row onto which the dragged nodes are being dropped.
+				//
+				// tags:
+				//		private
+
+				// Note: overriding to enable also checking when dropping from the grid
+
+				// If the dragged object is not coming from the tree this widget belongs to,
+				// it cannot be invalid.
+				if(!source.tree || source.tree != this.tree){
+					return false;
+				}
+
+
+				var root = source.tree.domNode;
+				var ids = source.selection;
+
+				var node = targetRow.parentNode;
+
+				// Iterate up the DOM hierarchy from the target drop row,
+				// checking if it has the same ID as any of the selected nodes.
+				while(node != root && !ids[node.id]){
+					node = node.parentNode;
+				}
+
+				return node.id && ids[node.id];
 			}
 
 		});
