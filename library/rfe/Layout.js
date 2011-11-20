@@ -167,14 +167,14 @@ define([
 					});
 					panes.gridPane.set({
 						region: 'bottom',
-						style: 'top: auto; width: 100%; height: 50%',	// top is not removed when changing from center to bottom
+						style: 'top: auto; width: 100%; height: 60%',	// top is not removed when changing from center to bottom
 						splitter: true
 					});
 				}
 				else if (view == 'horizontal') {
 					panes.treePane.set({
 						region: 'left',
-						style: 'top: 0; bottom: auto; width: 20%; height: 100%;',
+						style: 'top: 0; bottom: auto; width: 25%; height: 100%;',
 						minSize: 180,
 						splitter: true
 					});
