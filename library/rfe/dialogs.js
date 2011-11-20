@@ -8,16 +8,28 @@ define([
 
 	return {
 
-		show: function(type, copy) {
+		show: function(type, item, newParentItem, copy) {
 			var dialog;
-			switch(type) {
+			switch (type) {
 				case 'sameFolder':
 					dialog = this.get(type, {
 						hasOkButton: false,
 						hasSkipCheckBox: false,
-						title: copy ? 'Copy' : 'Move' +  ' Folder',
-						content: '<p>The destination folder is the same as the source folder.</p>'
-               });
+						title: copy ? 'Copy' : 'Move' + ' Folder',
+						content: '<p>The destination folder is the same as the source folder.</p>' +
+						'<p>' + item.name + '<br>' + item.mod + '</p>' +
+						'<p>' + newParentItem.name + '<br>' + newParentItem.mod + '</p>'
+					});
+					break;
+				case 'subFolder':
+					dialog = this.get(type, {
+						hasOkButton: false,
+						hasSkipCheckBox: false,
+						title: copy ? 'Copy' : 'Move' + ' Folder',
+						content: '<p>The destination folder is subfolder of the source folder.</p>' +
+						'<p>' + item.name + '<br>' + item.mod + '</p>' +
+						'<p>' + newParentItem.name + '<br>' + newParentItem.mod + '</p>'
+					});
 					break;
 			}
 			return dialog.show();

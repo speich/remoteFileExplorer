@@ -208,7 +208,8 @@ define([
 					else {
 						parentItem = grid.getItem(this.currentRowIndex);
 					}
-					Deferred.when(grid.store.get(parentItem.parId), function(parentItem) {
+//					Deferred.when(grid.store.get(parentItem.parId), function(parentItem) {
+					parentItem = this.grid.store.storeMemory.get(parentItem.parId);
 						if (this == source) {	// dropped onto grid from grid
 							console.log('grid onDndDrop: dropped onto grid from grid')
 							drop.onGridGrid(source, nodes, copy, parentItem);
@@ -217,7 +218,7 @@ define([
 							console.log('grid onDropExternal: to be implemented', source, nodes, copy);
 							drop.onTreeGrid(source, nodes, copy, parentItem);
 						}
-					});
+//					});
 				}
 				else if (this == source) {	// dropped outside of grid from grid
 					console.log('grid onDndDrop: dropped outside of grid')

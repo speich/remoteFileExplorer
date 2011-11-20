@@ -16,7 +16,6 @@ define([
 		onTreeTree: function() {},
 
       onTreeGrid: function(source, nodes, copy, newParentItem) {
-
 				var dfds = [];
 				var store = source.grid ? source.grid.store : source.tree.model;
 				var i = 0, len = nodes.length;
@@ -32,8 +31,10 @@ define([
 						var dndItem = source.getItem(nodes[i].id);
 						var item = dndItem.data.item;
 						console.log(item, newParentItem)
-						if (item.id == newParentItem.id) {	// do nothing when dropping child on current parent
-							return dialogs.show('sameFolder', copy);
+						// guard from dropping onto self
+						if (item.id == newParentItem.id) {
+
+							return dialogs.show('sameFolder', item, newParentItem, copy);
 						}
 						else {
 							oldParentItem = store.storeMemory.get(item.parId);
