@@ -12,7 +12,7 @@ define([
 	'rfe/Layout',
 	'rfe/Edit',
 	'rfe/dnd/Avatar'
-], function(lang, array, declare, Deferred, cookie, keys, dom, domClass, locale, registry, Layout, Edit, dummy) {
+], function(lang, array, declare, Deferred, cookie, keys, dom, domClass, locale, registry, Layout, Edit) {
 	/**
 	 * File explorer allows you to browse files.
 	 *
@@ -342,7 +342,7 @@ define([
 			var item, oreo, arr, id, paths = [];
 
 			grid.showMessage(grid.loadingMessage);
-
+			console.log('patch not applied yet')
 			oreo = cookie(tree.dndController.cookieName);
 			if (tree.persist && oreo) {
 				paths = array.map(oreo.split(","), function(path){

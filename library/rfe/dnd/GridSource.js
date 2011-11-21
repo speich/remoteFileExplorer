@@ -196,29 +196,27 @@ define([
 			// when target is the grid (grid -> grid, tree -> grid). When target
 			// is the tree (grid -> tree, tree -> tree), it is handled in TreeSource.onDndDrop()
 
-			var parentItem, grid = this.grid;
+			var item, newParentItem, grid = this.grid;
 
 			if (this.containerState == "Over") {
 				this.isDragging = false;
 				// TODO: update cookie that saves selection state.
 				if (this == target) {
-					if (this.currentRowIndex == -1) {		// dropped onto grid , but not grid rows
-						parentItem = grid.getItem(0);	// we can use the parent of any row
+					if (this.currentRowIndex == -1) {		// dropped onto grid, but not grid rows
+						newParentItem = grid.getItem(0);		// we can use the parent of any row
+						newParentItem = grid.store.storeMemory.get(item.parId);
 					}
 					else {
-						parentItem = grid.getItem(this.currentRowIndex);
+						newParentItem = grid.getItem(this.currentRowIndex);
 					}
-//					Deferred.when(grid.store.get(parentItem.parId), function(parentItem) {
-					parentItem = this.grid.store.storeMemory.get(parentItem.parId);
-						if (this == source) {	// dropped onto grid from grid
-							console.log('grid onDndDrop: dropped onto grid from grid')
-							drop.onGridGrid(source, nodes, copy, parentItem);
-						}
-						else {	// dropped onto grid from external (tree)
-							console.log('grid onDropExternal: to be implemented', source, nodes, copy);
-							drop.onTreeGrid(source, nodes, copy, parentItem);
-						}
-//					});
+					if (this == source) {	// dropped onto grid from grid
+						console.log('grid onDndDrop: dropped onto grid from grid')
+						drop.onGridGrid(source, nodes, copy, newParentItem);
+					}
+					else {	// dropped onto grid from external (tree)
+						console.log('grid onDropExternal: to be implemented', source, nodes, copy);
+						drop.onTreeGrid(source, nodes, copy, newParentItem);
+					}
 				}
 				else if (this == source) {	// dropped outside of grid from grid
 					console.log('grid onDndDrop: dropped outside of grid')
@@ -227,6 +225,7 @@ define([
 				}
 				else {
 					// dropped outside of grid from grid
+					// do nothing, tree takes care
 					console.log('grid onDndDrop: dropped outside of grid from outside of grid')
 				}
 			}
