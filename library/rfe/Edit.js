@@ -186,7 +186,6 @@ define([
 				// store.add calls onNew() before returning. The grid listens to onNew() and calls grid._addItem() in turn.
 				// So item is added to internal grid index before it is rendered, e.g. rowIndex is available right away
 				var itemRowIndex = grid.getItemIndex(item);
-				var itemRowIndex = grid.getItemIndex(item);
 				var signal = aspect.after(grid, 'renderRow', lang.hitch(this, function(rowIndex) {
 					if (rowIndex == itemRowIndex) {
 						signal.remove();
