@@ -8,13 +8,9 @@ define([
 	'dojo/cookie',
 	'dojo/dom-construct',
 	'dojo/query',
-	'dojo/store/Memory',
-	'dojo/store/JsonRest',
-	'rfe/StoreFileCache',
 	'dijit/Tree',
 	'dijit/tree/dndSource',
 	'rfe/Grid',
-	'rfe/dnd/GridSource',
 	'dijit/registry',
 	'dijit/layout/BorderContainer',
 	'dijit/layout/ContentPane',
@@ -30,8 +26,8 @@ define([
 	"dijit/form/Button",
 	"dijit/form/CheckBox",
 	"dijit/Dialog"
-], function(array, lang, declare, event, aspect, on, cookie, construct, query, Memory, JsonRest, StoreFileCache, Tree, TreeSource,
-				Grid, GridSource, registry,
+], function(array, lang, declare, event, aspect, on, cookie, construct, query, Tree, TreeSource,
+				Grid, registry,
 				BorderContainer, ContentPane, MenuBar, MenuBarItem, PopupMenuBarItem, Menu, MenuItem, MenuSeparator,
 				PopupMenuItem, CheckedMenuItem, Toolbar, Button, CheckBox, Dialog) {
 
@@ -45,15 +41,7 @@ define([
 			},
 
 			constructor: function(args) {
-				var storeMaster, storeMemory;
 				lang.mixin(this, args);
-
-				storeMaster = new JsonRest({target: '/library/rfe/controller.php/'});
-				storeMemory = new Memory({});
-
-				this.store = new StoreFileCache(storeMaster, storeMemory);
-				this.grid = this.initGrid('rfeGrid', this.store);
-				this.tree = this.initTree('rfeTree', this.store);
 			},
 
 			/**
@@ -61,10 +49,14 @@ define([
 			 * @param id
 			 * @param {rfe/StoreFileCache} store
 			 */
-			initTree: function(id, store) {
+			initTree: function(id, store, model) {
+				construct.create('div', {
+					id: id
+				}, this.layout.panes.treePane.domNode);
+
+				//this.tree.placeAt(panes.treePane.domNode);
 				return new Tree({
-					id: id,
-					model: store,
+					model: model,
 					childrenAttrs: [store.childrenAttr],
 					openOnClick: false,
 					openOnDblClick: true,
@@ -73,28 +65,18 @@ define([
 					dndController: function(arg, params) {
 						return new TreeSource(arg, lang.mixin(params || {}, {
 							accept: ['treeNode', 'gridNode'],
-							store: store,
+							store: model,
 							singular: true
 						}))
 					}
-				});
+				}, id);
 			},
 
-			/**
-			 * Initializes the grid and grid dnd.
-			 * @param {string} id
-			 * @param {dojo.store.Memory} store
-			 */
-			initGrid: function(id, store) {
-				var grid = new Grid({
-					id: id,
-					store: null	// set in FileExplorer.showItemChildrenInGrid() every time user clicks tree
-				});
-				// add drag and drop to the grid
-				grid.dndController = new GridSource(grid, {
-					store: store
-				});
-				return grid;
+			initGrid: function(id) {
+				construct.create('div', {
+					id: id
+				}, this.layout.panes.gridPane.domNode);
+				return new Grid({}, id)
 			},
 
 			/**
@@ -115,8 +97,6 @@ define([
 
 				menuBar.placeAt(panes.menuPane.domNode);
 				toolbar.placeAt(panes.menuPane.domNode);
-				this.tree.placeAt(panes.treePane.domNode);
-				this.grid.placeAt(panes.gridPane.domNode);
 				panes.menuPane.placeAt(panes.borderContainer);
 				panes.treePane.placeAt(panes.borderContainer);
 				panes.gridPane.placeAt(panes.borderContainer);
@@ -125,7 +105,6 @@ define([
 				this.layout.menu = menuBar;
 				this.layout.panes = panes;
 				panes.borderContainer.startup();
-				this.grid.startup(); // call startup here, otherwise store data is loaded twice (no idea why though)
 			},
 
 			/**
@@ -332,7 +311,6 @@ define([
 				panes.borderContainer = new BorderContainer({
 					liveSplitters: true,
 					gutters: false
-
 				}, id);
 				on(panes.borderContainer.domNode, 'contextmenu', function(evt) {
 					event.stop(evt);
@@ -380,10 +358,12 @@ define([
 					var button = registry.byId('rfeButtonDirectoryUp');
 					button.set('disabled', item == tree.rootNode.item);
 				}, true);
+				/*
 				this.grid.on('RowDblClick', function(item) {
 					var button = registry.byId('rfeButtonDirectoryUp');
 					button.set('disabled', item == tree.rootNode.item);
 				});
+				*/
 
 				toolbar.addChild(new Button({
 					id: 'rfeButtonHistoryBack',

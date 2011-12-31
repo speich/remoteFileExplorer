@@ -15,6 +15,7 @@ define([
 		hasOkButton: true,
 		hasCancelButton: true,
 		hasSkipCheckBox: true,
+		hasUnderlay: true,
 		dfd: null,
 
 		/**
@@ -32,7 +33,7 @@ define([
 
 			var remember = false;
 			var div = construct.create('div', {
-				className: 'DialogConfirm'
+				className: 'dialogConfirm'
 			}, this.containerNode, 'last');
 
 			if (this.hasSkipCheckBox) {
@@ -75,7 +76,9 @@ define([
 		 */
 		show: function() {
 			this.inherited('show', arguments);
-			construct.destroy(this.id + '_underlay');	// remove underlay
+			if (!this.hasUnderlay) {
+				construct.destroy(this.id + '_underlay');	// remove underlay
+			}
 			this.dfd = new Deferred();
 			return this.dfd;
 		}

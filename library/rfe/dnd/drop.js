@@ -7,17 +7,47 @@ define([
 
 	return {
 
-		onGridGrid: function(source, nodes, copy, newParentItem) {
+		/**
+		 * Handle dropping when source and target are the grid.
+		 * @param source
+		 * @param nodes
+		 * @param copy
+		 * @param {object} oldParent
+		 */
+		onGridToGrid: function(source, nodes, copy, oldParent) {
+			console.log('grid onDndDrop: dropped onto grid from grid')
+			/* Note: - guard against dropping onto self was already checked in GridSource.canDrop()
+						- only allow dropping on folders was already checked in GridSource.canDrop()
+						- no other checks necessary
+			*/
 
+			var grid  = source.grid;
+			var store = source.grid.store;
+			var i = 0, len = nodes.length;
+
+			if (this.currentRowIndex == -1) {	// dropped onto grid, but not onto a grid row
+											oldParent = grid.getItem(0);		// -> we can use the parent of any row to get the parentItem
+										}
+										else {
+											oldParent = grid.getItem(this.currentRowIndex);
+										}
+										oldParent = grid.store.storeMemory.get(oldParent.parId);
+
+
+			for (; i < len; i++) {
+				var object = source.getItem(nodes[i].id).data.item;
+				var oldParent = store.storeMemory.get(object.parId);
+				store.pasteItem(object, oldParent, oldParent, copy);
+			}
 		},
 
-		onGridTree: function() {},
+		onGridToTree: function() {},
 
-		onTreeTree: function() {},
+		onTreeToTree: function() {},
 
-      onTreeGrid: function(source, nodes, copy, newParentItem) {
+      onTreeToGrid: function(source, nodes, copy, newParentItem) {
 				var dfds = [];
-				var store = source.grid ? source.grid.store : source.tree.model;
+				var store = source.tree.model;
 				var i = 0, len = nodes.length;
 
 				// chain the pasting of all nodes as deferreds

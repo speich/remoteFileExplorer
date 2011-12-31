@@ -11,15 +11,14 @@ define([
 	'dijit/registry',
 	'rfe/Layout',
 	'rfe/Edit',
+	'rfe/Store/FileCache',
 	'rfe/dnd/Avatar'
-], function(lang, array, declare, Deferred, cookie, keys, dom, domClass, locale, registry, Layout, Edit, dummy) {
+], function(lang, array, declare, Deferred, cookie, keys, dom, domClass, locale, registry, Layout, Edit, FileCache) {
 	/**
 	 * File explorer allows you to browse files.
 	 *
 	 * The file explorer consists of a tree and a grid. The tree loads file
 	 * data via php from disk.
-	 *
-	 * JsonRestStore.save() contains valuable information. *
 	 * TODO: grid even selected, focus and selected vs selected but not focus
 	 */
 
@@ -52,13 +51,22 @@ define([
 
 			lang.mixin(this, args);
 
+			this.createLayout(this.id);
+
+			this.store = new FileCache();
+			//var model = new ObjectStoreModel({store: store, query: {id: 'world'}});
+			this.tree = tree = this.initTree('rfeTree', this.store, this.store);
+			this.grid = grid = this.initGrid('rfeGrid');
+
 			// init tree events
-			tree.on('load', lang.hitch(this, this._initState));
+			// TODO: grid and tree not avaible yet (layout not init)
+
+			tree.on('load', lang.hitch(this, this.initState));
 			tree.on('click', lang.hitch(this, function(item, node) {
 				// note onClick is also fired when user uses keyboard navigation and hits space
 				if (item != this.currentTreeItem) {		// prevent executing twice (dblclick)
-					grid.selection.clear(); 				// otherwise item in not-displayed folder is still selected or with same idx
-					grid.showMessage(grid.loadingMessage);
+//					grid.selection.clear(); 				// otherwise item in not-displayed folder is still selected or with same idx
+
 					Deferred.when(this.showItemChildrenInGrid(item), function() {	// only called, when store.openOnClick is set to false
 						tree.focusNode(node);				// refocus node because it got moved to grid
 					});
@@ -66,7 +74,7 @@ define([
 				}
 				this.currentTreeItem = item;
 			}));
-
+			/*
 			grid.on('rowMouseDown', lang.hitch(this, function(evt) {
 				// rowMouseDown also registers right click
 				this.currentGridItem = grid.getItem(evt.rowIndex);     // TODO use grid.selection instead ?
@@ -82,8 +90,11 @@ define([
 					this.setHistory(item.id);
 				}
 			}));
-			this.createLayout(this.id);
-			this.initContextMenu(dom.byId(this.id));
+			*/
+
+
+
+//			this.initContextMenu(dom.byId(this.id));
 		},
 
 		/**
@@ -96,16 +107,18 @@ define([
 			var dfd = new Deferred();
 			var store = this.store;
 
+			item = item || this.tree.rootNode.item;
+
 			if (!grid.store) {
-				grid.setStore(this.store, {
+				grid.setStore(this.store.storeMemory, {
 					parId: item.id
 				});
 			}
 
 			if (item.dir) {
-				store.skipWithNoChildren = false;
+//				store.skipWithNoChildren = false;
 				return Deferred.when(store.getChildren(item), function() {
-					store.skipWithNoChildren = true;
+//					store.skipWithNoChildren = true;
 					grid.setQuery({
 						parId: item.id
 					});
@@ -146,8 +159,8 @@ define([
 		display: function(item) {
 			var grid = this.grid;
 			var def = this.showItemInTree(item);
-			grid.selection.deselectAll();
-			grid.showMessage(grid.loadingMessage);
+//			grid.selection.deselectAll();
+//			grid.showMessage(grid.loadingMessage);
 			def.then(lang.hitch(this, function() {
 				return this.showItemChildrenInGrid(item);
 			}));
@@ -337,12 +350,11 @@ define([
 		 * Sets the tree to its last state.
 		 * Reads the tree cookies to expand and set the tree selected and display the correct folder in the grid.
 		 */
-		_initState: function() {
+		initState: function() {
 			var tree = this.tree, grid = this.grid;
 			var item, oreo, arr, id, paths = [];
 
-			grid.showMessage(grid.loadingMessage);
-
+			/*
 			oreo = cookie(tree.dndController.cookieName);
 			if (tree.persist && oreo) {
 				paths = array.map(oreo.split(","), function(path){
@@ -358,10 +370,11 @@ define([
 				}));
 			}
 			else {
+			*/
 				item = tree.rootNode.item;
 				id = item.id;
 				this.display(item);
-			}
+			//}
 
 			this.setHistory(id);   // do not set history in display() since history uses display too
 		}

@@ -82,10 +82,11 @@ define([
 						if (this == source) {	// dropped on tree from tree
 							console.log('tree onDndDrop: dropped onto tree from tree')
 							var newParentItem = this.current.item;
-							this.onDrop(source, nodes, copy, target, newParentItem);
+							this.onTreeToTree(source, nodes, copy, target, newParentItem);
 						}
 						else {						// dropped on tree from grid
 							console.log('tree onDndDrop: dropped onto tree from external')
+							this.onGridToTree(source, nodes, copy, target, newParentItem);
 						}
 					}
 					else if (this == source) { // dropped outside of tree from tree

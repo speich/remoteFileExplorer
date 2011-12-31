@@ -3,8 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Remote File Explorer (rfe)</title>
-<link rel="stylesheet" type="text/css" href="library/dojo/1.7/dijit/themes/claro/claro.css"/>
-<link rel="stylesheet" type="text/css" href="library/dojo/1.7/dojox/grid/resources/claroGrid.css"/>
+<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.7.1/dijit/themes/claro/claro.css"/>
 <style type="text/css">
 body {
 	font-family: Verdana, Helvetica, Arial, sans-serif;
@@ -116,42 +115,33 @@ body {
 <body class="claro">
 <div id="remoteFileExplorer"></div>
 <script type="text/javascript">
-
-// TODO: move this to a loader file
 var dojoConfig = {
 	async: true,
-	baseUrl: '/library/dojo/',
-	packages: [{
-			'name': 'dojo',
-			'location': '1.7/dojo'
-		},{
-			'name': 'dijit',
-			'location': '1.7/dijit'
-		},{
-			'name': 'dojox',
-			'location': '1.7/dojox'
-		},{
-			'name': 'rfe',
-			'location': "../rfe"
-		},{
-			'name': 'original',
-			'location': '1.7'
-		}
+  baseUrl: 'http://ajax.googleapis.com/ajax/libs/dojo/1.7.1/dojo/',
+	packages: [
+		{name: 'dgrid', location: '/library/dgrid'},
+		{name: 'xstyle', location: '/library/xstyle'},
+		{name: 'put-selector', location: '/library/put-selector'},
+		{name: 'rfe', location: '/library/rfe'},
+		{name: 'original', location: '../'}
 	],
 	// redirect the following modules to my own modules
 	paths: {
-		'dijit/tree/_dndSelector': '../rfe/dnd/TreeSelector',
-		'dijit/tree/dndSource': '../rfe/dnd/TreeSource'
+//		'dijit/tree/_dndSelector': '/library/rfe/dnd/TreeSelector',
+//		'dijit/tree/dndSource': '/library/rfe/dnd/TreeSource'
 	}
 };
 
 </script>
-<script type="text/javascript" src="library/dojo/1.7/dojo/dojo.js"></script>
+<!--<script type="text/javascript" src="library/dojo/1.7/dojo/dojo.js"></script>-->
+<script src="http://ajax.googleapis.com/ajax/libs/dojo/1.7.1/dojo/dojo.js" type="text/javascript"></script>
 <script type="text/javascript">
-require(['rfe/FileExplorer'], function(FileExplorer) {
-    new FileExplorer({
-		 id: 'remoteFileExplorer'
-    });
+require(['dojo/ready', 'rfe/FileExplorer'], function(ready, FileExplorer) {
+	ready(function() {
+		new FileExplorer({
+			id: 'remoteFileExplorer'
+		});
+	});
 });
 </script>
 </body>

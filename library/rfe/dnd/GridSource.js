@@ -33,10 +33,10 @@ define([
 				}
 			}
 
-			this.isDragging = false;
-			this.mouseDown = false;
+			this.isDragging = false;	// allows to check if we are dragging when moving the mouse
+			this.mouseDown = false;    // keep track if button is down and we can start dragging when moving the mouse
 			this.targetAnchor = null;
-			this._lastX = 0;	// enables detecting drag after a treshold
+			this._lastX = 0;				// enables detecting drag after a treshold
 			this._lastY = 0;
 
 			this.targetState = "";
@@ -103,7 +103,7 @@ define([
 				return;
 			}
 
-			this.inherited("onMouseMove", arguments);
+			//this.inherited("onMouseMove", arguments);
 
 			var m = dndManager.manager();
 
@@ -145,18 +145,18 @@ define([
 			}
 		},
 
-		// topic event processors
+		/**
+		 * Processes topic event /dnd/source/over which is called whenever a source has the mouse over it.
+		 * Note: This is not only called when mouse is over the grid, but over any detected dnd source.
+		 * @param {dojo/dnd/Source} source
+		 */
 		onDndSourceOver: function(source) {
-			// summary: topic event processor for /dnd/source/over, called when detected a current source
-			// source: Object: the source which has the mouse over it
-
-			//note: this is called on any detected dnd source (e.g. also when over the tree) and not only when over the grid
 			if (this != source) {
-				this.mouseDown = false;
+				this.mouseDown = false;	// reset when we are not over grid
 			}
 			else if (this.isDragging) {
 				var m = dndManager.manager();
-				m.canDrop(false);
+				m.canDrop(false);		// set to false on whole grid unless we explicitly allow it on a specific row in onMouseMove()
 			}
 		},
 
@@ -196,29 +196,20 @@ define([
 			// when target is the grid (grid -> grid, tree -> grid). When target
 			// is the tree (grid -> tree, tree -> tree), it is handled in TreeSource.onDndDrop()
 
-			var parentItem, grid = this.grid;
+			var object, oldParent, grid = this.grid;
 
 			if (this.containerState == "Over") {
 				this.isDragging = false;
 				// TODO: update cookie that saves selection state.
 				if (this == target) {
-					if (this.currentRowIndex == -1) {		// dropped onto grid , but not grid rows
-						parentItem = grid.getItem(0);	// we can use the parent of any row
+					if (this == source) {
+						drop.onGridToGrid(source, nodes, copy, oldParent);
 					}
 					else {
-						parentItem = grid.getItem(this.currentRowIndex);
+						console.log('grid onDropExternal: to be implemented', source, nodes, copy);
+						drop.onTreeToGrid(source, nodes, copy, oldParent);
 					}
-//					Deferred.when(grid.store.get(parentItem.parId), function(parentItem) {
-					parentItem = this.grid.store.storeMemory.get(parentItem.parId);
-						if (this == source) {	// dropped onto grid from grid
-							console.log('grid onDndDrop: dropped onto grid from grid')
-							drop.onGridGrid(source, nodes, copy, parentItem);
-						}
-						else {	// dropped onto grid from external (tree)
-							console.log('grid onDropExternal: to be implemented', source, nodes, copy);
-							drop.onTreeGrid(source, nodes, copy, parentItem);
-						}
-//					});
+
 				}
 				else if (this == source) {	// dropped outside of grid from grid
 					console.log('grid onDndDrop: dropped outside of grid')
@@ -263,6 +254,7 @@ define([
 
 		/**
 		 * Check if nodes can be dropped from source onto the grid.
+		 * Returns only true if we are over a folder which is not beeing dragged.
 		 */
 		canDrop: function() {
 			var node, item;
@@ -276,12 +268,13 @@ define([
 				item = grid.getItem(this.currentRowIndex);
 				sel = grid.selection.getSelected();
 				len = sel.length;
-				// Guard against dropping onto yourself
+				// Guard against dropping onto yourself. When multiple we cancel all
 				for (; i < len; i++) {
 					if (item.id === sel[i].id) {
 						return false;
 					}
 				}
+				// only allow dropping onto a folder
 				return item && item.dir;
 			}
 			else {	// tree is source
