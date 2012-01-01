@@ -49,15 +49,10 @@ define([
 			 * @param id
 			 * @param {rfe/StoreFileCache} store
 			 */
-			initTree: function(id, store, model) {
-				construct.create('div', {
-					id: id
-				}, this.layout.panes.treePane.domNode);
-
-				//this.tree.placeAt(panes.treePane.domNode);
-				return new Tree({
-					model: model,
-					childrenAttrs: [store.childrenAttr],
+			initTree: function(props) {
+				props = lang.mixin({
+					model: props.store,
+					childrenAttrs: [props.store.childrenAttr],
 					openOnClick: false,
 					openOnDblClick: true,
 					showRoot: true,
@@ -65,11 +60,17 @@ define([
 					dndController: function(arg, params) {
 						return new TreeSource(arg, lang.mixin(params || {}, {
 							accept: ['treeNode', 'gridNode'],
-							store: model,
+							store: props.store,
 							singular: true
 						}))
 					}
-				}, id);
+				}, props);
+
+				var div = construct.create('div', {
+					id: props.id
+				}, this.layout.panes.treePane.domNode);
+
+				return new Tree(props, div);
 			},
 
 			initGrid: function(id) {
@@ -354,7 +355,7 @@ define([
 						}));
 					})
 				}));
-				aspect.after(this, 'showItemChildrenInGrid', function(item) {
+				aspect.after(this, 'displayChildrenInGrid', function(item) {
 					var button = registry.byId('rfeButtonDirectoryUp');
 					button.set('disabled', item == tree.rootNode.item);
 				}, true);

@@ -117,7 +117,8 @@ body {
 <script type="text/javascript">
 var dojoConfig = {
 	async: true,
-  baseUrl: 'http://ajax.googleapis.com/ajax/libs/dojo/1.7.1/dojo/',
+	//baseUrl: 'http://ajax.googleapis.com/ajax/libs/dojo/1.7.1/dojo/',
+	baseUrl: '/library/dojo/trunk/dojo/',
 	packages: [
 		{name: 'dgrid', location: '/library/dgrid'},
 		{name: 'xstyle', location: '/library/xstyle'},
@@ -127,14 +128,14 @@ var dojoConfig = {
 	],
 	// redirect the following modules to my own modules
 	paths: {
-//		'dijit/tree/_dndSelector': '/library/rfe/dnd/TreeSelector',
-//		'dijit/tree/dndSource': '/library/rfe/dnd/TreeSource'
+		'dijit/tree/_dndSelector': '/library/rfe/dnd/TreeSelector',
+		'dijit/tree/dndSource': '/library/rfe/dnd/TreeSource'
 	}
 };
 
 </script>
-<!--<script type="text/javascript" src="library/dojo/1.7/dojo/dojo.js"></script>-->
-<script src="http://ajax.googleapis.com/ajax/libs/dojo/1.7.1/dojo/dojo.js" type="text/javascript"></script>
+<script type="text/javascript" src="library/dojo/trunk/dojo/dojo.js"></script>
+<!--<script src="http://ajax.googleapis.com/ajax/libs/dojo/1.7.1/dojo/dojo.js" type="text/javascript"></script>-->
 <script type="text/javascript">
 require(['dojo/ready', 'rfe/FileExplorer'], function(ready, FileExplorer) {
 	ready(function() {
