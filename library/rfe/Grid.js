@@ -1,14 +1,16 @@
 define([
 	'dojo/_base/Deferred',
-	'dgrid/OnDemandGrid',
-	'dgrid/extensions/ColumnResizer',
 	'dojo/_base/declare',
+	'dgrid/OnDemandGrid',
+	'dgrid/Selection',
+	'dgrid/extensions/ColumnResizer',
 	'xstyle/has-class',
 	'xstyle/css',
 	'put-selector/put'
-], function(Deferred, Grid, ColumnResizer, declare) {
+], function(Deferred, declare, Grid, Selection, ColumnResizer) {
 
-	return declare([Grid, ColumnResizer], {
+	return declare([Grid, Selection, ColumnResizer], {
+		selectionMode: 'extended',
 		columns: [{
 			label: "name",
 			field: 'name',
@@ -36,7 +38,7 @@ define([
 			sortable: false
 		}],
 
-		dndController2: null,
+		dndController: null,
 
 		/**
 		 * Format integer to display file size in kilobyte.

@@ -3,7 +3,7 @@ define([
 	'dojo/_base/array',
 	'dojo/_base/declare',
 	'dojo/_base/Deferred',
-   'dojo/cookie',
+	'dojo/cookie',
 	'dojo/keys',
 	'dojo/dom',
 	'dojo/dom-class',
@@ -28,15 +28,15 @@ define([
 	 * @class
 	 */
 	return declare('rfe.FileExplorer', [Layout, Edit], {
-		version:'1.0',
-		versionDate:'2011',
-		currentTreeItem:null, // currently selected store object in tree, equals always parent of grid items
-		currentGridItem:null, // currently (last, when multi-) selected store object in grid
+		version: '1.0',
+		versionDate: '2011',
+		currentTreeItem: null, // currently selected store object in tree, equals always parent of grid items
+		currentGridItem: null, // currently (last, when multi-) selected store object in grid
 
 		history: {
-			steps: [],     // saves the steps
-			curIdx: null,	// index of current history array we're on
-			numSteps: 5    // number of steps you can go forward/back
+			steps: [], // saves the steps
+			curIdx: null, // index of current history array we're on
+			numSteps: 5	 // number of steps you can go forward/back
 		},
 
 		/**
@@ -73,30 +73,27 @@ define([
 				// note onClick is also fired when user uses keyboard navigation and hits space
 
 //					grid.selection.clear(); 				// otherwise item in not-displayed folder is still selected or with same idx
-					Deferred.when(this.displayChildrenInGrid(item), function() {	// only called, when store.openOnClick is set to false
-//						tree.focusNode(node);				// refocus node because it got moved to grid
-					});
-					this.setHistory(item.id);
-
+				this.displayChildrenInGrid(item);
+				this.setHistory(item.id);
 				this.currentTreeItem = item;
 			}));
 			/*
-			grid.on('rowMouseDown', lang.hitch(this, function(evt) {
-				// rowMouseDown also registers right click
-				this.currentGridItem = grid.getItem(evt.rowIndex);     // TODO use grid.selection instead ?
-			}));
-			grid.on('rowDblClick', lang.hitch(this, function(evt) {
-				// cancel when editing
-				if (grid.edit.isEditing()) {
-					return;
-				}
-				var item = grid.getItem(evt.rowIndex);
-				if (item.dir) {
-					this.display(item);
-					this.setHistory(item.id);
-				}
-			}));
-			*/
+			 grid.on('rowMouseDown', lang.hitch(this, function(evt) {
+			 // rowMouseDown also registers right click
+			 this.currentGridItem = grid.getItem(evt.rowIndex);     // TODO use grid.selection instead ?
+			 }));
+			 grid.on('rowDblClick', lang.hitch(this, function(evt) {
+			 // cancel when editing
+			 if (grid.edit.isEditing()) {
+			 return;
+			 }
+			 var item = grid.getItem(evt.rowIndex);
+			 if (item.dir) {
+			 this.display(item);
+			 this.setHistory(item.id);
+			 }
+			 }));
+			 */
 		},
 
 
@@ -113,7 +110,7 @@ define([
 			if (object.dir) {
 				//				store.skipWithNoChildren = false;
 				return Deferred.when(store.getChildren(object), function() {				  // TODO:  I think we can use memory store directly because they are already loaded
-					//					store.skipWithNoChildren = true;
+//					store.skipWithNoChildren = true;
 					grid.setQuery({
 						parId: object.id
 					});
@@ -129,19 +126,19 @@ define([
 		/**
 		 * Displays folder content in tree.
 		 * Returns false if item is not a folder, otherwise returns a dojo.Deferred
-		 * @param {Object} item dojo.data.item
+		 * @param {Object} object dojo.data.item
 		 * @return {object} dojo.Deferred returning boolean
 		 */
-		displayInTree: function(item) {
+		displayInTree: function(object) {
 			var dfd = new Deferred();
-			if (item.dir) {
-				var path = this.store.getPath(item);
+			if (object.dir) {
+				var path = this.store.getPath(object);
 				dfd = this.tree.set('path', path);
 			}
 			else {
 				dfd.reject(false);
 			}
-			this.currentTreeItem = item;
+			this.currentTreeItem = object;
 			return dfd;
 		},
 
@@ -165,26 +162,26 @@ define([
 
 		/**
 		 * Display parent directory.
-		 * @param {Object} [item] dojo.data.item
+		 * @param {Object} [object] dojo.data.object
 		 */
-		goDirUp: function(item) {
-            var def;
-            if (!item) {
-                item = this.currentTreeItem;
-            }
-            if (item.parId) {
-                return Deferred.when(this.store.get(item.parId), lang.hitch(this, function(item) {
-                    return this.display(item);
-                }), function(err) {
-                    console.debug('Error occurred when going directory up', err);
-                });
-            }
-            else {
-                def = new Deferred();
-                def.resolve(false);
-                return def;
-            }
-        },
+		goDirUp: function(object) {
+			var def;
+			if (!object) {
+				object = this.currentTreeItem;
+			}
+			if (object.parId) {
+				return Deferred.when(this.store.get(object.parId), lang.hitch(this, function(item) {
+					return this.display(item);
+				}), function(err) {
+					console.debug('Error occurred when going directory up', err);
+				});
+			}
+			else {
+				def = new Deferred();
+				def.resolve(false);
+				return def;
+			}
+		},
 
 		/**
 		 * Reload current folder.
@@ -279,16 +276,16 @@ define([
 		 */
 		getDate: function() {
 			return locale.format(new Date(), {
-					datePattern: 'dd.MM.yyyy',
-					timePattern: 'HH:mm'
-			  });
+				datePattern: 'dd.MM.yyyy',
+				timePattern: 'HH:mm'
+			});
 		},
 
 		/**
 		 * Returns the last selected item of the focused widget.
 		 */
 		getLastSelectedItem: function() {
-            // widget.focused does not work when used from toolbar, since focus is moved to menu
+			// widget.focused does not work when used from toolbar, since focus is moved to menu
 			// TODO use grid.selection and tree.selection instead ?
 			if (this.tree.focused || this.layout.panes.treePane.focused) {
 				return this.currentTreeItem;
@@ -353,8 +350,8 @@ define([
 			oreo = cookie(tree.dndController.cookieName);
 			if (tree.persist && oreo) {
 				// extract information to display folder content in grid
-				paths = array.map(oreo.split(","), function(path){
-				   return path.split("/");
+				paths = array.map(oreo.split(","), function(path) {
+					return path.split("/");
 				});
 				// we only use last item in array to set the folders in the grid (normally there would be one selection only anyway)
 				arr = paths[paths.length - 1];

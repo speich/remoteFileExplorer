@@ -4,23 +4,18 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Remote File Explorer (rfe)</title>
 <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.7.1/dijit/themes/claro/claro.css"/>
+<link rel="stylesheet" href="/library/dgrid/css/skins/claro.css">
 <style type="text/css">
 body {
 	font-family: Verdana, Helvetica, Arial, sans-serif;
 	font-size: 12px;
 }
 
-.dojoxGrid {
-	font-family: inherit;
+.claro .dgrid {
+	border: none;
+	height: 100%;
 }
 
-.dojoxGridRowOdd .dojoxGridRowTable tr {
-	background-color: #ffffff;
-}
-.dojoxGridHeader .dojoxGridCell  {
-	border-top: 0;
-	font-size: 11px;
-}
 .claro .dijitSplitter {
 	border-width: 0 1px;
 	border-style: solid;
@@ -58,10 +53,6 @@ body {
 #rfeTreeMenuBar .dojoxGridCell {
 	margin-right: 1px;
 	border-right: 0;
-}
-
-#rfeGrid .dojoxGridRow {
-	padding: 2px 4px 0 4px;
 }
 
 .dijitDisabled .rfeToolbarIcon {
