@@ -185,9 +185,7 @@ define([
 		},
 
 
-		paste: function(copy) {
-
-		},
+		paste: function(copy) {},
 
 		/**
 		 * Move or copy an item from one parent item to another.

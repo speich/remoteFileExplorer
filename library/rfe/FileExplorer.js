@@ -8,12 +8,14 @@ define([
 	'dojo/dom',
 	'dojo/dom-class',
 	'dojo/date/locale',
+	'dojo/on',
+	'dojo/Stateful',
 	'dijit/registry',
 	'rfe/Layout',
 	'rfe/Edit',
 	'rfe/Store/FileCache',
 	'rfe/dnd/Avatar'
-], function(lang, array, declare, Deferred, cookie, keys, dom, domClass, locale, registry, Layout, Edit, FileCache) {
+], function(lang, array, declare, Deferred, cookie, keys, dom, domClass, locale, on, Stateful, registry, Layout, Edit, FileCache) {
 	/**
 	 * File explorer allows you to browse files.
 	 *
@@ -51,7 +53,7 @@ define([
 
 			lang.mixin(this, args);
 
-			this.createLayout(this.id);
+			this.create(this.id);
 
 			this.store = new FileCache();
 			//var model = new ObjectStoreModel({store: store, query: {id: 'world'}});
@@ -63,20 +65,31 @@ define([
 			this.grid = this.initGrid('rfeGrid');
 			this.initEvents();
 
+			this.currentTreeItem = new Stateful();
+			this.currentTreeItem.watch(this.toolbar.updateButtons);
 //			this.initContextMenu(dom.byId(this.id));
 		},
 
 		initEvents: function() {
 			var grid = this.grid, tree = this.tree;
+			on(tree.domNode, 'dblclick', function() {
+				console.log('dblclicked');
+			});
+			tree.on('click', lang.hitch(this, function(object, node) {
 
-			tree.on('click', lang.hitch(this, function(item, node) {
 				// note onClick is also fired when user uses keyboard navigation and hits space
+				if (object != this.currentTreeItem) {		// prevent executing twice (dblclick)
+					console.log('clicked')
+//					grid.selection.clear(); 				// otherwise object in not-displayed folder is still selected or with same idx
 
-//					grid.selection.clear(); 				// otherwise item in not-displayed folder is still selected or with same idx
-				this.displayChildrenInGrid(item);
-				this.setHistory(item.id);
-				this.currentTreeItem = item;
+//					grid.selection.clear(); 				// otherwise object in not-displayed folder is still selected or with same idx
+					this.displayChildrenInGrid(object);
+					this.setHistory(object.id);
+				}
+
+				this.currentTreeItem.set(object);
 			}));
+
 			/*
 			 grid.on('rowMouseDown', lang.hitch(this, function(evt) {
 			 // rowMouseDown also registers right click
@@ -138,7 +151,7 @@ define([
 			else {
 				dfd.reject(false);
 			}
-			this.currentTreeItem = object;
+			this.currentTreeItem.set(object);
 			return dfd;
 		},
 
@@ -363,7 +376,7 @@ define([
 							parId: id
 						});
 					}));
-					this.currentTreeItem = object;
+					this.currentTreeItem.set(object);	// wat
 				}));
 			}
 			else {
