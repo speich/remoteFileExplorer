@@ -50,14 +50,12 @@ define([
 		constructor: function(args) {
 			// TODO: should tree connect also on right click as grid? If so, attache event to set currentTreeItem
 
-
 			lang.mixin(this, args);
-
-			this.create(this.id);
 
 			this.store = new FileCache();
 			//var model = new ObjectStoreModel({store: store, query: {id: 'world'}});
-			this.tree = this.initTree({
+
+			this.initTree({
 				id: 'rfeTree',
 				store: this.store,
 				onLoad: lang.hitch(this, this.initState)
@@ -68,6 +66,7 @@ define([
 			this.currentTreeItem = new Stateful();
 			this.currentTreeItem.watch(this.toolbar.updateButtons);
 //			this.initContextMenu(dom.byId(this.id));
+
 		},
 
 		initEvents: function() {

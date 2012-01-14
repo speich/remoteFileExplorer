@@ -19,9 +19,10 @@ define([
 		 * Creates the toolbar.
 		 * @return {Object} dijit.Toolbar
 		 */
-		create: function() {
+		postCreate: function() {
+			console.log('Toolsbar',this)
 			//var node = registry.byId(this.id);
-			this.domNode.addChild(new Button({
+			this.addChild(new Button({
 				id: 'rfeButtonDirectoryUp',
 				label: 'up',
 				showLabel: true,
@@ -50,7 +51,7 @@ define([
 			 });
 			 */
 
-			this.domNode.addChild(new Button({
+			this.addChild(new Button({
 				id: 'rfeButtonHistoryBack',
 				label: 'history back',
 				showLabel: false,
@@ -67,7 +68,7 @@ define([
 				registry.byId('rfeButtonHistoryBack').set('disabled', this.history.curIdx < 1);
 			}));
 
-			this.domNode.addChild(new Button({
+			this.addChild(new Button({
 				id: 'rfeButtonHistoryForward',
 				label: 'history forward',
 				showLabel: false,
@@ -80,7 +81,7 @@ define([
 			aspect.after(this, 'goHistory', function() {
 				registry.byId('rfeButtonHistoryForward').set('disabled', this.history.curIdx > this.history.steps.length - 2);
 			});
-			this.domNode.addChild(new Button({
+			this.addChild(new Button({
 				id: 'rfeButtonReload',
 				label: 'reload',
 				showLabel: true,

@@ -12,26 +12,42 @@ define([
 	'dijit/tree/dndSource',
 	'rfe/Grid',
 	'dijit/registry',
-	'dijit/layout/BorderContainer',
-	'dijit/layout/ContentPane',
 	"dijit/form/CheckBox",
 	"dijit/Dialog",
 	'rfe/layout/Toolbar',
-	'rfe/layout/Menubar'
-], function(array, lang, declare, event, aspect, on, cookie, construct, query, Tree, TreeSource,
-				Grid, registry,
-				BorderContainer, ContentPane, CheckBox, Dialog, Toolbar, Menubar) {
+	'rfe/layout/Menubar',
+	'rfe/layout/Panes'
+], function(array, lang, declare, event, aspect, on, cookie, domConstruct, query, Tree, TreeSource,
+				Grid, registry, CheckBox, Dialog, Toolbar, Menubar, Panes) {
 
 		return declare('rfe.Layout', null, {
 //			store: null,
 //			grid: null,
 //			tree: null,
 
+			panes: null,
 			toolbar: null,
 			menubar: null,
+			tree: null,
 
-			constructor: function(args) {
-				lang.mixin(this, args);
+			constructor: function(props) {
+				lang.mixin(this, props || {});
+
+				this.panes = new Panes({}, this.id);
+
+				this.toolbar = new Toolbar({
+					rfe: this
+				}, domConstruct.create('div'));
+
+				this.menubar = new Menubar({
+				}, domConstruct.create('div'));
+
+				this.menubar.placeAt(this.panes.menuPane.domNode);
+				this.toolbar.placeAt(this.panes.menuPane.domNode);
+
+				this.panes.setView('horizontal');
+				this.panes.startup();
+
 			},
 
 			/**
@@ -56,111 +72,24 @@ define([
 					}
 				}, props);
 
-				var div = construct.create('div', {
+				var div = domConstruct.create('div', {
 					id: props.id
 				}, this.panes.treePane.domNode);
 
-				return new Tree(props, div);
+				this.tree = new Tree(props, div);
 			},
 
 			initGrid: function(id) {
-				construct.create('div', {
+				domConstruct.create('div', {
 					id: id
 				}, this.panes.gridPane.domNode);
 				return new Grid({}, id)
 			},
 
 			/**
-			 * Create the layout containers for the tree and grid.
-			 * @param {Number} id
-			 * @return {Object} layout
-			 */
-			create: function(id) {
-				var panes = this.panes;
-				panes.create(id);
-
-
-				this.menubar = new Menubar({
-					id: 'rfeMenuBar'
-				});
-				this.menubar = this.menubar.create();
-
-				this.toolbar = new Toolbar({
-					id: 'rfeToolbar',
-					rfe: this
-				}, panes.menuPane.domNode);
-				this.toolbar.create();
-
-				construct.create('div', {
-					'id': 'rfeTreeMenuBar',
-					'class': 'dojoxGridHeader',// 'dijitMenuBar',
-					innerHTML: '<div class="dojoxGridCell"><div class="dojoxGridSortNode">folders</div></div>'  // imitating dojox grid header to use same style and size as grid headers
-				}, panes.treePane.domNode, 'first');
-
-				this.menuBar.placeAt(panes.menuPane.domNode);
-
-
-				panes.menuPane.placeAt(panes.borderContainer);
-				panes.treePane.placeAt(panes.borderContainer);
-				panes.gridPane.placeAt(panes.borderContainer);
-
-				this.view.set(this.view.current, this.panes);
-
-				panes.borderContainer.startup();
-			},
-
-			view: {
-				current: 'horizontal',
-
-				/**
-				 * Sets the layout view of the explorer.
-				 * @param {object} panes dijit.BorderContainer
-				 * @param {string} view
-				 */
-				set: function(view, panes) {
-					var treePane = panes.treePane;
-					var gridPane = panes.gridPane;
-
-					panes.borderContainer.removeChild(treePane);
-					panes.borderContainer.removeChild(gridPane);
-					if (view == 'vertical') {
-						panes.treePane.set({
-							region: 'center',
-							style: 'width: 100%;',
-							minSize: null,
-							splitter: false
-						});
-						panes.gridPane.set({
-							region: 'bottom',
-							style: 'top: auto; width: 100%; height: 60%',	// top is not removed when changing from center to bottom
-							splitter: true
-						});
-					}
-					else if (view == 'horizontal') {
-						panes.treePane.set({
-							region: 'left',
-							style: 'top: 0; bottom: auto; width: 25%; height: 100%;',
-							minSize: 180,
-							splitter: true
-						});
-						panes.gridPane.set({
-							region: 'center',
-							style: 'top: 0; height: 100%'
-						});
-					}
-					panes.borderContainer.addChild(treePane);
-					panes.borderContainer.addChild(gridPane);
-
-					this.current = view;
-				}
-			},
-
-			/**
 			 * Creates the main menu.
 			 * @return dijit.MenuBar
 			 */
-
-
 			panes: {
 				/**
 				 * Creates the layout panes.
@@ -168,27 +97,10 @@ define([
 				 * @return {Object} dijit.BorderContainer and dijit.ContentPane
 				 */
 				create: function(id) {
-					this.borderContainer = new BorderContainer({
-						liveSplitters: true,
-						gutters: false
-					}, id);
 					on(this.borderContainer.domNode, 'contextmenu', function(evt) {
 						event.stop(evt);
 					});
-					this.menuPane = new ContentPane({
-						id: 'rfeContentPaneMenu',
-						region: 'top'
-					}, document.createElement('div'));
-					this.treePane = new ContentPane({
-						id: 'rfeContentPaneTree'
-					}, document.createElement('div'));
-					this.gridPane = new ContentPane({
-						id: 'rfeContentPaneGrid'
-					}, document.createElement('div'));
-					this.loggingPane = new ContentPane({
-						id: 'rfeContentPaneLogging',
-						region: 'bottom'
-					}, document.createElement('div'));
+
 				},
 
 				/**
@@ -239,12 +151,12 @@ define([
 					'</div>'
 				});
 
-				var label = construct.create('label', {
+				var label = domConstruct.create('label', {
 					innerHTML: 'Remember folders state'
 				}, query('fieldset', dialog.domNode)[0], 'last');
-				construct.create('br', null, label);
+				domConstruct.create('br', null, label);
 
-				var input = construct.create('input', null, label, 'first');
+				var input = domConstruct.create('input', null, label, 'first');
 				new CheckBox({
 					checked: true,
 					onClick: function() {
@@ -252,10 +164,10 @@ define([
 					}
 				}, input);
 
-				label = construct.create('label', {
+				label = domConstruct.create('label', {
 					innerHTML: 'Show folders only'
 				}, query('fieldset', dialog.domNode)[0], 'last');
-				input = construct.create('input', null, label, 'first');
+				input = domConstruct.create('input', null, label, 'first');
 				new CheckBox({
 					checked: true,
 					onClick: function() {
