@@ -85,7 +85,7 @@ define([
 				label: 'Layout horizontal',
 				checked: true,
 				onClick: lang.hitch(this, function() {
-					this.setView('horizontal');
+					this.rfe.panes.setView('horizontal');
 					on.emit('rfe/menuView/setView');   // notify menuView/folders to set checked = true
 					registry.byId('rfeMenuItemVertical').set('checked', false);
 				})
@@ -95,7 +95,7 @@ define([
 				label: 'Layout vertical',
 				checked: false,
 				onClick: lang.hitch(this, function() {
-					this.setView('vertical');
+					this.rfe.panes.setView('vertical');
 					on.emit('rfe/menuView/setView');   // notify menuView/folders to set checked = true
 					registry.byId('rfeMenuItemHorizontal').set('checked', false);
 				})

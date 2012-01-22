@@ -3,12 +3,14 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Remote File Explorer (rfe)</title>
+<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.7.1/dijit/themes/claro/document.css"/>
 <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.7.1/dijit/themes/claro/claro.css"/>
 <link rel="stylesheet" href="/library/dgrid/css/skins/claro.css">
 <style type="text/css">
-body {
-	font-family: Verdana, Helvetica, Arial, sans-serif;
-	font-size: 0.8em;
+html, body {
+	width: 100%;
+	height: 100%;
+	font-size: 1.2em;
 }
 
 .claro .dgrid {
@@ -27,37 +29,24 @@ body {
 	border-color: #B5BCC7;
 	background-color: #f1f1f1;
 }
-#remoteFileExplorer {
-	position: absolute;
-   top: 20px; left: 8px; bottom: 8px; right: 8px;
-	border: 1px solid #B5BCC7;
-	background-color: #ffffff;
-}
-.rfeMenuPane {
+
+.claro .dijitContentPane {
 	padding: 0;
-	overflow: hidden;
+}
+#remoteFileExplorer {
+	width: 100%;
+	height: 100%;
+	background-color: #ffffff;
 }
 .rfeMenuPane {
 	border-width: 0 0 1px 0;
 }
-#rfeContentPaneTree, #rfeContentPaneGrid {
-	padding: 0;
-}
-#rfeContentPaneLogging {
-	border-top: 1px solid #B5BCC7;
-	max-height: 300px;
+.claro .rfeTreePane {
+	padding: 10px;
 }
 
-#rfeTreeMenuBar {
-	position: relative;
-	width: 100%;
-	font-weight: bold;
-	font-size: 100%;
-	line-height: 14px;
-}
-#rfeTreeMenuBar .dojoxGridCell {
-	margin-right: 1px;
-	border-right: 0;
+#rfeContentPaneTree, #rfeContentPaneGrid {
+	padding: 0;
 }
 
 .dijitDisabled .rfeToolbarIcon {
@@ -124,8 +113,8 @@ var dojoConfig = {
 	],
 	// redirect the following modules to my own modules
 	paths: {
-		'dijit/tree/_dndSelector': '/library/rfe/dnd/TreeSelector',
-		'dijit/tree/dndSource': '/library/rfe/dnd/TreeSource'
+//		'dijit/tree/_dndSelector': '/library/rfe/dnd/TreeSelector',
+//		'dijit/tree/dndSource': '/library/rfe/dnd/TreeSource'
 	}
 };
 
@@ -135,9 +124,10 @@ var dojoConfig = {
 <script type="text/javascript">
 require(['dojo/ready', 'rfe/FileExplorer'], function(ready, FileExplorer) {
 	ready(function() {
-		new FileExplorer({
+		var fe = new FileExplorer({
 			id: 'remoteFileExplorer'
 		});
+		fe.startup();
 	});
 });
 </script>

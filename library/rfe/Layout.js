@@ -12,7 +12,7 @@ define([
 	'dijit/tree/dndSource',
 	'rfe/Grid',
 	'dijit/registry',
-	"dijit/form/CheckBox",
+	'dijit/form/CheckBox',
 	"dijit/Dialog",
 	'rfe/layout/Toolbar',
 	'rfe/layout/Menubar',
@@ -20,7 +20,7 @@ define([
 ], function(array, lang, declare, event, aspect, on, cookie, domConstruct, query, Tree, TreeSource,
 				Grid, registry, CheckBox, Dialog, Toolbar, Menubar, Panes) {
 
-		return declare('rfe.Layout', null, {
+		return declare(null, {
 //			store: null,
 //			grid: null,
 //			tree: null,
@@ -28,11 +28,16 @@ define([
 			panes: null,
 			toolbar: null,
 			menubar: null,
+
 			tree: null,
+			grid: null,
 
 			constructor: function(props) {
 				lang.mixin(this, props || {});
+			},
 
+			create: function() {
+				console.log('Layout postCreate', this.currentTreeObject)
 				this.panes = new Panes({}, this.id);
 
 				this.toolbar = new Toolbar({
@@ -40,89 +45,46 @@ define([
 				}, domConstruct.create('div'));
 
 				this.menubar = new Menubar({
+					rfe: this
 				}, domConstruct.create('div'));
 
 				this.menubar.placeAt(this.panes.menuPane.domNode);
 				this.toolbar.placeAt(this.panes.menuPane.domNode);
 
 				this.panes.setView('horizontal');
-				this.panes.startup();
 
+				this.initGrid();
+				this.initTree();
+				this.panes.startup();
 			},
 
 			/**
 			 * Initializes the tree and tree dnd.
-			 * @param id
-			 * @param {rfe/StoreFileCache} store
 			 */
-			initTree: function(props) {
-				props = lang.mixin({
-					model: props.store,
-					childrenAttrs: [props.store.childrenAttr],
+			initTree: function(){
+				var div = domConstruct.create('div', {}, this.panes.treePane.domNode);
+				this.tree = new Tree({
+					model: this.store,
+					childrenAttrs: [this.store.childrenAttr],
 					openOnClick: false,
 					openOnDblClick: true,
 					showRoot: true,
 					persist: true,
-					dndController: function(arg, params) {
+					onLoad: lang.hitch(this, this.initState),
+					dndController: function(arg, params){
 						return new TreeSource(arg, lang.mixin(params || {}, {
 							accept: ['treeNode', 'gridNode'],
-							store: props.store,
+							store: this.store,
 							singular: true
 						}))
 					}
-				}, props);
-
-				var div = domConstruct.create('div', {
-					id: props.id
-				}, this.panes.treePane.domNode);
-
-				this.tree = new Tree(props, div);
+				}, div);
 			},
 
-			initGrid: function(id) {
-				domConstruct.create('div', {
-					id: id
-				}, this.panes.gridPane.domNode);
-				return new Grid({}, id)
+			initGrid: function() {
+				var div = domConstruct.create('div', {}, this.panes.gridPane.domNode);
+				this.grid = new Grid({}, div)
 			},
-
-			/**
-			 * Creates the main menu.
-			 * @return dijit.MenuBar
-			 */
-			panes: {
-				/**
-				 * Creates the layout panes.
-				 * @param {String} id id of HTMLDivElement layout should be appended to
-				 * @return {Object} dijit.BorderContainer and dijit.ContentPane
-				 */
-				create: function(id) {
-					on(this.borderContainer.domNode, 'contextmenu', function(evt) {
-						event.stop(evt);
-					});
-
-				},
-
-				/**
-				 * Toggle display of the tree pane.
-				 */
-				toggleTreePane: function() {
-					// to keep it simple for the moment we switch to vertical view where the remaining pane is the center pane
-					// -> automatically expands to fill the remaining space
-					var treePane = this.treePane;
-					if (treePane.domNode.parentNode) {  // hide pane
-						if (this.layout.view == 'vertical') {
-							this.setView('horizontal');
-						}
-						this.borderContainer.removeChild(treePane);
-					}
-					else {	// show pane
-						this.borderContainer.addChild(treePane);
-					}
-				}
-			},
-
-
 
 			showDialogAbout: function() {
 				var dialog = registry.byId('rfeDialogAbout') || new Dialog({

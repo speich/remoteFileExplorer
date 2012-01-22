@@ -14,10 +14,10 @@ define([
 	'dijit/PopupMenuItem'
 ], function(lang, array, declare, Deferred, on, aspect, mouse, dom, domClass, registry, Menu, MenuItem, PopupMenuItem) {
 
-	return declare('rfe.Edit', null, {
+	return declare(null, {
 		editor: {
-			contextMenu: null,   // reference to the context menu
-			context: null  // reference to the widget the context menu was created on (right clicked on)
+			contextMenu: null,	// reference to the context menu
+			context: null 		// reference to the widget the context menu was created on (right clicked on)
 		},
 
 		/**
@@ -152,7 +152,7 @@ define([
 		 */
 		createItem: function(itemProps) {
 			var store = this.store;
-			var parId = this.currentTreeItem.id;
+			var parId = this.currentTreeObject.id;
 			var item = {
 				size: 0,
 				parId: parId,

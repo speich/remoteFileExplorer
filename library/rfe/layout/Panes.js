@@ -10,7 +10,7 @@ define([
 	'dojo/text!rfe/layout/Layout.html'
 ], function(lang, declare, dom, domConstruct, BorderContainer, ContentPane, _WidgetBase, _TemplatedMixin, template) {
 
-		return declare('rfe.Panes', [BorderContainer, _WidgetBase, _TemplatedMixin], {
+		return declare([BorderContainer, _WidgetBase, _TemplatedMixin], {
 
 			widgetsInTemplate: true,
 			templateString: template,
@@ -30,16 +30,13 @@ define([
 
 			postCreate: function() {
 				this.menuPane = new ContentPane({
-//					id: 'rfeContentPaneMenu',
 					region: 'top'	// menu is always on top
 				}, this.rfeMenuPaneNode);
 
 				this.treePane = new ContentPane({
-//					id: 'rfeContentPaneTree'
 				}, this.rfeTreePaneNode);
 
 				this.gridPane = new ContentPane({
-//					id: 'rfeContentPaneGrid',
 					region: 'center'
 				}, this.rfeGridPaneNode);
 			},
@@ -49,9 +46,6 @@ define([
 			 * @param {string} view
 			 */
 			setView: function(view) {
-
-//							panes.borderContainer.removeChild(treePane);
-//							panes.borderContainer.removeChild(gridPane);
 				if (view == 'vertical') {
 					this.treePane.set({
 						region: 'center',
@@ -77,12 +71,26 @@ define([
 						style: 'height: 100%'
 					});
 				}
-//							panes.borderContainer.addChild(treePane);
-//							panes.borderContainer.addChild(gridPane);
-
 				this.currentView = view;
-			}
+			},
 
+			/**
+			 * Toggle display of the tree pane.
+			 */
+			toggleTreePane: function() {
+				// to keep it simple for the moment we switch to vertical view where the remaining pane is the center pane
+				// -> automatically expands to fill the remaining space
+				var treePane = this.treePane;
+				if (treePane.domNode.parentNode) {  // hide pane
+					if (this.layout.view == 'vertical') {
+						this.setView('horizontal');
+					}
+					this.borderContainer.removeChild(treePane);
+				}
+				else {	// show pane
+					this.borderContainer.addChild(treePane);
+				}
+			}
 
 		})
 });

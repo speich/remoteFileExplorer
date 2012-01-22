@@ -16,91 +16,71 @@ define([
 		},
 
 		/**
-		 * Creates the toolbar.
-		 * @return {Object} dijit.Toolbar
+		 * Adds the buttons to the toolbar buttons and defines their actions.
 		 */
 		postCreate: function() {
-			console.log('Toolsbar',this)
-			//var node = registry.byId(this.id);
-			this.addChild(new Button({
-				id: 'rfeButtonDirectoryUp',
+			this.inherited('postCreate', arguments);	// in case we've overriden something
+
+			var rfe = this.rfe;
+			var bt1 = new Button({
 				label: 'up',
 				showLabel: true,
 				iconClass: 'rfeToolbarIcon rfeToolbarIconDirUp',
-				disabled: false,
-				onClick: lang.hitch(this, function() {
-					var def = this.goDirUp();
-					def.then(lang.hitch(this, function(item) {
-						if (item) {
-							this.setHistory(this.currentTreeItem.id);
+				disabled: true,
+				onClick: function() {
+					var def = rfe.goDirUp();
+					def.then(function(object) {
+						if (object) {
+							rfe.setHistory(rfe.currentTreeObject.id);
 						}
-					}));
-				})
-			}));
+					});
+				}
+			});
+			rfe.currentTreeObject.watch('id', function(prop, oldVal, newVal) {
+				bt1.set('disabled', newVal == rfe.tree.rootNode.item.id);
+			});
+			this.addChild(bt1);
 
-			/*
-			 aspect.after(this, 'displayChildrenInGrid', function(item) {
-			 var button = registry.byId('rfeButtonDirectoryUp');
-			 button.set('disabled', item == tree.rootNode.item);
-			 }, true);
-			 */
-			/*
-			 this.grid.on('RowDblClick', function(item) {
-			 var button = registry.byId('rfeButtonDirectoryUp');
-			 button.set('disabled', item == tree.rootNode.item);
-			 });
-			 */
-
-			this.addChild(new Button({
-				id: 'rfeButtonHistoryBack',
+			var bt2 = new Button({
 				label: 'history back',
 				showLabel: false,
 				iconClass: 'dijitEditorIcon dijitEditorIconUndo',
 				disabled: true,
-				onClick: lang.hitch(this, function() {
-					this.goHistory('back');
-				})
-			}));
-			aspect.after(this, 'setHistory', lang.hitch(this, function() {
-				registry.byId('rfeButtonHistoryBack').set('disabled', this.history.steps.length < 2);
-			}));
-			aspect.after(this, 'goHistory', lang.hitch(this, function() {
-				registry.byId('rfeButtonHistoryBack').set('disabled', this.history.curIdx < 1);
-			}));
+				onClick: function() {
+					rfe.goHistory('back');
+				}
+			});
+			aspect.after(rfe, 'setHistory', function() {
+				bt2.set('disabled', rfe.history.steps.length < 2);
+			});
+			aspect.after(rfe, 'goHistory', function() {
+				bt2.set('disabled', rfe.history.curIdx < 1);
+			});
+			this.addChild(bt2);
 
-			this.addChild(new Button({
-				id: 'rfeButtonHistoryForward',
+			var bt3 = new Button({
 				label: 'history forward',
 				showLabel: false,
 				iconClass: 'dijitEditorIcon dijitEditorIconRedo',
 				disabled: true,
-				onClick: lang.hitch(this, function() {
-					this.goHistory('forward');
-				})
-			}));
-			aspect.after(this, 'goHistory', function() {
-				registry.byId('rfeButtonHistoryForward').set('disabled', this.history.curIdx > this.history.steps.length - 2);
+				onClick: function() {
+					rfe.goHistory('forward');
+				}
 			});
+			aspect.after(rfe, 'goHistory', function() {
+				bt3.set('disabled', rfe.history.curIdx > rfe.history.steps.length - 2);
+			});
+			this.addChild(bt3);
+
 			this.addChild(new Button({
-				id: 'rfeButtonReload',
 				label: 'reload',
 				showLabel: true,
 				iconClass: 'dijitEditorIcon dijitEditorIconRedo',
 				disabled: false,
-				onClick: lang.hitch(this, function() {
-					this.reload();
-				})
+				onClick: function() {
+					rfe.reload();
+				}
 			}));
-
-			return toolbar;
-		},
-
-		updateButtons: function() {
-			console.log(this);
-			console.log('toolbar', toolbar)
-			var button = registry.byId('rfeButtonDirectoryUp');
-			button.set('disabled', this.id == this.tree.rootNode.item);	// TODO: do not hardcode 'root'
-
 		}
 
 	});
