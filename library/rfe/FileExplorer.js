@@ -43,7 +43,6 @@ define([
 		 */
 		constructor: function(props) {
 			// TODO: should tree connect also on right click as grid? If so, attache event to set currentTreeItem
-			lang.mixin(this, props);
 			this.currentTreeObject = new Stateful();	// allows Toolbar and Menubar to keep track
 			this.history = {
 				steps: [],		// saves the steps
@@ -61,26 +60,15 @@ define([
 
 		initEvents: function() {
 			var grid = this.grid, tree = this.tree;
-
-			tree.on('dblclick', function() {
-				console.log('dblclicked');
-			});
 			tree.on('click', lang.hitch(this, function(object, node) {
-
-				// note onClick is also fired when user uses keyboard navigation and hits space
-				if (object != this.currentTreeObject) {		// prevent executing twice (dblclick)
-					console.log('clicked', object, this.currentTreeObject)
-//					grid.selection.clear(); 				// otherwise object in not-displayed folder is still selected or with same idx
-
+				if (object.id != this.currentTreeObject.id) {		// prevent executing twice (dblclick)
 //					grid.selection.clear(); 				// otherwise object in not-displayed folder is still selected or with same idx
 					this.displayChildrenInGrid(object);
 					this.setHistory(object.id);
 				}
-
 				this.currentTreeObject.set(object);
-
-
 			}));
+			tree.on('load', lang.hitch(this, this.initState));
 
 			/*
 			 grid.on('rowMouseDown', lang.hitch(this, function(evt) {
@@ -98,7 +86,6 @@ define([
 			 this.setHistory(item.id);
 			 }
 			 }));
-
 
 			 					on(this.borderContainer.domNode, 'contextmenu', function(evt) {
 						event.stop(evt);

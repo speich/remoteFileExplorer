@@ -67,10 +67,9 @@ define([
 					model: this.store,
 					childrenAttrs: [this.store.childrenAttr],
 					openOnClick: false,
-					openOnDblClick: true,
+					openOnDblClick: true,	// note: tree.on('dblclick') only fires when this is set to false
 					showRoot: true,
 					persist: true,
-					onLoad: lang.hitch(this, this.initState),
 					dndController: function(arg, params){
 						return new TreeSource(arg, lang.mixin(params || {}, {
 							accept: ['treeNode', 'gridNode'],
