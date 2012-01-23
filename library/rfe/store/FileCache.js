@@ -2,15 +2,19 @@
  * This stores caching algorithm has one flaw: If item doesn't have children it is not cached, since the cache checks for
  * the items children in the cache.
  */
-define('rfe/StoreFileCache', [
+define([
 	'dojo/regexp',
 	'dojo/_base/declare',
 	'dojo/_base/lang',
 	'dojo/_base/Deferred',
 	'dojo/_base/array',
-	'dojo/store/Cache'], function(regexp, declare, lang, Deferred, array, Cache) {
+	'dojo/store/Memory',
+	'dojo/store/JsonRest',
+	'dojo/store/Observable',
+	'dojo/store/Cache'
+], function(regexp, declare, lang, Deferred, array, Memory, JsonRest, Observable, Cache) {
 
-	return declare('rfe.StoreFileCache', null, {
+	return declare('rfe.Store.FileCache', null, {
 		// references for MonkeyPatching the store.Cache
 		refPut: null,
 		refDel: null,
@@ -27,14 +31,33 @@ define('rfe/StoreFileCache', [
 		/**
 		 * Constructs the caching file store.
 		 * @constructor
-		 * @param {dojo.store.JsonRest} storeMaster
-		 * @param {dojo.store.Memory} storeMemory
-		 * @param {object} options
 		 */
-		constructor: function(storeMaster, storeMemory) {
-			var storeCache;
+		constructor: function() {
+			var storeMaster, storeMemory, storeCache;
+			storeMaster = new JsonRest({target: '/library/rfe/controller.php/'});
+			storeMemory = new Memory({
+				// Observable only works correctly when object has an id. Memory store does not add id to object when creating an object
+				// see bugs http://bugs.dojotoolkit.org/ticket/12835 and http://bugs.dojotoolkit.org/ticket/14281
+				// Will be fixed with dojo 1.8
+				// Also Observable does not work correctly with JsonRest. Therefore we use the grid with the Memory Store and the Observable
+				put: function(object, options) {
+					var data = this.data, index = this.index, idProperty = this.idProperty;
+					var id = object[idProperty] = (options && "id" in options) ? options.id : idProperty in object ? object[idProperty] : Math.random();
+					if (id in index) {
+						if (options && options.overwrite === false) {
+							throw new Error("Object already exists");
+						}
+						data[index[id]] = object;
+					}
+					else {
+						index[id] = data.push(object) - 1;
+					}
+					return id;
+				}
+			});
+
 			this.storeMaster = storeMaster;
-			this.storeMemory = storeMemory;
+			this.storeMemory = Observable(storeMemory);
 			storeCache = new Cache(this.storeMaster, this.storeMemory);
 			this.refPut = storeCache.put;
 			this.refDel = storeCache.remove;
@@ -42,7 +65,7 @@ define('rfe/StoreFileCache', [
 			storeCache.put = this.put;
 			storeCache.remove = this.remove;
 			storeCache.add = this.add;
-			lang.mixin(this, storeCache);
+			lang.mixin(this, storeCache);    // TODO: necessary?
 		},
 
 		put: function(item) {
@@ -161,6 +184,9 @@ define('rfe/StoreFileCache', [
 			return arr;
 		},
 
+
+		paste: function(copy) {},
+
 		/**
 		 * Move or copy an item from one parent item to another.
 		 * Used in drag & drop by the tree and the grid.
@@ -248,106 +274,6 @@ define('rfe/StoreFileCache', [
 			return item[this.labelAttr];
 		},
 
-		getFeatures: function() {
-			// used by the grid
-			return {
-				'dojo.data.api.Read': true,
-				'dojo.data.api.Write': true,
-				'dojo.data.api.Identity': true,
-				'dojo.data.api.Notification': true
-			}
-		},
-
-		fetchItemByIdentity: function(args) {
-			// only used by the grid
-			var item;
-			Deferred.when(this.storeMemory.get(args.identity), function(result){
-				item = result;
-				args.onItem.call(args.scope, result);
-			},	function(error){
-				args.onError.call(args.scope, error);
-			});
-			return item;
-		},
-
-		fetch: function(args) {
-			// this is used only by the grid
-			args = lang.delegate(args, args && args.queryOptions);
-			var self = this;
-			var scope = args.scope || self;
-			var query = args.query;
-			if (typeof query == "object") { // can be null, but that is ignore by for-in
-				query = lang.delegate(query); // don't modify the original
-				for (var i in query) {
-					// find any strings and convert them to regular expressions for wildcard support
-					var required = query[i];
-					if (typeof required == "string") {
-						query[i] = new RegExp("^" + regexp.escapeString(required, "*?").replace(/\*/g, '.*').replace(/\?/g, '.') + "$", args.ignoreCase ? "mi" : "m");
-						query[i].toString = (function(original) {
-							return function() {
-								return original;
-							}
-						})(required);
-					}
-				}
-			}
-
-			var results = this.storeMemory.query(query, args);
-			Deferred.when(results.total, function(totalCount) {
-				Deferred.when(results, function(results) {
-					if (args.onBegin) {
-						args.onBegin.call(scope, totalCount || results.length, args);
-					}
-					if (args.onItem) {
-						for (var i = 0; i < results.length; i++) {
-							args.onItem.call(scope, results[i], args);
-						}
-					}
-					if (args.onComplete) {
-						args.onComplete.call(scope, args.onItem ? null : results, args);
-					}
-					return results;
-				}, errorHandler);
-			}, errorHandler);
-
-			function errorHandler(error) {
-				if (args.onError) {
-					args.onError.call(scope, error, args);
-				}
-			}
-
-			args.abort = function() {
-				// abort the request
-				if (results.cancel) {
-					results.cancel();
-				}
-			};
-			/*
-			if (results.observe) {
-				console.log('results.observe self.oinSet')
-				results.observe(function(object, removedFrom, insertedInto) {
-					if (array.indexOf(self._dirtyObjects, object) == -1) {
-						if (removedFrom == -1) {
-							self.onNew(object);
-						}
-						else if (insertedInto == -1) {
-							self.onDelete(object);
-						}
-						else {
-							for (var i in object) {
-								if (i != self.idProperty) {
-									self.onSet(object, i, null, object[i]);
-								}
-							}
-						}
-					}
-				});
-			}
-*/
-			args.store = this;
-			return args;
-		},
-
 		getValue: function(item, attribute) {
 			return attribute in item ? item[attribute] : undefined;
 		},
@@ -392,12 +318,7 @@ define('rfe/StoreFileCache', [
 		 */
 		onChildrenChange: function(item, children) {},
 
-		getRoot: function(onItem) {
-			Deferred.when(this.get(this.rootId), function(item) {
-				this.root = item;
-				onItem(this.root);
-			});
-		},
+
 
 		mayHaveChildren: function(item) {
 			return item[this.childrenAttr];
@@ -424,6 +345,17 @@ define('rfe/StoreFileCache', [
 			Deferred.when(this.getChildren(parItem), lang.hitch(this, function(children) {
 				this.onChildrenChange(parItem, children);
 			}));
+		},
+
+
+
+		// NEEDED BY THE TREE
+		getRoot: function(onItem) {
+			console.log('loading root', onItem)
+			Deferred.when(this.get(this.rootId), function(item) {
+				this.root = item;
+				onItem(this.root);
+			});
 		}
 
 	});

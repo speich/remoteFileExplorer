@@ -6,8 +6,8 @@ define([
 	'dojo/dom-class',
 	'original/dijit/tree/dndSource',
 	'dojo/dnd/Manager',
-	'rfe/dnd/drop'
-], function(lang, declare, Deferred, on, domClass, dndSource, dndManager, drop) {
+	'rfe/dnd/Drop'
+], function(lang, declare, Deferred, on, domClass, dndSource, dndManager, Drop) {
 
 		return declare([dndSource], {
 
@@ -16,6 +16,7 @@ define([
 			constructor: function(tree, params) {
 
 				lang.mixin(this, params || {});
+				lang.mixin(this, Drop);
 
 				var type = params.accept instanceof Array ? params.accept : ['treeNode', 'gridNode'];
 				this.accept = null;
@@ -75,19 +76,17 @@ define([
 
 			onDndDrop: function(source, nodes, copy, target) {
 				// note: this method is called from dnd.Manager topic /dnd/drop
-				var newParentItem;
 				if (this.containerState == "Over"){
 					this.isDragging = false;
 					if (this == target) {
 						if (this == source) {	// dropped on tree from tree
 							console.log('tree onDndDrop: dropped onto tree from tree')
-							newParentItem = this.targetAnchor.item;
-							console.log('newParentItem', newParentItem)
-							// because of reference of this? use clone?
-							drop.onTreeTree(source, nodes, copy, target, newParentItem);
+							var newParentItem = this.current.item;
+							this.onTreeToTree(source, nodes, copy, target, newParentItem);
 						}
 						else {						// dropped on tree from grid
 							console.log('tree onDndDrop: dropped onto tree from external')
+							this.onGridToTree(source, nodes, copy, target, newParentItem);
 						}
 					}
 					else if (this == source) { // dropped outside of tree from tree
@@ -99,6 +98,43 @@ define([
 					}
 				}
 				this.onDndCancel();
+			},
+
+			_isParentChildDrop: function(source, targetRow){
+				// summary:
+				//		Checks whether the dragged items are parent rows in the tree which are being
+				//		dragged into their own children.
+				//
+				// source:
+				//		The DragSource object.
+				//
+				// targetRow:
+				//		The tree row onto which the dragged nodes are being dropped.
+				//
+				// tags:
+				//		private
+
+				// Note: overriding to enable also checking when dropping from the grid
+
+				// If the dragged object is not coming from the tree this widget belongs to,
+				// it cannot be invalid.
+				if(!source.tree || source.tree != this.tree){
+					return false;
+				}
+
+
+				var root = source.tree.domNode;
+				var ids = source.selection;
+
+				var node = targetRow.parentNode;
+
+				// Iterate up the DOM hierarchy from the target drop row,
+				// checking if it has the same ID as any of the selected nodes.
+				while(node != root && !ids[node.id]){
+					node = node.parentNode;
+				}
+
+				return node.id && ids[node.id];
 			}
 
 		});

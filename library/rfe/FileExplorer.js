@@ -3,24 +3,23 @@ define([
 	'dojo/_base/array',
 	'dojo/_base/declare',
 	'dojo/_base/Deferred',
-   'dojo/cookie',
+	'dojo/cookie',
 	'dojo/keys',
 	'dojo/dom',
 	'dojo/dom-class',
 	'dojo/date/locale',
+	'dojo/on',
+	'dojo/Stateful',
 	'dijit/registry',
 	'rfe/Layout',
 	'rfe/Edit',
+	'rfe/Store/FileCache',
 	'rfe/dnd/Avatar'
-], function(lang, array, declare, Deferred, cookie, keys, dom, domClass, locale, registry, Layout, Edit) {
+], function(lang, array, declare, Deferred, cookie, keys, dom, domClass, locale, on, Stateful, registry, Layout, Edit, FileCache) {
 	/**
-	 * File explorer allows you to browse files.
-	 *
+	 * File explorer allows you to browse files.	 *
 	 * The file explorer consists of a tree and a grid. The tree loads file
 	 * data via php from disk.
-	 *
-	 * JsonRestStore.save() contains valuable information. *
-	 * TODO: grid even selected, focus and selected vs selected but not focus
 	 */
 
 
@@ -29,165 +28,148 @@ define([
 	 * @class
 	 */
 	return declare('rfe.FileExplorer', [Layout, Edit], {
-		version:'1.0',
-		versionDate:'2011',
-		currentTreeItem:null, // currently selected store object in tree, equals always parent of grid items
-		currentGridItem:null, // currently (last, when multi-) selected store object in grid
+		version: '1.0',
+		versionDate: '2012',
+		currentTreeObject: null, // currently selected store object in tree, equals always parent of grid items
+		currentGridObject: null, 	 // currently (last, when multi-) selected store object in grid
 
-		history: {
-			steps: [],     // saves the steps
-			curIdx: null,	// index of current history array we're on
-			numSteps: 5    // number of steps you can go forward/back
-		},
+		history: null,
 
 		/**
 		 * Creates the file explorer.
 		 * The global property object contains the urls to communicate with PHP backend.
-		 * @param {object} args
+		 * @param {object} props
 		 * @constructor
 		 */
-		constructor: function(args) {
+		constructor: function(props) {
 			// TODO: should tree connect also on right click as grid? If so, attache event to set currentTreeItem
-			var grid = this.grid, tree = this.tree;
-
-			lang.mixin(this, args);
-
-			// init tree events
-			tree.on('load', lang.hitch(this, this._initState));
-			tree.on('click', lang.hitch(this, function(item, node) {
-				// note onClick is also fired when user uses keyboard navigation and hits space
-				if (item != this.currentTreeItem) {		// prevent executing twice (dblclick)
-					grid.selection.clear(); 				// otherwise item in not-displayed folder is still selected or with same idx
-					grid.showMessage(grid.loadingMessage);
-					Deferred.when(this.showItemChildrenInGrid(item), function() {	// only called, when store.openOnClick is set to false
-						tree.focusNode(node);				// refocus node because it got moved to grid
-					});
-					this.setHistory(item.id);
-				}
-				this.currentTreeItem = item;
-			}));
-
-			grid.on('rowMouseDown', lang.hitch(this, function(evt) {
-				// rowMouseDown also registers right click
-				this.currentGridItem = grid.getItem(evt.rowIndex);     // TODO use grid.selection instead ?
-			}));
-			grid.on('rowDblClick', lang.hitch(this, function(evt) {
-				// cancel when editing
-				if (grid.edit.isEditing()) {
-					return;
-				}
-				var item = grid.getItem(evt.rowIndex);
-				if (item.dir) {
-					this.display(item);
-					this.setHistory(item.id);
-				}
-			}));
-			this.createLayout(this.id);
-			this.initContextMenu(dom.byId(this.id));
+			this.currentTreeObject = new Stateful();	// allows Toolbar and Menubar to keep track
+			this.history = {
+				steps: [],		// saves the steps
+				curIdx: null,	// index of current history array we're on
+				numSteps: 5		// number of steps you can go forward/back
+			};
+			this.store = new FileCache();
 		},
+
+		startup: function() {
+			this.create();
+			this.initEvents();
+//			this.initContextMenu(dom.byId(this.id));
+		},
+
+		initEvents: function() {
+			var grid = this.grid, tree = this.tree;
+			tree.on('click', lang.hitch(this, function(object, node) {
+				if (object.id != this.currentTreeObject.id) {		// prevent executing twice (dblclick)
+//					grid.selection.clear(); 				// otherwise object in not-displayed folder is still selected or with same idx
+					this.displayChildrenInGrid(object);
+					this.setHistory(object.id);
+				}
+				this.currentTreeObject.set(object);
+			}));
+			tree.on('load', lang.hitch(this, this.initState));
+
+			/*
+			 grid.on('rowMouseDown', lang.hitch(this, function(evt) {
+			 // rowMouseDown also registers right click
+			 this.currentGridItem = grid.getItem(evt.rowIndex);     // TODO use grid.selection instead ?
+			 }));
+			 grid.on('rowDblClick', lang.hitch(this, function(evt) {
+			 // cancel when editing
+			 if (grid.edit.isEditing()) {
+			 return;
+			 }
+			 var item = grid.getItem(evt.rowIndex);
+			 if (item.dir) {
+			 this.display(item);
+			 this.setHistory(item.id);
+			 }
+			 }));
+
+			 					on(this.borderContainer.domNode, 'contextmenu', function(evt) {
+						event.stop(evt);
+					});
+			 */
+		},
+
 
 		/**
 		 * Displays folder content in grid.
-		 * @param {Object} item dojo data item
+		 * @param {Object} object dojo data object
 		 * @return {dojo.Deferred}
 		 */
-		showItemChildrenInGrid: function(item) {
+		displayChildrenInGrid: function(object) {
+			console.log(object)
 			var grid = this.grid;
 			var dfd = new Deferred();
-			var store = this.store;
-
-			if (!grid.store) {
-				grid.setStore(this.store, {
-					parId: item.id
-				});
-			}
-
-			if (item.dir) {
-				store.skipWithNoChildren = false;
-				return Deferred.when(store.getChildren(item), function() {
-					store.skipWithNoChildren = true;
+			if (object.dir) {
+				dfd = Deferred.when(this.store.getChildren(object), function() {				  // TODO:  I think we can use memory store directly because they are already loaded
 					grid.setQuery({
-						parId: item.id
+						parId: object.id
 					});
 				});
 			}
 			else {
-				dfd.resolve(item);
-				return dfd;
+				dfd.resolve(object);
 			}
+			return dfd;
 		},
 
 		/**
-		 * Displays folder content in tree.
-		 * Returns false if item is not a folder, otherwise returns a dojo.Deferred
-		 * @param {Object} item dojo.data.item
-		 * @return {object} dojo.Deferred returning boolean
+		 * Displays the store object (folder) in the tree and it's children in the grid.
+		 * The tree and the grid can either be in sync meaning that they show the same content (e.g. tree folder is expanded)
+		 * or the grid is one level down (e.g. tree folder is selected but not expanded).
+		 * @param {Object} object store object
+		 * @return {dojo/Deferred}
 		 */
-		showItemInTree: function(item) {
+		display: function(object) {
 			var dfd = new Deferred();
-			if (item.dir) {
-				var path = this.store.getPath(item);
+			if (object.dir) {
+				var path = this.store.getPath(object);
 				dfd = this.tree.set('path', path);
 			}
 			else {
 				dfd.reject(false);
 			}
-			this.currentTreeItem = item;
+			dfd.then(lang.hitch(this, function() {
+				return this.displayChildrenInGrid(object);
+			}));
+			this.currentTreeObject.set(object);
 			return dfd;
 		},
 
 		/**
-		 * Displays the data item (folder) in the tree and it's children in the grid.
-		 * The tree and the grid can either be in sync meaning that they show the same content (e.g. tree folder is expanded)
-		 * or the grid is one level down (e.g. tree folder is selected but not expanded).
-		 * @param {Object} [item] dojo.data.item
-		 * @return {Object} dojo.Deferred
+		 * Display parent directory.
+		 * @param {Object} [object] dojo.data.object
 		 */
-		display: function(item) {
-			var grid = this.grid;
-			var def = this.showItemInTree(item);
-			grid.selection.deselectAll();
-			grid.showMessage(grid.loadingMessage);
-			def.then(lang.hitch(this, function() {
-				return this.showItemChildrenInGrid(item);
-			}));
+		goDirUp: function(object) {
+			var def;
+			if (!object) {
+				object = this.currentTreeObject;
+			}
+			if (object.parId) {
+				def = Deferred.when(this.store.get(object.parId), lang.hitch(this, function(object) {
+					return this.display(object);
+				}), function(err) {
+					console.debug('Error occurred when going directory up', err);
+				});
+			}
+			else {
+				def = new Deferred();
+				def.resolve(false);
+			}
 			return def;
 		},
-
-		/**
-		 * Display parent directory.
-		 * @param {Object} [item] dojo.data.item
-		 */
-		goDirUp: function(item) {
-            var def;
-            if (!item) {
-                item = this.currentTreeItem;
-            }
-            if (item.parId) {
-                return Deferred.when(this.store.get(item.parId), lang.hitch(this, function(item) {
-                    return this.display(item);
-                }), function(err) {
-                    console.debug('Error occurred when going directory up', err);
-                });
-            }
-            else {
-                def = new Deferred();
-                def.resolve(false);
-                return def;
-            }
-        },
 
 		/**
 		 * Reload current folder.
 		 */
 		reload: function() {
-			var grid = this.grid;
 			var dndController = this.tree.dndController.declaredClass;
 
-			this.store.storeMemory.data = [];
-
-			// reset grid
-			grid._clearData();	// this is not really necessary, more of a visual feedback to user
+			this.store.storeMemory.setData([]);
+			this.grid.refresh();
 
 			// reset and rebuild tree
 			this.tree.dndController.destroy();	// cleanup dnd connections and such
@@ -197,13 +179,11 @@ define([
 			this.tree.dndController = dndController; //'rfe.dnd.TreeSource',
 			this.tree.postMixInProperties();
 			this.tree.postCreate();
-
-			this.display(this.currentGridItem || this.currentTreeItem);
 		},
 
 		/**
-		 * Adds current item id to history.
-		 * @param {string} itemId id of JsonRestStore item
+		 * Adds current object id to history.
+		 * @param {string} itemId id of JsonRestStore object
 		 */
 		setHistory: function(itemId) {
 			var hist = this.history;
@@ -228,13 +208,13 @@ define([
 		},
 
 		/**
-		 * Remove item form history.
+		 * Remove object form history.
 		 * @param {string} itemId
 		 */
 		removeHistory: function(itemId) {
 			var hist = this.history;
-			hist.steps = dojo.filter(hist.steps, function(item) {
-				return item !== itemId;
+			hist.steps = dojo.filter(hist.steps, function(object) {
+				return object !== itemId;
 			});
 			hist.curIdx--;
 		},
@@ -255,8 +235,8 @@ define([
 				id = hist.steps[++hist.curIdx];
 			}
 			if (id != null) {
-				return Deferred.when(this.store.get(id), lang.hitch(this, function(item) {
-					return this.display(item);
+				return Deferred.when(this.store.get(id), lang.hitch(this, function(object) {
+					return this.display(object);
 				}));
 			}
 			else {
@@ -270,25 +250,25 @@ define([
 		 */
 		getDate: function() {
 			return locale.format(new Date(), {
-					datePattern: 'dd.MM.yyyy',
-					timePattern: 'HH:mm'
-			  });
+				datePattern: 'dd.MM.yyyy',
+				timePattern: 'HH:mm'
+			});
 		},
 
 		/**
-		 * Returns the last selected item of the focused widget.
+		 * Returns the last selected object of the focused widget.
 		 */
 		getLastSelectedItem: function() {
-            // widget.focused does not work when used from toolbar, since focus is moved to menu
+			// widget.focused does not work when used from toolbar, since focus is moved to menu
 			// TODO use grid.selection and tree.selection instead ?
 			if (this.tree.focused || this.layout.panes.treePane.focused) {
-				return this.currentTreeItem;
+				return this.currentTreeObject;
 			}
 			else if (this.grid.focused) {
-				return this.currentGridItem;
+				return this.currentGridObject;
 			}
 			else {
-				return this.currentGridItem || this.currentTreeItem;
+				return this.currentGridObject || this.currentTreeObject;
 			}
 		},
 
@@ -334,36 +314,41 @@ define([
 		},
 
 		/**
-		 * Sets the tree to its last state.
-		 * Reads the tree cookies to expand and set the tree selected and display the correct folder in the grid.
+		 * Initializes the default or last state of the tree and the grid.
+		 * Expects the tree to be loaded and expanded otherwise it will be set to root, then displays the correct folder in the grid.
 		 */
-		_initState: function() {
+		initState: function() {
 			var tree = this.tree, grid = this.grid;
-			var item, oreo, arr, id, paths = [];
+			var store = this.store;
+			var object, oreo, arr, id, paths = [];
 
-			grid.showMessage(grid.loadingMessage);
-			console.log('patch not applied yet')
 			oreo = cookie(tree.dndController.cookieName);
 			if (tree.persist && oreo) {
-				paths = array.map(oreo.split(","), function(path){
-				   return path.split("/");
-				})
-				tree.set('paths', paths);
-				// we only use last to set the folders in the grid (normally there would be one selection only anyway)
+				// extract information to display folder content in grid
+				paths = array.map(oreo.split(","), function(path) {
+					return path.split("/");
+				});
+				// we only use last object in array to set the folders in the grid (normally there would be one selection only anyway)
 				arr = paths[paths.length - 1];
 				id = arr[arr.length - 1];
-				Deferred.when(this.store.get(id), lang.hitch(this, function(item) {
-					this.showItemChildrenInGrid(item); // no return, since we don't have to wait for the grid to load
-					this.currentTreeItem = item;
+
+				Deferred.when(store.get(id), lang.hitch(this, function(object) {
+					Deferred.when(store.getChildren(object), function() {	// load children first before setting store
+						grid.setStore(store.storeMemory, {	// also calls setQuery
+							parId: id
+						});
+					});
+					this.currentTreeObject.set(object);
 				}));
 			}
 			else {
-				item = tree.rootNode.item;
-				id = item.id;
-				this.display(item);
+				// no cookie available use root
+				object = tree.rootNode.item;
+				id = object.id;
+				this.display(object);
 			}
 
-			this.setHistory(id);   // do not set history in display() since history uses display too
+			this.setHistory(id);   // do not set history in display() since history uses display too in goHistory()
 		}
 	});
 

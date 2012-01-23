@@ -8,50 +8,46 @@ define([
 	return {
 
 		/**
-		 * Handles drag and drop from grid onto grid.
+		 * Handle dropping when source and target are the grid.
 		 * @param source
 		 * @param nodes
 		 * @param copy
-		 * @param newParentItem
+		 * @param {object} oldParent
 		 */
-		onGridGrid: function(source, nodes, copy, newParentItem) {
-			// its ok to paste. all checks have already taken place in GridSource.OnMouseOver calling canDrop()
-			var dndItem, item, oldParentItem;
+		onGridToGrid: function(source, nodes, copy, oldParent) {
+			console.log('grid onDndDrop: dropped onto grid from grid')
+			/* Note: - guard against dropping onto self was already checked in GridSource.canDrop()
+						- only allow dropping on folders was already checked in GridSource.canDrop()
+						- no other checks necessary
+			*/
+
+			var grid  = source.grid;
 			var store = source.grid.store;
 			var i = 0, len = nodes.length;
+
+			if (this.currentRowIndex == -1) {	// dropped onto grid, but not onto a grid row
+											oldParent = grid.getItem(0);		// -> we can use the parent of any row to get the parentItem
+										}
+										else {
+											oldParent = grid.getItem(this.currentRowIndex);
+										}
+										oldParent = grid.store.storeMemory.get(oldParent.parId);
+
+
 			for (; i < len; i++) {
-				dndItem = source.getItem(nodes[i].id);
-				item = dndItem.data.item;
-				oldParentItem = store.storeMemory.get(item.parId);
-				store.pasteItem(item, oldParentItem, newParentItem, copy);
+				var object = source.getItem(nodes[i].id).data.item;
+				var oldParent = store.storeMemory.get(object.parId);
+				store.pasteItem(object, oldParent, oldParent, copy);
 			}
 		},
 
-		onGridTree: function() {},
+		onGridToTree: function() {},
 
-		onTreeTree: function(source, nodes, copy, newParentItem) {
-			var dndItem, item, oldParentItem;
-			var store = source.tree.model;
-			var i = 0, len = nodes.length;
-			for (; i < len; i++) {
-				dndItem = source.getItem(nodes[i].id);
-				item = dndItem.data.item;
-				if (item.parId == newParentItem.id) {	// do nothing when dropping child on current parent
-					return dialogs.show('sameFolder', item, newParentItem, copy);
-				}
-				else {
-					oldParentItem = store.storeMemory.get(item.parId);
-					console.log('newParentItem is not an item anymore!?', newParentItem)
-					// because of reference of this? use clone?
-					console.log('pasting',item, oldParentItem, newParentItem, copy)
-//					store.pasteItem(item, oldParentItem, newParentItem, copy);
-				}
-			}
-		},
+		onTreeToTree: function() {},
 
-      onTreeGrid: function(source, nodes, copy, newParentItem) {
+      onTreeToGrid: function(source, nodes, copy, newParentItem) {
 				var dfds = [];
-				var store = source.grid ? source.grid.store : source.tree.model;
+				var store = source.tree.model;
 				var i = 0, len = nodes.length;
 
 				// chain the pasting of all nodes as deferreds
@@ -67,6 +63,7 @@ define([
 						console.log(item, newParentItem)
 						// guard from dropping onto self
 						if (item.id == newParentItem.id) {
+
 							return dialogs.show('sameFolder', item, newParentItem, copy);
 						}
 						else {

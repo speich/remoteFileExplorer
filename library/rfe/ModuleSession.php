@@ -52,7 +52,6 @@ class ModuleSession extends FileExplorer {
 		42 => array('id' => 42, 'parId' => 1, 'name' => 'photo02.jpg', 'size' => 29634, 'mod' => '27.03.2010'),
 		43 => array('id' => 43, 'parId' => 1, 'name' => 'photo03.jpg', 'size' => 79308, 'mod' => '27.07.2009'),
 
-		9 => array('id' => 9, 'parId' => 2, 'name' => 'subfolder 21', 'size' => 0, 'mod' => '27.03.2010', 'dir' => true),
 		10 => array('id' => 10, 'parId' => 2, 'name' => 'file5.txt', 'size' => 1631, 'mod' => '06.11.1973'),
 		11 => array('id' => 11, 'parId' => 2, 'name' => 'file1.txt', 'size' => 9638, 'mod' => '27.01.2010'),
 		12 => array('id' => 12, 'parId' => 2, 'name' => 'subfolder 22', 'size' => 0, 'mod' => '27.03.2010', 'dir' => true),
@@ -64,7 +63,7 @@ class ModuleSession extends FileExplorer {
 		15 => array('id' => 15, 'parId' => 3, 'name' => 'file2.pdf', 'size' => 8923, 'mod' => '01.03.2003'),
 
 		16 => array('id' => 16, 'parId' => 9, 'name' => 'test 21', 'size' => 30, 'mod' => '27.03.2010'),
-		17 => array('id' => 17, 'parId' => 9, 'name' => 'subfolder 22', 'size' => 0, 'mod' => '21.05.2010', 'dir' => true),
+		17 => array('id' => 17, 'parId' => 9, 'name' => 'subsubfolder 22', 'size' => 0, 'mod' => '21.05.2010', 'dir' => true),
 
 		18 => array('id' => 18, 'parId' => 12, 'name' => 'file4.xls', 'size' => 128923, 'mod' => '27.03.2010'),
 		19 => array('id' => 19, 'parId' => 12, 'name' => 'file5.xls', 'size' => 428925, 'mod' => '27.03.2010'),
@@ -81,6 +80,9 @@ class ModuleSession extends FileExplorer {
 	 * @param string $rootDir
 	 */
 	public function __construct($rootDir) {
+//		if (rand(0, 1) == 1) {
+			$this->fsDefault[9] = array('id' => 9, 'parId' => 2, 'name' => 'subfolder 21', 'size' => 0, 'mod' => '27.03.2010', 'dir' => true);
+//		}
 		parent::__construct($rootDir);
 		if (!isset($_SESSION['rfe'])) {
 			$_SESSION['rfe'][$rootDir] = serialize($this->fsDefault);
