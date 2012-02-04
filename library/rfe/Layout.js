@@ -37,7 +37,7 @@ define([
 			},
 
 			create: function() {
-				console.log('Layout postCreate', this.currentTreeObject)
+				console.log('Layout postCreate', this.store)
 				this.panes = new Panes({}, this.id);
 
 				this.toolbar = new Toolbar({

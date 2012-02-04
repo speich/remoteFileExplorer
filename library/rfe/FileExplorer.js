@@ -43,7 +43,7 @@ define([
 		 */
 		constructor: function(props) {
 			// TODO: should tree connect also on right click as grid? If so, attache event to set currentTreeItem
-			this.currentTreeObject = new Stateful();	// allows Toolbar and Menubar to keep track
+			this.currentTreeObject = new Stateful();	// allows Toolbar and Menubar to keep track of selected item in tree
 			this.history = {
 				steps: [],		// saves the steps
 				curIdx: null,	// index of current history array we're on
@@ -61,8 +61,8 @@ define([
 		initEvents: function() {
 			var grid = this.grid, tree = this.tree;
 			tree.on('click', lang.hitch(this, function(object, node) {
-				if (object.id != this.currentTreeObject.id) {		// prevent executing twice (dblclick)
-//					grid.selection.clear(); 				// otherwise object in not-displayed folder is still selected or with same idx
+				if (object.id != this.currentTreeObject.id) {	// prevent executing twice (dblclick)
+//					grid.selection.clear(); 					// otherwise object in not-displayed folder is still selected or with same idx
 					this.displayChildrenInGrid(object);
 					this.setHistory(object.id);
 				}
@@ -70,23 +70,14 @@ define([
 			}));
 			tree.on('load', lang.hitch(this, this.initState));
 
-			/*
-			 grid.on('rowMouseDown', lang.hitch(this, function(evt) {
-			 // rowMouseDown also registers right click
-			 this.currentGridItem = grid.getItem(evt.rowIndex);     // TODO use grid.selection instead ?
-			 }));
-			 grid.on('rowDblClick', lang.hitch(this, function(evt) {
-			 // cancel when editing
-			 if (grid.edit.isEditing()) {
-			 return;
-			 }
-			 var item = grid.getItem(evt.rowIndex);
-			 if (item.dir) {
-			 this.display(item);
-			 this.setHistory(item.id);
-			 }
-			 }));
-
+			grid.on('dblclick', lang.hitch(this, function(evt){
+				var obj = grid.row(evt.target).data;
+				if (obj.dir){
+					this.display(obj);
+					this.setHistory(obj.id);
+				}
+			}));
+			 /*
 			 					on(this.borderContainer.domNode, 'contextmenu', function(evt) {
 						event.stop(evt);
 					});
@@ -100,7 +91,6 @@ define([
 		 * @return {dojo.Deferred}
 		 */
 		displayChildrenInGrid: function(object) {
-			console.log(object)
 			var grid = this.grid;
 			var dfd = new Deferred();
 			if (object.dir) {
