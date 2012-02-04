@@ -8,14 +8,14 @@ define([
 	'dijit/MenuBar',
 	'dijit/MenuBarItem',
 	'dijit/PopupMenuBarItem',
-	'dijit/Menu',
+	'dijit/DropDownMenu',
 	'dijit/MenuItem',
 	'dijit/MenuSeparator',
 	'dijit/PopupMenuItem',
 	'dijit/CheckedMenuItem'
 
 ], function(lang, declare, array, on, aspect, registry,
-				MenuBar, MenuBarItem, PopupMenuBarItem, Menu, MenuItem, MenuSeparator, PopupMenuItem, CheckedMenuItem) {
+				MenuBar, MenuBarItem, PopupMenuBarItem, DropDownMenu, MenuItem, MenuSeparator, PopupMenuItem, CheckedMenuItem) {
 
 	return declare([MenuBar], {
 
@@ -31,7 +31,7 @@ define([
 			var subMenuFile;
 
 			// ********** menu file **************
-			menuFile = new Menu({
+			menuFile = new DropDownMenu({
 				id: 'rfeMenuFile',
 				onOpen: lang.hitch(this, function() {
 					if (this.grid.selection.getSelected().length === 0) {
@@ -48,7 +48,7 @@ define([
 					}
 				})
 			});
-			subMenuFile = new Menu();
+			subMenuFile = new DropDownMenu();
 			menuFile.addChild(new PopupMenuItem({
 				label: 'New',
 				popup: subMenuFile,
@@ -79,7 +79,7 @@ define([
 
 
 			// ******* menu layout ********
-			menuView = new Menu({ id: 'rfeMenuView' });
+			menuView = new DropDownMenu({ id: 'rfeMenuView' });
 			menuView.addChild(new CheckedMenuItem({
 				id: 'rfeMenuItemHorizontal',
 				label: 'Layout horizontal',
@@ -113,7 +113,7 @@ define([
 			});
 
 			// ********** menu tools ***************
-			menuTools = new Menu({ id: 'rfeMenuTools' });
+			menuTools = new DropDownMenu({ id: 'rfeMenuTools' });
 			menuTools.addChild(new MenuItem({
 				label: 'Settings',
 				onClick: lang.hitch(this, function() {
@@ -123,7 +123,7 @@ define([
 
 
 			// ********** menu help ***************
-			menuHelp = new Menu({ id: 'rfeMenuHelp' });
+			menuHelp = new DropDownMenu({ id: 'rfeMenuHelp' });
 			menuHelp.addChild(new MenuItem({
 				label: 'About rfe',
 				onClick: lang.hitch(this, function() {

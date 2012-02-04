@@ -14,10 +14,11 @@ define([
 	'rfe/Layout',
 	'rfe/Edit',
 	'rfe/Store/FileCache',
+	'rfe/Store/FileStore',
 	'rfe/dnd/Avatar'
-], function(lang, array, declare, Deferred, cookie, keys, dom, domClass, locale, on, Stateful, registry, Layout, Edit, FileCache) {
+], function(lang, array, declare, Deferred, cookie, keys, dom, domClass, locale, on, Stateful, registry, Layout, Edit, FileCache, FileStore) {
 	/**
-	 * File explorer allows you to browse files.	 *
+	 * File explorer allows you to browse files.
 	 * The file explorer consists of a tree and a grid. The tree loads file
 	 * data via php from disk.
 	 */
@@ -49,11 +50,12 @@ define([
 				curIdx: null,	// index of current history array we're on
 				numSteps: 5		// number of steps you can go forward/back
 			};
-			this.store = new FileCache();
+			//this.store = new FileCache();
+			this.store = new FileStore();
 		},
 
 		startup: function() {
-			this.create();
+			this.init();
 			this.initEvents();
 //			this.initContextMenu(dom.byId(this.id));
 		},
