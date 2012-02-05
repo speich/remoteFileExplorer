@@ -77,11 +77,11 @@ define([
 
 
 			this.refPut = storeCache.put;
-			this.refDel = storeCache.remove;
-			this.refNew = storeCache.add;
+//			this.refDel = storeCache.remove;
+//			this.refNew = storeCache.add;
 			storeCache.put = this.put;
-			storeCache.remove = this.remove;
-			storeCache.add = this.add;
+//			storeCache.remove = this.remove;
+//			storeCache.add = this.add;
 
 			lang.mixin(this, storeCache);
 		},

@@ -53,7 +53,7 @@ define([
 				renderCell: function(object, data, td) {
 					formatImg(object, data, td)
 				}
-			}, 'text', 'dgrid-cellfocusin, click'), {
+			}, 'text', 'click, dgrid-cellfocusin'), {
 				label: 'size',
 				field: 'size',
 				sortable: false,

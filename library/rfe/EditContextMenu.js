@@ -19,8 +19,6 @@ define([
 
 		rfe: null,
 
-		context: null, // reference to the widget the context menu was created on (right clicked on)
-
 		constructor: function(props) {
 			lang.mixin(this, props || {});
 		},
@@ -84,12 +82,17 @@ define([
 
 			menu.startup();
 
+			var context = this.rfe.context;
+			context.watch(lang.hitch(this, function() {
+				this.enableContextMenuItems(menu, context);
+			}));
 		},
 
 		/**
 		 * Enables or disables context menu items depending on the clicked context.
-		 * @param {dijit.Menu} menu
-		 * @param {object} context
+		 * @param {string} name name of property
+		 * @param {string} oldVal old property value
+		 * @param {string} newVal new property value
 		 */
 		enableContextMenuItems: function(menu, context) {
 			// TODO: this does not work with i18n since it uses the labels...

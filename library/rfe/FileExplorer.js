@@ -9,6 +9,7 @@ define([
 	'dojo/dom-class',
 	'dojo/date/locale',
 	'dojo/on',
+	'dojo/mouse',
 	'dojo/Stateful',
 	'dijit/registry',
 	'rfe/Layout',
@@ -16,7 +17,7 @@ define([
 	'rfe/Store/FileCache',
 	'rfe/Store/FileStore',
 	'rfe/dnd/Avatar'
-], function(lang, array, declare, Deferred, cookie, keys, dom, domClass, locale, on, Stateful, registry, Layout, Edit, FileCache, FileStore) {
+], function(lang, array, declare, Deferred, cookie, keys, dom, domClass, locale, on, mouse, Stateful, registry, Layout, Edit, FileCache, FileStore) {
 	/**
 	 * File explorer allows you to browse files.
 	 * The file explorer consists of a tree and a grid. The tree loads file
@@ -28,12 +29,11 @@ define([
 	/**
 	 * @class
 	 */
-	return declare('rfe.FileExplorer', [Layout, Edit], {
+	return declare([Layout, Edit], {
 		version: '1.0',
 		versionDate: '2012',
-		currentTreeObject: null, // currently selected store object in tree, equals always parent of grid items
-		currentGridObject: null, 	 // currently (last, when multi-) selected store object in grid
-
+		currentTreeObject: null,	// stateful object, which keeps track of currently selected store object in tree. Equals always parent of grid items
+		context: null,					// stateful object, which keeps track of widget the context menu was created on (right clicked on)
 		history: null,
 
 		/**
@@ -42,7 +42,7 @@ define([
 		 * @param {object} props
 		 * @constructor
 		 */
-		constructor: function(props) {
+		constructor: function() {
 			// TODO: should tree connect also on right click as grid? If so, attache event to set currentTreeItem
 			this.currentTreeObject = new Stateful();	// allows Toolbar and Menubar to keep track of selected item in tree
 			this.history = {
@@ -50,8 +50,13 @@ define([
 				curIdx: null,	// index of current history array we're on
 				numSteps: 5		// number of steps you can go forward/back
 			};
-			//this.store = new FileCache();
 			this.store = new FileStore();
+			this.context = new Stateful({
+				isOnGrid: false,
+				isOnTree: false,
+				isOnTreePane: false,
+				isOnGridPane: false
+			})
 		},
 
 		startup: function() {
@@ -61,29 +66,30 @@ define([
 		},
 
 		initEvents: function() {
+			var self = this;
 			var grid = this.grid, tree = this.tree;
-			tree.on('click', lang.hitch(this, function(object, node) {
-				if (object.id != this.currentTreeObject.id) {	// prevent executing twice (dblclick)
-//					grid.selection.clear(); 					// otherwise object in not-displayed folder is still selected or with same idx
-					this.displayChildrenInGrid(object);
-					this.setHistory(object.id);
+			tree.on('click', function(object) {
+				if (object.id != self.currentTreeObject.id) {	// prevent executing twice (dblclick)
+					self.displayChildrenInGrid(object);
+					self.setHistory(object.id);
 				}
-				this.currentTreeObject.set(object);
-			}));
+				self.currentTreeObject.set(object);
+			});
 			tree.on('load', lang.hitch(this, this.initState));
 
-			grid.on('dblclick', lang.hitch(this, function(evt){
+			grid.on('dblclick', function(evt){
 				var obj = grid.row(evt.target).data;
 				if (obj.dir){
-					this.display(obj);
-					this.setHistory(obj.id);
+					self.display(obj);
+					self.setHistory(obj.id);
 				}
-			}));
-			 /*
-			 					on(this.borderContainer.domNode, 'contextmenu', function(evt) {
-						event.stop(evt);
-					});
-			 */
+			});
+
+			// TODO: Set context also when using keyboard navigation
+			on(this.panes.containerNode, '.rfeTreePane:mousedown, .rfeGridPane:mousedown, .dijitTreeRow:mousedown, .dgrid-row:mousedown', function(evt) {
+				var node = this;
+				lang.hitch(self, self._setContext(evt, node));
+			});
 		},
 
 
@@ -248,61 +254,20 @@ define([
 		},
 
 		/**
-		 * Returns the last selected object of the focused widget.
-		 */
-		getLastSelectedItem: function() {
-			// widget.focused does not work when used from toolbar, since focus is moved to menu
-			// TODO use grid.selection and tree.selection instead ?
-			if (this.tree.focused || this.layout.panes.treePane.focused) {
-				return this.currentTreeObject;
-			}
-			else if (this.grid.focused) {
-				return this.currentGridObject;
-			}
-			else {
-				return this.currentGridObject || this.currentTreeObject;
-			}
-		},
-
-		/**
 		 * Returns an object describing on which part of the file explorer we are on
 		 * @param {Event} evt
-		 * @return {Object}
 		 */
-		getContext: function(evt) {
-			// find in which pane (of grid/tree) we are and if we are over the grid/tree or below
-			// TODO: find better solution for this
-			var obj = {
-				isOnGrid: false,
-				isOnTree: false,
-				isOnTreePane: false,
-				isOnGridPane: false,
-				widget: null
-			};
-			var node = evt.target || node;
-			while (node && node.tagName !== "BODY") {
-				if (domClass.contains(node, 'dijitTree')) {
-					obj.isOnTree = true;
-					obj.widget = this.tree;
-					break;
-				}
-				else if (domClass.contains(node, 'dojoxGridContent')) {
-					obj.isOnGrid = true;
-					obj.widget = this.grid;
-					break;
-				}
-				else if (domClass.contains(node, 'dijitContentPane')) {
-					if (node.id == 'rfeContentPaneTree') {
-						obj.isOnTreePane = true;
-					}
-					else if (node.id == 'rfeContentPaneGrid') {
-						obj.isOnGridPane = true;
-					}
-					break;
-				}
-				node = node.parentNode;
+		_setContext: function(evt, node) {
+			if (!mouse.isRight(evt)) {
+				return;
 			}
-			return obj;
+			this.context.set({
+				isOnGrid: domClass.contains(node, 'dgrid-row'),
+				isOnGridPane: domClass.contains(node, 'rfeGridPane'),
+				isOnTree: domClass.contains(node, 'dijitTreeRow'),
+				isOnTreePane: domClass.contains(node, 'rfeTreePane')
+			});
+
 		},
 
 		/**
