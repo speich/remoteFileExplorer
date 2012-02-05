@@ -68,7 +68,7 @@ define([
 				onClick: lang.hitch(this, this.rfe.del)
 			}));
 
-			// subMenu new
+			// subMenu New
 			subMenu.addChild(MenuItem({
 				label: 'Directory',
 				onClick: lang.hitch(this, function() {

@@ -47,24 +47,17 @@ define([
 		 * @param {object} itemProps
 		 * @return {object} dojo.store object
 		 */
-		create: function(itemProps) {
+		create: function(object) {
 			var store = this.store;
-			var parId = this.currentTreeObject.id;
-			var item = {
+			var parId = this.currentTreeObject.get('id');
+			object = lang.mixing(object, {
 				size: 0,
 				parId: parId,
 				mod: this.getDate()
-			};
-			if (itemProps && itemProps.dir) {
-				item.dir = true;
-				item.name = 'new directory';
-			}
-			else {
-				item.name = 'new text file.txt';
-			}
-
-			return Deferred.when(store.add(item), function() {
-				return item;
+			});
+			object.name = object.dir ? 'new directory' : object.name = 'new text file.txt';
+			return Deferred.when(store.add(object), function() {
+				return object;
 			})
 		},
 
