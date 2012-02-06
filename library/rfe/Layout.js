@@ -16,14 +16,12 @@ define([
 	"dijit/Dialog",
 	'rfe/layout/Toolbar',
 	'rfe/layout/Menubar',
-	'rfe/layout/Panes'
+	'rfe/layout/Panes',
+	'rfe/EditContextMenu'
 ], function(array, lang, declare, event, aspect, on, cookie, domConstruct, query, Tree, TreeSource,
-				Grid, registry, CheckBox, Dialog, Toolbar, Menubar, Panes) {
+				Grid, registry, CheckBox, Dialog, Toolbar, Menubar, Panes, EditContextMenu) {
 
 		return declare(null, {
-//			store: null,
-//			grid: null,
-//			tree: null,
 
 			panes: null,
 			toolbar: null,
@@ -36,8 +34,8 @@ define([
 				lang.mixin(this, props || {});
 			},
 
-			create: function() {
-				console.log('Layout postCreate', this.currentTreeObject)
+			init: function() {
+				console.log('Layout postCreate', this.store)
 				this.panes = new Panes({}, this.id);
 
 				this.toolbar = new Toolbar({
@@ -47,6 +45,10 @@ define([
 				this.menubar = new Menubar({
 					rfe: this
 				}, domConstruct.create('div'));
+
+				this.editContextMenu = new EditContextMenu({
+					rfe: this
+				});
 
 				this.menubar.placeAt(this.panes.menuPane.domNode);
 				this.toolbar.placeAt(this.panes.menuPane.domNode);
