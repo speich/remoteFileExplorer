@@ -35,23 +35,6 @@ define([
 				popUpDelay: 10
 			});
 			var subMenu = Menu();
-
-			/*
-
-			 // Enable/disable menu items before displaying it:
-			 array.forEach(menu.targetNodeIds, function(id) {
-			 var context, domNode = dom.byId(id);
-			 on(domNode, 'mousedown', lang.hitch(this, function(evt) {
-			 if (!mouse.isRight(evt)) {
-			 return;
-			 }
-			 context = this.getContext(evt);
-			 this.enableContextMenuItems(menu, context);
-			 this.editor.context = context;
-			 }));
-			 }, this);
-			 */
-
 			menu.addChild(PopupMenuItem({
 				label: 'New',
 				popup: subMenu,
@@ -59,25 +42,25 @@ define([
 			}));
 			menu.addChild(MenuItem({
 				label: 'Rename',
-				onClick: lang.hitch(this, this.edit)
+				onClick: lang.hitch(this.rfe, this.rfe.edit)
 			}));
 			menu.addChild(MenuItem({
 				label: 'Delete',
-				onClick: lang.hitch(this, this.rfe.del)
+				onClick: lang.hitch(this.rfe, this.rfe.del)
 			}));
 
 			// subMenu New
 			subMenu.addChild(MenuItem({
 				label: 'Directory',
-				onClick: lang.hitch(this, function() {
-					this.rfe.createRename({
+				onClick: lang.hitch(this.rfe, function() {
+					this.createRename({
 						dir: true
 					});
 				})
 			}));
 			subMenu.addChild(MenuItem({
 				label: 'File',
-				onClick: lang.hitch(this, this.rfe.createRename)
+				onClick: lang.hitch(this.rfe, this.rfe.createRename)
 			}));
 
 			menu.startup();

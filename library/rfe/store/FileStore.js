@@ -17,7 +17,7 @@ define([
 		// references for MonkeyPatching the store.Cache
 		refPut: null,
 		refDel: null,
-		refNew: null,
+		refAdd: null,
 		storeMaster: null,
 		storeMemory: null,
 		childrenAttr: 'dir',
@@ -33,8 +33,8 @@ define([
 		 */
 		constructor: function() {
 
-			var storeMaster = this.storeMaster = Observable(new JsonRest({target: '/library/rfe/controller.php/'}));
-			var storeMemory = this.storeMemory = new Memory({
+			var storeMaster = this.storeMaster = new JsonRest({target: '/library/rfe/controller.php/'});
+			var storeMemory = this.storeMemory = new Observable(new Memory({
 				// Memory store does not add id to object when creating an object
 				// See bugs http://bugs.dojotoolkit.org/ticket/12835 and http://bugs.dojotoolkit.org/ticket/14281
 				// Will be fixed with dojo 1.8
@@ -52,7 +52,7 @@ define([
 					}
 					return id;
 				}
-			});
+			}));
 			var storeCache = new Cache(storeMaster, storeMemory);
 
 			// Fix for cache not working with jsonrest
@@ -61,7 +61,7 @@ define([
 			storeCache.add = function(object, directives){
 				return Deferred.when(storeMaster.add(object, directives), function(result){
 					// now put result in cache
-					storeCache.add(typeof result == "object" ? result : object, directives);
+					storeMemory.add(typeof result == "object" ? result : object, directives);
 					return result; // the result from the add should be dictated by the masterStore and be unaffected by the cachingStore
 				});
 			};
@@ -75,47 +75,47 @@ define([
 				});
 			};
 
-
 			this.refPut = storeCache.put;
-//			this.refDel = storeCache.remove;
-//			this.refNew = storeCache.add;
+			this.refDel = storeCache.remove;
+			this.refAdd = storeCache.add;
 			storeCache.put = this.put;
-//			storeCache.remove = this.remove;
-//			storeCache.add = this.add;
+			storeCache.remove = this.remove;
+			storeCache.add = this.add;
 
 			lang.mixin(this, storeCache);
 		},
 
+		/*** extend put, add, remove to notify tree ***/
 		put: function(object, options) {
-			this.onChildrenChange(object, this.getChildren(object));
-			this.onChange(object);	// notifies the tree (e.g. renamed an item)
-			return JsonRest.prototype.put.apply(this, arguments);
+			return Deferred.when(this.refPut.apply(this, arguments), function() {
+				this.onChildrenChange(object, this.getChildren(object));
+				this.onChange(object);
+			}, function(err) {
+				console.log('error', err);
+			});
 		},
 
-		/*
-		add: function(item) {
+		add: function(object, options) {
 			var self = this;
-			return Deferred.when(this.refNew.apply(this, arguments), function(newId) {
-				item.id = newId
-				self.onNewItem(item);	// tree only
-				self.onNew(item);		// dojo.data.api
+			return Deferred.when(this.refAdd.apply(this, arguments), function(newId) {
+				object.id = newId;
+				self.onNewItem(object);	// notifies tree
+				console.log('is added also in storeMemory?', self.storeMemory)
 				return newId;
-			}, function() {
-				self.revert();
+			}, function(err) {
+				console.log('error', err);
 			});
 		},
 
 		remove: function(id) {
 			var self = this;
-			var item = this.get(id);
+			var object = this.get(id);
 			return Deferred.when(this.refDel.apply(this, arguments), function() {
-				self.onDelete(item);	// notifies tree and the grid
-			}, function() {
-				self.revert();
+				self.onDelete(object);	// notifies tree
+			}, function(err) {
+				console.log('error', err);
 			});
 		},
-          */
-
 
 
 		/**
@@ -176,12 +176,10 @@ define([
 			// Items not cached yet, add them to the storeCache
 			else {
 				query = self.storeMaster.query(id + '/');
-				// TODO: enable as soon as bug http://bugs.dojotoolkit.org/ticket/12835 is fixed
-				//query.observe(lang.hitch(this, self.observeChildren));
 				dfd = Deferred.when(query, function(children) {
 					var i = 0, len = children.length;
 					for (; i < len; i++) {
-						self.storeMemory.put(children[i]);
+						self.storeMemory.add(children[i]);
 					}
 					if (self.skipWithNoChildren) {
 						childItems = array.filter(children, function(child) {
@@ -232,9 +230,22 @@ define([
 
 		getLabel: function(object) {
 			return object[this.labelAttr];
+		},
+
+		/**
+		 *	Handler for when new items appear in the store, either from a drop operation or some other way.
+		 *	Updates the tree view (if necessary).
+		 *	If the new item is a child of an existing item, calls onChildrenChange()
+		 *	with the new list of children for that existing item.
+		 * @param item
+		 */
+		onNewItem: function(object) {
+			var parItem = this.storeMemory.get(object.parId);
+			// since we know, that objects with this parItem are already cached (except the new one), we just query the memoryStore and add it
+			Deferred.when(this.getChildren(parItem), lang.hitch(this, function(children) {
+				this.onChildrenChange(parItem, children);
+			}));
 		}
-
-
 
 	});
 });

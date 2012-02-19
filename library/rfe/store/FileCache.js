@@ -18,7 +18,7 @@ define([
 		// references for MonkeyPatching the store.Cache
 		refPut: null,
 		refDel: null,
-		refNew: null,
+		refAdd: null,
 		storeMaster: null,
 		storeMemory: null,
 		childrenAttr: 'dir',

@@ -18,25 +18,19 @@ define([
 			// happens from the different menu in layout.js -> move here?
 			// B. When deleting from context menu use source to decide which selected items to use
 			var self = this, store = this.store;
-			var context = this.getContext();
-			var i = 0, len;
 			var object, objects, widget;
 
-			widget = context.isOnGrid || context.isOnGridPane ? this.grid : this.tree;
-            objects = widget.selection.getSelected();	// TODO: make this work also for the tree which doesn't have the same selection object
-			len = objects.length;
-			for (; i < len; i++) {
-				object = objects[i];
-				Deferred.when(store.remove(object.id), function() {
-					self.removeHistory(object.id);
-					// When deleting folder in tree, grid is not updated by store.onDelete() since grid only contains folders children!
-					if (object.dir && (context.isOnTree || context.isOnTreePane)) {
-						console.log('deleteItems: refreshing grid');
-						self.grid._refresh();   // note: grid._refresh has a timeout, so it doesn't matter to call it in rapid succession (in a loop)
-					}
-				}, function(err) {
-					console.log(err);
-				});
+			widget = this.context.isOnGrid || this.context.isOnGridPane ? this.grid : this.tree;
+			// TODO: make this work also for the tree which doesn't have the same selection object
+			// tree's selection is widget.selectedItems which is array of store objects
+			for (var id in widget.selection) {
+				if (widget.selection[id] === true) {
+					Deferred.when(store.remove(id), function() {
+						self.removeHistory(id);
+					}, function (err) {
+						console.log(err);
+					});
+				}
 			}
 		},
 
@@ -54,9 +48,11 @@ define([
 				mod: this.getDate()
 			});
 			object.name = object.dir ? 'new directory' : object.name = 'new text file.txt';
+			store.add(object);
+			/*
 			return Deferred.when(store.add(object), function() {
 				return object;
-			})
+			})*/
 		},
 
 		/**
@@ -66,10 +62,10 @@ define([
          *
 		 */
 		createRename: function(object) {
-
-			return Deferred.when(this.create(object), lang.hitch(this, function(object) {
-
-			}))
+			this.create(object);
+/*			return Deferred.when(this.create(object), lang.hitch(this, function(object) {
+console.log('created store object', object)
+			}))*/
 		}
 
 	})

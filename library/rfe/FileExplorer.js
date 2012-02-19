@@ -25,7 +25,7 @@ define([
 	 */
 
 
-	// TODO: multi select (in tree allow only of files but not of folders)
+	// TODO: multiselect (in tree allow only of files but not of folders)
 	/**
 	 * @class
 	 */
@@ -88,6 +88,7 @@ define([
 			// TODO: Set context also when using keyboard navigation
 			on(this.panes.containerNode, '.rfeTreePane:mousedown, .rfeGridPane:mousedown, .dijitTreeRow:mousedown, .dgrid-row:mousedown', function(evt) {
 				var node = this;
+				console.log('setting context to', node)
 				lang.hitch(self, self._setContext(evt, node));
 			});
 		},
@@ -102,7 +103,7 @@ define([
 			var grid = this.grid;
 			var dfd = new Deferred();
 			if (object.dir) {
-				dfd = Deferred.when(this.store.getChildren(object), function() {				  // TODO:  I think we can use memory store directly because they are already loaded
+				dfd = Deferred.when(this.store.getChildren(object), function() {  // TODO:  I think we can use memory store directly because they are already loaded
 					grid.setQuery({
 						parId: object.id
 					});
