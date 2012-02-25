@@ -106,7 +106,8 @@ define([
 			showDialogTools: function() {
 				// TODO: use dijit template for all dialogs
 				var self = this;
-				var dialog = registry.byId('rfeDialogSettings') || new Dialog({
+				var isCreated = registry.byId('rfeDialogSettings');
+				var dialog = isCreated || new Dialog({
 					id: 'rfeDialogSettings',
 					title: "Settings",
 					content: '<div>' +
@@ -114,30 +115,31 @@ define([
 					'</div>'
 				});
 
-				var label = domConstruct.create('label', {
-					innerHTML: 'Remember folders state'
-				}, query('fieldset', dialog.domNode)[0], 'last');
-				domConstruct.create('br', null, label);
+				if (!isCreated) {
+					var label = domConstruct.create('label', {
+						innerHTML: 'Remember folders state'
+					}, query('fieldset', dialog.domNode)[0], 'last');
+					domConstruct.create('br', null, label);
+					var input = domConstruct.create('input', null, label, 'first');
+					new CheckBox({
+						checked: true,
+						onClick: function() {
+							self.tree.set('persist', this.checked);
+						}
+					}, input);
 
-				var input = domConstruct.create('input', null, label, 'first');
-				new CheckBox({
-					checked: true,
-					onClick: function() {
-						self.grid.persist = this.checked;
-					}
-				}, input);
-
-				label = domConstruct.create('label', {
-					innerHTML: 'Show folders only'
-				}, query('fieldset', dialog.domNode)[0], 'last');
-				input = domConstruct.create('input', null, label, 'first');
-				new CheckBox({
-					checked: true,
-					onClick: function() {
-						self.store.skipWithNoChildren = this.checked;
-					}
-				}, input);
-
+					label = domConstruct.create('label', {
+						innerHTML: 'Show folders only'
+					}, query('fieldset', dialog.domNode)[0], 'last');
+					input = domConstruct.create('input', null, label, 'first');
+					new CheckBox({
+						checked: true,
+						onClick: function() {
+							self.store.skipWithNoChildren = this.checked;
+							self.reload();
+						}
+					}, input);
+				}
 				dialog.show();
 			}
 
