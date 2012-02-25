@@ -6,7 +6,6 @@ define([
 	'dojo/aspect',
 	'dijit/registry',
 	'dijit/MenuBar',
-	'dijit/MenuBarItem',
 	'dijit/PopupMenuBarItem',
 	'dijit/DropDownMenu',
 	'dijit/MenuItem',
@@ -15,7 +14,7 @@ define([
 	'dijit/CheckedMenuItem'
 
 ], function(lang, declare, array, on, aspect, registry,
-				MenuBar, MenuBarItem, PopupMenuBarItem, DropDownMenu, MenuItem, MenuSeparator, PopupMenuItem, CheckedMenuItem) {
+				MenuBar, PopupMenuBarItem, DropDownMenu, MenuItem, MenuSeparator, PopupMenuItem, CheckedMenuItem) {
 
 	return declare([MenuBar], {
 
@@ -26,28 +25,14 @@ define([
 		},
 
 		postCreate: function() {
+			this.inherited('postCreate', arguments);	// in case we've overriden something
+
 			// TODO: reuse menu from edit.js?
-			var menuBar, menuFile, menuView, menuHelp, menuTools;
+			var menuFile, menuView, menuHelp, menuTools;
 			var subMenuFile;
 
 			// ********** menu file **************
-			menuFile = new DropDownMenu({
-				id: 'rfeMenuFile',
-				onOpen: lang.hitch(this, function() {
-					if (this.grid.selection.getSelected().length === 0) {
-						array.filter(menuFile.getChildren(), function(item) {
-							if (item.get('label') != 'New' && item.get('label') != 'Upload') {
-								item.set('disabled', true);
-							}
-						});
-					}
-					else {
-						array.forEach(menuFile.getChildren(), function(item) {
-							item.set('disabled', false);
-						});
-					}
-				})
-			});
+			menuFile = new DropDownMenu({	id: 'rfeMenuFile'	});
 			subMenuFile = new DropDownMenu();
 			menuFile.addChild(new PopupMenuItem({
 				label: 'New',
@@ -56,25 +41,23 @@ define([
 			}));
 			subMenuFile.addChild(new MenuItem({
 				label: 'File',
-				onClick: lang.hitch(this, function() {
-					this.createRenameItem();
-				})
+				onClick: lang.hitch(this.rfe, this.rfe.createRename)
 			}));
 			subMenuFile.addChild(new MenuItem({
 				label: 'Directory',
-				onClick: lang.hitch(this, function() {
-					this.createRenameItem({
+				onClick: lang.hitch(this.rfe, function() {
+					this.createRename({
 						dir: true
 					});
 				})
 			}));
 			menuFile.addChild(new MenuItem({
 				label: 'Rename',
-				onClick: lang.hitch(this, this.edit)
+				onClick: lang.hitch(this.rfe, this.rfe.rename)
 			}));
 			menuFile.addChild(new MenuItem({
 				label: 'Delete',
-				onClick: lang.hitch(this, this.deleteItems)
+				onClick: lang.hitch(this.rfe, this.rfe.del)
 			}));
 
 
@@ -84,41 +67,40 @@ define([
 				id: 'rfeMenuItemHorizontal',
 				label: 'Layout horizontal',
 				checked: true,
-				onClick: lang.hitch(this, function() {
-					this.rfe.panes.setView('horizontal');
-					on.emit('rfe/menuView/setView');   // notify menuView/folders to set checked = true
-					registry.byId('rfeMenuItemVertical').set('checked', false);
+				onClick: lang.hitch(this.rfe, function() {
+					this.panes.setView('horizontal');
+//					on.emit('rfe/menuView/setView');   // notify menuView/folders to set checked = true
+//					registry.byId('rfeMenuItemVertical').set('checked', false);
 				})
 			}));
 			menuView.addChild(new CheckedMenuItem({
 				id: 'rfeMenuItemVertical',
 				label: 'Layout vertical',
 				checked: false,
-				onClick: lang.hitch(this, function() {
-					this.rfe.panes.setView('vertical');
-					on.emit('rfe/menuView/setView');   // notify menuView/folders to set checked = true
-					registry.byId('rfeMenuItemHorizontal').set('checked', false);
+				onClick: lang.hitch(this.rfe, function() {
+					this.panes.setView('vertical');
+//					on.emit('rfe/menuView/setView');   // notify menuView/folders to set checked = true
+//					registry.byId('rfeMenuItemHorizontal').set('checked', false);
 				})
 			}));
 			menuView.addChild(new MenuSeparator());
 			menuView.addChild(new CheckedMenuItem({
 				id: 'rfeMenuItemFolders',
-				label: 'Show folders',
+				label: 'Navigation pane',
 				checked: true,
-				onClick: lang.hitch(this, this.toggleTreePane)
+				onChange: lang.hitch(this.rfe.panes, this.rfe.panes.toggleTreePane)
 			}));
+/*
 			on('rfe/menuView/setView', function() {
 				var el = registry.byId('rfeMenuItemFolders');
 				el.set('checked', true);
-			});
+			});*/
 
 			// ********** menu tools ***************
 			menuTools = new DropDownMenu({ id: 'rfeMenuTools' });
 			menuTools.addChild(new MenuItem({
 				label: 'Settings',
-				onClick: lang.hitch(this, function() {
-					this.showDialogTools();
-				})
+				onClick: lang.hitch(this.rfe, this.rfe.showDialogTools)
 			}));
 
 
@@ -126,9 +108,7 @@ define([
 			menuHelp = new DropDownMenu({ id: 'rfeMenuHelp' });
 			menuHelp.addChild(new MenuItem({
 				label: 'About rfe',
-				onClick: lang.hitch(this, function() {
-					this.showDialogAbout();
-				})
+				onClick: lang.hitch(this.rfe, this.rfe.showDialogAbout)
 			}));
 
 
@@ -149,9 +129,45 @@ define([
 				popup: menuHelp
 			}));
 
-			return menuBar;
-		}
+			var context = this.rfe.context;
+			context.watch(lang.hitch(this, function() {
+				this.enableMenuItems(menuFile, context);
+			}));
 
+		},
+
+		/**
+		 * Enable/disable menu items depending on the context
+		 * @param {dijit/DropDownMenu} menu
+		 * @param {dojo/Stateful} context
+		 */
+		enableMenuItems: function(menu, context) {
+			// TODO: this does not work with i18n since it uses the labels...
+			// If not clicked on a item (tree.node or grid.row), but below widget and nothing is selected,
+			// then set all menuItems to disabled except create/upload
+			var label = '';
+			if (context.isOnTree || context.isOnTreePane) {
+				array.filter(menu.getChildren(), function(item) {
+					label = item.get('label');
+					if (label != 'New' && label != 'Upload') {
+						item.set('disabled', true);
+					}
+				});
+			}
+			else if (context.isOnGridPane) {
+				array.filter(menu.getChildren(), function(item) {
+					label = item.get('label');
+					if (label == 'Rename' || label == 'Delete') {
+						item.set('disabled', true);
+					}
+				});
+			}
+			else if (context.isOnGrid) {
+				array.forEach(menu.getChildren(), function(item) {
+					item.set('disabled', false);
+				});
+			}
+		}
 
 	});
 });

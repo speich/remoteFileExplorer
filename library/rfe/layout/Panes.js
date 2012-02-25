@@ -77,18 +77,18 @@ define([
 			/**
 			 * Toggle display of the tree pane.
 			 */
-			toggleTreePane: function() {
+			toggleTreePane: function(checked) {
 				// to keep it simple for the moment we switch to vertical view where the remaining pane is the center pane
 				// -> automatically expands to fill the remaining space
 				var treePane = this.treePane;
-				if (treePane.domNode.parentNode) {  // hide pane
-					if (this.layout.view == 'vertical') {
+				if (checked) {
+					this.addChild(treePane);
+				}
+				else {
+					if (this.currentView == 'vertical') {
 						this.setView('horizontal');
 					}
-					this.borderContainer.removeChild(treePane);
-				}
-				else {	// show pane
-					this.borderContainer.addChild(treePane);
+					this.removeChild(treePane);
 				}
 			}
 
