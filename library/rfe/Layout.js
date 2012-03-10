@@ -23,6 +23,8 @@ define([
 
 		return declare(null, {
 
+			_cnDialogSettingsFolderState: 'DialogSettingsFolderState',	// name of cookie
+
 			panes: null,
 			toolbar: null,
 			menubar: null,
@@ -57,6 +59,7 @@ define([
 
 				this.initGrid();
 				this.initTree();
+				this.initDialogs();
 				this.panes.startup();
 			},
 
@@ -71,7 +74,7 @@ define([
 					openOnClick: false,
 					openOnDblClick: true,	// note: tree.on('dblclick') only fires when this is set to false
 					showRoot: true,
-					persist: true,
+					persist: cookie(this._cnDialogSettingsFolderState) || true,
 					dndController: function(arg, params){
 						return new TreeSource(arg, lang.mixin(params || {}, {
 							accept: ['treeNode', 'gridNode'],
@@ -87,8 +90,9 @@ define([
 				this.grid = new Grid({}, div)
 			},
 
-			showDialogAbout: function() {
-				var dialog = registry.byId('rfeDialogAbout') || new Dialog({
+			initDialogs: function() {
+				// TODO: use dijit template for all dialogs
+				new Dialog({
 					id: 'rfeDialogAbout',
 					title: "About Remote File Explorer (rfe)",
 					content: '<div id="rfeDialogAboutLogo"><img src="library/rfe/resources/images/logo-speich.net.png" alt="speich.net logo" title="Created by Simon Speich, www.speich.net"/></div>' +
@@ -100,14 +104,9 @@ define([
 					'<p>Can be used and altered freely as long as this dialog with logo and link is included.</p>' +
 					'</div>'
 				});
-				dialog.show();
-			},
 
-			showDialogTools: function() {
-				// TODO: use dijit template for all dialogs
 				var self = this;
-				var isCreated = registry.byId('rfeDialogSettings');
-				var dialog = isCreated || new Dialog({
+				var dialog = new Dialog({
 					id: 'rfeDialogSettings',
 					title: "Settings",
 					content: '<div>' +
@@ -115,32 +114,40 @@ define([
 					'</div>'
 				});
 
-				if (!isCreated) {
-					var label = domConstruct.create('label', {
-						innerHTML: 'Remember folders state'
-					}, query('fieldset', dialog.domNode)[0], 'last');
-					domConstruct.create('br', null, label);
-					var input = domConstruct.create('input', null, label, 'first');
-					new CheckBox({
-						checked: true,
-						onClick: function() {
-							self.tree.set('persist', this.checked);
-						}
-					}, input);
 
-					label = domConstruct.create('label', {
-						innerHTML: 'Show folders only'
-					}, query('fieldset', dialog.domNode)[0], 'last');
-					input = domConstruct.create('input', null, label, 'first');
-					new CheckBox({
-						checked: true,
-						onClick: function() {
-							self.store.skipWithNoChildren = this.checked;
-							self.reload();
-						}
-					}, input);
-				}
-				dialog.show();
+				// TODO: move dialog creation to constructor/init so we can use cookie also to set store on first display
+				var label = domConstruct.create('label', {
+					innerHTML: 'Remember folders state'
+				}, query('fieldset', dialog.domNode)[0], 'last');
+				domConstruct.create('br', null, label);
+				var input = domConstruct.create('input', null, label, 'first');
+				new CheckBox({
+					checked: cookie(this._cnDialogSettingsFolderState) || true,
+					onChange: function() {
+						self.tree.set('persist', this.checked);
+						cookie(this._cnDialogSettingsFolderState, this.checked);
+					}
+				}, input);
+
+				label = domConstruct.create('label', {
+					innerHTML: 'Show folders only'
+				}, query('fieldset', dialog.domNode)[0], 'last');
+				input = domConstruct.create('input', null, label, 'first');
+				new CheckBox({
+					checked: true,
+					onClick: function() {
+						self.store.skipWithNoChildren = this.checked;
+						self.reload();
+					}
+				}, input);
+			},
+
+			showDialogAbout: function() {
+				registry.byId('rfeDialogAbout').show();
+			},
+
+			showDialogSettings: function() {
+				registry.byId('rfeDialogSettings').show();
 			}
 
 		});

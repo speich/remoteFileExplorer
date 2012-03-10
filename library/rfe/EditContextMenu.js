@@ -28,7 +28,6 @@ define([
 		 * @target {object} target domNode
 		 */
 		postCreate: function() {
-			console.log('Edit postCreate');
 			var p = this.rfe.panes;
 			var menu = Menu({
 				targetNodeIds: [p.treePane.id, p.gridPane.id], // grid extends to same size as pane, tree not
@@ -42,7 +41,7 @@ define([
 			}));
 			menu.addChild(MenuItem({
 				label: 'Rename',
-				onClick: lang.hitch(this.rfe, this.rfe.edit)
+				onClick: lang.hitch(this.rfe, this.rfe.rename)
 			}));
 			menu.addChild(MenuItem({
 				label: 'Delete',
@@ -67,17 +66,16 @@ define([
 
 			var context = this.rfe.context;
 			context.watch(lang.hitch(this, function() {
-				this.enableContextMenuItems(menu, context);
+				this.enableMenuItems(menu, context);
 			}));
 		},
 
 		/**
 		 * Enables or disables context menu items depending on the clicked context.
-		 * @param {string} name name of property
-		 * @param {string} oldVal old property value
-		 * @param {string} newVal new property value
+		 * @param {dijit/Menu} menu
+		 * @param {dojo/Stateful} context
 		 */
-		enableContextMenuItems: function(menu, context) {
+		enableMenuItems: function(menu, context) {
 			// TODO: this does not work with i18n since it uses the labels...
 			// If not clicked on a item (tree.node or grid.row), but below widget and nothing is selected,
 			// then set all menuItems to disabled except create/upload

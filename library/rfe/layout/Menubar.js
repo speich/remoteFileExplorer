@@ -100,7 +100,7 @@ define([
 			menuTools = new DropDownMenu({ id: 'rfeMenuTools' });
 			menuTools.addChild(new MenuItem({
 				label: 'Settings',
-				onClick: lang.hitch(this.rfe, this.rfe.showDialogTools)
+				onClick: this.rfe.showDialogSettings
 			}));
 
 
@@ -108,7 +108,7 @@ define([
 			menuHelp = new DropDownMenu({ id: 'rfeMenuHelp' });
 			menuHelp.addChild(new MenuItem({
 				label: 'About rfe',
-				onClick: lang.hitch(this.rfe, this.rfe.showDialogAbout)
+				onClick: this.rfe.showDialogAbout
 			}));
 
 

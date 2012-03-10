@@ -3,8 +3,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Remote File Explorer (rfe)</title>
-<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.7.1/dijit/themes/claro/document.css"/>
-<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.7.1/dijit/themes/claro/claro.css"/>
+<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.7.2/dijit/themes/claro/document.css"/>
+<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.7.2/dijit/themes/claro/claro.css"/>
 <link rel="stylesheet" href="/library/dgrid/css/skins/claro.css">
 <style type="text/css">
 html, body {
@@ -104,14 +104,14 @@ html, body {
 <script type="text/javascript">
 var dojoConfig = {
 	async: true,
-	//baseUrl: 'http://ajax.googleapis.com/ajax/libs/dojo/1.7.1/dojo/',
+//	baseUrl: 'http://ajax.googleapis.com/ajax/libs/dojo/1.7.2/dojo/',
 	baseUrl: '/library/dojo/trunk/dojo/',
 	packages: [
 		{name: 'dgrid', location: '/library/dgrid'},
 		{name: 'xstyle', location: '/library/xstyle'},
 		{name: 'put-selector', location: '/library/put-selector'},
-		{name: 'rfe', location: '/library/rfe'},
-		{name: 'original', location: '../'}
+		{name: 'rfe', location: '/library/rfe'}
+//		{name: 'original', location: '../'}
 	],
 	// redirect the following modules to my own modules
 	paths: {
@@ -122,7 +122,7 @@ var dojoConfig = {
 
 </script>
 <script type="text/javascript" src="library/dojo/trunk/dojo/dojo.js"></script>
-<!--<script src="http://ajax.googleapis.com/ajax/libs/dojo/1.7.1/dojo/dojo.js" type="text/javascript"></script>-->
+<!--<script src="http://ajax.googleapis.com/ajax/libs/dojo/1.7.2/dojo/dojo.js" type="text/javascript"></script>-->
 <script type="text/javascript">
 require(['dojo/ready', 'rfe/FileExplorer'], function(ready, FileExplorer) {
 	ready(function() {

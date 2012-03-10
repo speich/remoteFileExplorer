@@ -88,11 +88,10 @@ define([
 			// TODO: Set context also when using keyboard navigation
 			on(this.panes.containerNode, '.rfeTreePane:mousedown, .rfeGridPane:mousedown, .dijitTreeRow:mousedown, .dgrid-row:mousedown', function(evt) {
 				var node = this;
-				console.log('setting context to', node)
+//				console.log('setting context to', node)
 				lang.hitch(self, self._setContext(evt, node));
 			});
 		},
-
 
 		/**
 		 * Displays folder content in grid.
@@ -259,9 +258,9 @@ define([
 		 * @param {Event} evt
 		 */
 		_setContext: function(evt, node) {
-			if (!mouse.isRight(evt)) {
+			/*if (!mouse.isRight(evt)) {
 				return;
-			}
+			}*/
 			this.context.set({
 				isOnGrid: domClass.contains(node, 'dgrid-row'),
 				isOnGridPane: domClass.contains(node, 'rfeGridPane'),

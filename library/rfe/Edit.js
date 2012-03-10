@@ -2,8 +2,9 @@ define([
 	'dojo/_base/lang',
 	'dojo/_base/array',
 	'dojo/_base/declare',
-	'dojo/_base/Deferred'
-], function(lang, array, declare, Deferred) {
+	'dojo/_base/Deferred',
+	'put-selector/put'
+], function(lang, array, declare, Deferred, put) {
 
 	return declare(null, {
 
@@ -18,9 +19,8 @@ define([
 			// happens from the different menu in layout.js -> move here?
 			// B. When deleting from context menu use source to decide which selected items to use
 			var self = this, store = this.store;
-			var object, objects, widget;
+			var widget = this.context.isOnGrid || this.context.isOnGridPane ? this.grid : this.tree;
 
-			widget = this.context.isOnGrid || this.context.isOnGridPane ? this.grid : this.tree;
 			// TODO: make this work also for the tree which doesn't have the same selection object
 			// tree's selection is widget.selectedItems which is array of store objects
 			for (var id in widget.selection) {
@@ -48,11 +48,9 @@ define([
 				mod: this.getDate()
 			});
 			object.name = object.dir ? 'new directory' : object.name = 'new text file.txt';
-			store.add(object);
-			/*
-			return Deferred.when(store.add(object), function() {
+			return Deferred.when(store.add(object), function(object) {
 				return object;
-			})*/
+			})
 		},
 
 		/**
@@ -62,10 +60,46 @@ define([
          *
 		 */
 		createRename: function(object) {
-			this.create(object);
-/*			return Deferred.when(this.create(object), lang.hitch(this, function(object) {
-console.log('created store object', object)
-			}))*/
+			var widget = this.context.isOnGrid || this.context.isOnGridPane ? this.grid : this.tree;
+
+			return Deferred.when(this.create(object), lang.hitch(this, function(object) {
+				console.log('created store object', object)
+				if (this.context.isOnGrid || this.context.isOnGridPane) {
+					var newRow = widget.row(object.id)	// properies are data, elememt, id
+					console.log(widget.editor, newRow)
+				}
+			}))
+		},
+
+		rename: function() {
+			var widget = this.context.isOnGrid || this.context.isOnGridPane ? this.grid : this.tree;
+			var store = this.store;
+			// TODO: make this work also for the tree which doesn't have the same selection object
+			// tree's selection is widget.selectedItems which is array of store objects
+
+			// find label column
+			var i = 0, len = widget.columns;
+			for (; i < len; i++) {
+				if (widget.columns[i].field == widget.store.labelAttr) {
+					return;
+				}
+			}
+			var column = widget.columns[i];
+			for (var id in widget.selection) {
+				if (widget.selection[id] === true) {
+					var row = widget.row(id);	// properies are data, elememt, id
+					var cell = widget.cell(id, 0);
+
+
+					//var column = widget.columns[0];	// should get by store.labelAttr
+					var editor = column.editorInstance;	// input field
+					console.log(widget, row, cell, column)
+					put(cell, editor.domNode || editor);
+
+					//column.onShowEditor();
+					//widget.editor.renderInput(value, cell, object);
+				}
+			}
 		}
 
 	})

@@ -47,13 +47,14 @@ define([
 		selectionMode: 'extended',
 		columns: [
 			Editor({
-				label: "name",
-				field: 'name',
-				sortable: false,
-				renderCell: function(object, data, td) {
-					formatImg(object, data, td)
-				}
-			}, 'text', 'click, dgrid-cellfocusin'), {
+					label: "name",
+					field: 'name',
+					sortable: false,
+					renderCell: function(object, data, td) {
+						formatImg(object, data, td)
+					}
+				}, 'text', 'click, dgrid-cellfocusin'
+			), {
 				label: 'size',
 				field: 'size',
 				sortable: false,
