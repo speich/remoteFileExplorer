@@ -10,7 +10,7 @@ define([
 	'dojo/dnd/Avatar'],
 function (lang, window, array, declare, construct, domClass, attr, query, Avatar) {
 
-	return declare('dojo.dnd.Avatar', Avatar, {
+	return declare([Avatar], {
 
 		construct: function () {
 			// preload icons

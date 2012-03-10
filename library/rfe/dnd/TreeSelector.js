@@ -1,6 +1,6 @@
 /**
  * So far the sole purpose of extending the _dndSelector are two things:
- * 1. Prevent deselecting the last selected node when dragging a node different from the last selected one
+ * 1. Prevent deselecting the last selected node when dragging a node different from the last selected one, because grid would update display to selected folder
  * 2. Do not select a node when only dragging it
  * @see conversation on http://dojo-toolkit.33424.n3.nabble.com/Reason-behind-selecting-treeNode-onMouseDown-and-not-onMouseUp-td3021149.html#a3066447
  *
@@ -17,7 +17,7 @@ define([
 	'original/dijit/tree/_dndSelector'
 ], function(array, lang, event, connect, mouse, cookie, _dndSelector) {
 
-	// set references to call be able to call overriden methods
+	// set references to be able to call overriden methods
 	var ref = _dndSelector.prototype;
 	var oldMouseUp = ref.onMouseUp;
 	var oldMouseMove = ref.onMouseMove;
