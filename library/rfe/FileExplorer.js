@@ -16,7 +16,7 @@ define([
 	'rfe/Edit',
 	'rfe/Store/FileCache',
 	'rfe/Store/FileStore',
-	'rfe/dnd/Avatar'
+	'rfe/dnd/Manager'
 ], function(lang, array, declare, Deferred, cookie, keys, dom, domClass, locale, on, mouse, Stateful, registry, Layout, Edit, FileCache, FileStore) {
 	/**
 	 * File explorer allows you to browse files.
@@ -279,7 +279,7 @@ define([
 			var store = this.store;
 			var object, oreo, arr, id, paths = [];
 
-			oreo = cookie(tree.dndController.cookieName);
+			oreo = tree.dndController.cookieName ? cookie(tree.dndController.cookieName) : false;	// not available in 1.7.2
 			if (tree.persist && oreo) {
 				// extract information to display folder content in grid
 				paths = array.map(oreo.split(","), function(path) {

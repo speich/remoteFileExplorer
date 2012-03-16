@@ -29,8 +29,10 @@ define([
 		_dragged: false,
 		getSelectedNodes: ref.getSelectedTreeNodes, // map two dnd method
 
-		/*** add state for selection to tree until patch http://bugs.dojotoolkit.org/ticket/14058 is checked in ***/
-		/*
+
+
+		/*** add state for selection to tree until patch http://bugs.dojotoolkit.org/ticket/14058 is checked in 1.8? ***/
+/*
 		_updateSelectionProperties: function(){
 			var selected = this.getSelectedTreeNodes();
 			var paths = [], nodes = [], selects = [];
