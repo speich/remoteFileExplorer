@@ -87,9 +87,17 @@ define([
 
 		/*** extend put, add, remove to notify tree ***/
 		put: function(object, options) {
-			return Deferred.when(this.refPut.apply(this, arguments), function() {
-				this.onChildrenChange(object, this.getChildren(object));
-				this.onChange(object);
+			var self = this;
+			//this.onChange(object);
+			// onChildrenChange is called in  paste item, since an object doesn't have children, only a parentAttr
+			//return this.refPut.apply(this, arguments);
+
+			return Deferred.when(this.refPut.apply(this, arguments), function(id) {
+				self.onChange(object);
+				/*Deferred.when(self.getChildren(object), function(children) {
+					self.onChildrenChange(object, children);
+				});*/
+				return id;
 			}, function(err) {
 				console.log('error', err);
 			});
@@ -100,7 +108,7 @@ define([
 			return Deferred.when(this.refAdd.apply(this, arguments), function(newId) {
 				object.id = newId;
 				self.onNewItem(object);	// notifies tree
-				console.log('is added also in storeMemory?', self.storeMemory)
+				console.log('is added also in storeMemory?', object, self.storeMemory)
 				return newId;
 			}, function(err) {
 				console.log('error', err);
@@ -121,7 +129,7 @@ define([
 		/**
 		 * Find all ids of and item's parents and return them as an array.
 		 * Includes the item's own id in the path.
-		 * @param {object} item StoreFileCache item
+		 * @param {object} object
 		 * @return {Array}
 		 */
 		getPath: function(object) {
@@ -216,18 +224,32 @@ define([
 		 * Callback whenever an item has changed, so that Tree can update the label, icon, etc.
 		 * Note that changes to an item's children or parent(s) will trigger an onChildrenChange()
 		 * so you can ignore those changes here.
-		 * @param {object} item
+		 * @param {object} object
 		 */
 		onChange: function(object) {},
 
+		/**
+		 * Indicate whether or not an object may have children prior to actually loading the children.
+		 * The presence of the property defined in this.childrenAttr (=dir) means having children.
+		 * @param {object} object
+		 */
 		mayHaveChildren: function(object) {
 			return object[this.childrenAttr];
 		},
 
+		/**
+		 * Retrieves the root node.
+		 * @param onItem
+		 * @param onError
+		 */
 		getRoot: function(onItem, onError) {
 			this.get(this.rootId).then(onItem, onError);
 		},
 
+		/**
+		 * Returns the label for the object.
+		 * @param {object} object
+		 */
 		getLabel: function(object) {
 			return object[this.labelAttr];
 		},
@@ -237,14 +259,68 @@ define([
 		 *	Updates the tree view (if necessary).
 		 *	If the new item is a child of an existing item, calls onChildrenChange()
 		 *	with the new list of children for that existing item.
-		 * @param item
+		 * @param {object} object
 		 */
 		onNewItem: function(object) {
-			var parItem = this.storeMemory.get(object.parId);
+			var parent = this.storeMemory.get(object.parId);
 			// since we know, that objects with this parItem are already cached (except the new one), we just query the memoryStore and add it
-			Deferred.when(this.getChildren(parItem), lang.hitch(this, function(children) {
-				this.onChildrenChange(parItem, children);
+			Deferred.when(this.getChildren(parent), lang.hitch(this, function(children) {
+				this.onChildrenChange(parent, children);
 			}));
+		},
+
+
+
+		/**
+		 * Move or copy an item from one parent item to another.
+		 * Used in drag & drop by the tree and the grid.
+		 * @param {object} child child object beeing pasted
+		 * @param {object} oldParent parent object where the child was dragged from
+		 * @param {object} newParent new parent of the child object, where the child was dragged to
+		 * @param {boolean} copy copy or move item
+		 * @return {dojo/_base/Deferred}
+		 */
+		pasteItem: function(child, oldParent, newParent, copy) {
+			var dfd;
+			var self = this, newObject;
+
+			// copy item
+			if (copy) {
+				// create new object based on child and use same id -> when server sees POST with id this means copy (implicitly)
+				// TODO: also recursevly copy all children
+				newObject = lang.clone(child);
+				newObject[this.parentAttr] = newParent.id;
+				dfd = Deferred.when(this.add(newObject, {
+					incremental: true	// otherwise store JsonRest does POST instead of PUT even if object has an id
+				}), function(newId) {
+					newObject.id = newId;
+					return newId;
+				});
+			}
+			// move item
+			else {
+				// TODO: Maybe I need to use the id instead of the items, because this.put calls remove on the cache and then
+				// re-indexes the cache. Items get a new index while newParent and oldParent use the old?
+
+				// Update object's parent attribute to new parent id
+				//			console.log('pasteItem', item)
+				child[this.parentAttr] = newParent.id;
+				dfd = this.put(child);
+
+				// Notify tree to update old parent (its children)
+				Deferred.when(self.getChildren(oldParent), function(children) {
+					self.onChildrenChange(oldParent, children);
+				});
+			}
+
+			// notify tree to update new parent (its children)
+			Deferred.when(dfd, function() {
+				Deferred.when(self.getChildren(newParent), function(children) {
+					self.onChildrenChange(newParent, children);
+				});
+			});
+
+			return dfd;
 		}
 
 	});

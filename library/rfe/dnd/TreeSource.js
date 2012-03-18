@@ -81,8 +81,8 @@ define([
 					if (this == target) {
 						if (this == source) {	// dropped on tree from tree
 							console.log('tree onDndDrop: dropped onto tree from tree')
-							var newParentItem = this.current.item;
-							this.onTreeToTree(source, nodes, copy, target, newParentItem);
+							var newParent = this.current.item;
+							this.onTreeToTree(source, nodes, copy, target, newParent);
 						}
 						else {						// dropped on tree from grid
 							console.log('tree onDndDrop: dropped onto tree from external')

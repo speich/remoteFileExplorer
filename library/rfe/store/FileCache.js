@@ -190,13 +190,13 @@ define([
 		/**
 		 * Move or copy an item from one parent item to another.
 		 * Used in drag & drop by the tree and the grid.
-		 * @param {object} item dojo.store object
-		 * @param {object} oldParentItem dojo.store object
-		 * @param {object} newParentItem dojo.store object
+		 * @param {object} object child beeing pasted
+		 * @param {object} oldParent parent object where the child was dragged from
+		 * @param {object} newParent new parent of the child object, where the child was dragged to
 		 * @param {boolean} copy copy or move item
 		 * @return {dojo/_base/Deferred}
 		 */
-		pasteItem: function(item, oldParentItem, newParentItem, copy) {
+		pasteItem: function(object, oldParent, newParent, copy) {
 			var dfd;
 			var self = this, newItem;
 

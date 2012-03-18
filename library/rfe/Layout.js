@@ -66,7 +66,8 @@ define([
 			/**
 			 * Initializes the tree and tree dnd.
 			 */
-			initTree: function(){
+			initTree: function() {
+				var self = this;
 				var div = domConstruct.create('div', {}, this.panes.treePane.domNode);
 				this.tree = new Tree({
 					model: this.store,
@@ -75,10 +76,10 @@ define([
 					openOnDblClick: true,	// note: tree.on('dblclick') only fires when this is set to false
 					showRoot: true,
 					persist: cookie(this._cnDialogSettingsFolderState) || true,
-					dndController: function(arg, params){
+					dndController: function(arg, params) {
 						return new TreeSource(arg, lang.mixin(params || {}, {
 							accept: ['treeNode', 'gridNode'],
-							store: this.store,
+							store: self.store,
 							singular: true
 						}))
 					}
