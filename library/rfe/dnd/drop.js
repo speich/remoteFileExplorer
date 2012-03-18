@@ -2,8 +2,9 @@ define([
 	'dojo/_base/lang',
 	'dojo/_base/declare',
 	'dojo/_base/Deferred',
+	'dojo/_base/Array',
 	'rfe/dialogs'
-], function(lang, declare, Deferred, dialogs) {
+], function(lang, declare, Deferred, array, dialogs) {
 
 	return {
 
@@ -43,7 +44,18 @@ define([
 
 		onGridToTree: function() {},
 
-		onTreeToTree: function() {},
+		onTreeToTree: function(source, nodes, copy, target, newParent) {
+			console.log('onTreeToTree:', source, nodes, copy, target, newParent);
+			array.forEach(nodes, function(node) {
+				// dojo.dnd.Item representing the thing being dropped.
+				// Don't confuse the use of item here (meaning a DnD item) with the
+				// uses below where item means dojo.store object.
+				var store = source.store;
+				var child = source.getItem(node.id).data.item;
+				var oldParent = store.storeMemory.get(child[store.parentAttr]);
+				store.pasteItem(child, oldParent, newParent, copy);
+			});
+		},
 
       onTreeToGrid: function(source, nodes, copy, newParentItem) {
 				var dfds = [];
