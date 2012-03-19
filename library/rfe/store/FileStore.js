@@ -9,9 +9,8 @@ define([
 	'dojo/_base/array',
 	'dojo/store/Memory',
 	'dojo/store/JsonRest',
-	'dojo/store/Observable',
 	'dojo/store/Cache'
-], function(declare, lang, Deferred, array, Memory, JsonRest, Observable, Cache) {
+], function(declare, lang, Deferred, array, Memory, JsonRest, Cache) {
 
 	return declare(null, {
 		// references for MonkeyPatching the store.Cache
@@ -34,10 +33,11 @@ define([
 		constructor: function() {
 
 			var storeMaster = this.storeMaster = new JsonRest({target: '/library/rfe/controller.php/'});
-			var storeMemory = this.storeMemory = new Observable(new Memory({
+			var storeMemory = this.storeMemory = new Memory({
 				// Memory store does not add id to object when creating an object
 				// See bugs http://bugs.dojotoolkit.org/ticket/12835 and http://bugs.dojotoolkit.org/ticket/14281
 				// Will be fixed with dojo 1.8
+				/*
 				put: function(object, options) {
 					var data = this.data, index = this.index, idProperty = this.idProperty;
 					var id = object[idProperty] = (options && "id" in options) ? options.id : idProperty in object ? object[idProperty] : Math.random();
@@ -52,12 +52,14 @@ define([
 					}
 					return id;
 				}
-			}));
+				*/
+			});
 			var storeCache = new Cache(storeMaster, storeMemory);
 
 			// Fix for cache not working with jsonrest
 			// See http://bugs.dojotoolkit.org/ticket/14704
 			// Will be fixed with dojo 1.8
+			/*
 			storeCache.add = function(object, directives){
 				return Deferred.when(storeMaster.add(object, directives), function(result){
 					// now put result in cache
@@ -74,6 +76,7 @@ define([
 					return result; // the result from the put should be dictated by the masterStore and be unaffected by the cachingStore
 				});
 			};
+			*/
 
 			this.refPut = storeCache.put;
 			this.refDel = storeCache.remove;
@@ -81,8 +84,16 @@ define([
 			storeCache.put = this.put;
 			storeCache.remove = this.remove;
 			storeCache.add = this.add;
-
 			lang.mixin(this, storeCache);
+
+/*									this.refPut = storeMemory.put;
+						this.refDel = storeMemory.remove;
+						this.refAdd = storeMemory.add;
+			storeMemory.put = this.put;
+			storeMemory.remove = this.remove;
+			storeMemory.add = this.add;
+						lang.mixin(this, storeMemory);*/
+
 		},
 
 		/*** extend put, add, remove to notify tree ***/
@@ -168,9 +179,7 @@ define([
 			if (children.length > 0) {
 				if (self.skipWithNoChildren) {
 					childItems = children.filter(function(child) {
-						if (child[self.childrenAttr]) {  // only display directories in the tree
-							return true;
-						}
+						return child[self.childrenAttr];  // only display directories in the tree
 					});
 				}
 				else {
@@ -185,15 +194,10 @@ define([
 			else {
 				query = self.storeMaster.query(id + '/');
 				dfd = Deferred.when(query, function(children) {
-					var i = 0, len = children.length;
-					for (; i < len; i++) {
-						self.storeMemory.add(children[i]);
-					}
 					if (self.skipWithNoChildren) {
-						childItems = array.filter(children, function(child) {
-							if (child[self.childrenAttr]) {  // only display directories in the tree
-								return true;
-							}
+						childItems = array.filter(children, function(child, i) {
+							self.storeMemory.add(children[i]);
+							return child[self.childrenAttr];	// only display directories in the tree
 						});
 					}
 					else {
@@ -207,7 +211,7 @@ define([
 
 				}, function(error) {
 					console.error(error);
-					onComplete([]);
+					onComplete(childItems);
 				})
 			}
 			return dfd;
@@ -305,17 +309,18 @@ define([
 				// Update object's parent attribute to new parent id
 				//			console.log('pasteItem', item)
 				child[this.parentAttr] = newParent.id;
-				dfd = this.put(child);
-
-				// Notify tree to update old parent (its children)
-				Deferred.when(self.getChildren(oldParent), function(children) {
-					self.onChildrenChange(oldParent, children);
+				dfd = Deferred.when(this.put(child), function() {
+					// Notify tree to update old parent (its children)
+					// Note: load children after put has completed, because put modifies the cache
+					return Deferred.when(self.getChildren(oldParent), function(children) {
+						self.onChildrenChange(oldParent, children);
+					});
 				});
 			}
 
 			// notify tree to update new parent (its children)
-			Deferred.when(dfd, function() {
-				Deferred.when(self.getChildren(newParent), function(children) {
+			dfd = Deferred.when(dfd, function() {
+				return Deferred.when(self.getChildren(newParent), function(children) {
 					self.onChildrenChange(newParent, children);
 				});
 			});
