@@ -96,18 +96,11 @@ define([
 
 		},
 
-		/*** extend put, add, remove to notify tree ***/
+		/*** extend put, add, remove to comply to dojo.data.api, e.g. notify tree ***/
 		put: function(object, options) {
 			var self = this;
-			//this.onChange(object);
-			// onChildrenChange is called in  paste item, since an object doesn't have children, only a parentAttr
-			//return this.refPut.apply(this, arguments);
-
 			return Deferred.when(this.refPut.apply(this, arguments), function(id) {
 				self.onChange(object);
-				/*Deferred.when(self.getChildren(object), function(children) {
-					self.onChildrenChange(object, children);
-				});*/
 				return id;
 			}, function(err) {
 				console.log('error', err);
@@ -165,10 +158,8 @@ define([
 		 * @param {Function|Object} options can be function to call (for tree) or options object (dojo.store api)
 		 * @return {dojo.Deferred}
 		 */
-		getChildren: function(object, options) {
-
-			// TODO: getChildren on parent when doing pasteItem returns cache with wrong children!!!
-			var self = this, query = [];
+		getChildren_old: function(object, options) {
+			var self = this, results = [];
 			var obj = {};
 			var cached = true;
 			var id = object[this.idProperty];
@@ -176,17 +167,15 @@ define([
 			obj[this.parentAttr] = id;
 
 			// check if children are available from cache
-			if (!(options && options.force)) {
-				query = this.storeMemory.query(obj);	// query has to be an object
-			}
+			results = this.storeMemory.query(obj);	// query has to be an object
 
 			// children not cached yet, query master store and add them to cache
-			if (query.length === 0) {
+			if (results.length === 0) {
 				cached = false;
-				query = self.storeMaster.query(id + '/');	// query has to be a string, otherwise will add querystring instead of REST resource
+				results = self.storeMaster.query(id + '/');	// query has to be a string, otherwise will add querystring instead of REST resource
 			}
 
-			return Deferred.when(query, function(children) {
+			return Deferred.when(results, function(children) {
 				var childObjects = array.filter(children, function(child) {
 					if (!cached) {
 						self.storeMemory.add(child);
@@ -197,11 +186,48 @@ define([
 				childObjects = self.skipWithNoChildren ? childObjects : children;
 
 				if (lang.isFunction(options)) {
+					// tree only, e.g. onComplete
 					options(childObjects);
 				}
 
-				return childObjects;
+				return results;
 			});
+		},
+
+		getChildren: function(object, options) {
+			var self = this;
+			var obj = {};
+			var cached = true;
+			var id = object[this.idProperty];
+			var results, resultsDirOnly, children;
+
+			obj[this.parentAttr] = id;
+
+			// check if children are available from cache
+			results = this.storeMemory.query(obj);	// query has to be an object
+
+			// children not cached yet, query master store and add them to cache
+			if (results.length === 0) {
+				cached = false;
+				results = self.storeMaster.query(id + '/');	// query has to be a string, otherwise will add querystring instead of REST resource
+			}
+
+			resultsDirOnly = results.filter(function(child) {
+				if (!cached) {
+					console.log('adding', child, 'to cache', self.storeMemory);
+					self.storeMemory.add(child);	// saves looping twice, but should be in foreEach
+				}
+				return child[self.childrenAttr];	// only display directories in the tree
+			});
+			children = this.skipWithNoChildren ? resultsDirOnly : results;
+			if (lang.isFunction(options)) {
+				// only used by tree
+				console.log('calling onComplete');
+				Deferred.when(children, function(result) {
+					options(result);	// calls onComplete
+				})
+			}
+			return children;
 		},
 
 		/**
@@ -276,7 +302,7 @@ define([
 			// copy item
 			if (copy) {
 				// create new object based on child and use same id -> when server sees POST with id this means copy (implicitly)
-				// TODO: also recursevly copy all children
+				// TODO: also recursively copy all children
 				newObject = lang.clone(child);
 				newObject[this.parentAttr] = newParent.id;
 				dfd = Deferred.when(this.add(newObject, {
@@ -297,7 +323,7 @@ define([
 				dfd = Deferred.when(this.put(child), function() {
 					// Notify tree to update old parent (its children)
 					// Note: load children after put has completed, because put modifies the cache
-					return Deferred.when(self.getChildren(oldParent, { force: true }), function(children) {
+					return Deferred.when(self.getChildren(oldParent), function(children) {
 						self.onChildrenChange(oldParent, children);
 					});
 				});
@@ -305,7 +331,7 @@ define([
 
 			// notify tree to update new parent (its children)
 			dfd = Deferred.when(dfd, function() {
-				return Deferred.when(self.getChildren(newParent, { force: true }), function(children) {
+				return Deferred.when(self.getChildren(newParent), function(children) {
 					self.onChildrenChange(newParent, children);
 				});
 			});
