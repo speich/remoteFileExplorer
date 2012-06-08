@@ -51,6 +51,7 @@ define([
 				numSteps: 5		// number of steps you can go forward/back
 			};
 			this.store = new FileStore();
+			//this.store = new FileCache();
 			this.context = new Stateful({
 				isOnGrid: false,
 				isOnTree: false,
@@ -86,7 +87,7 @@ define([
 			});
 
 			// TODO: Set context also when using keyboard navigation
-			on(this.panes.containerNode, '.rfeTreePane:mousedown, .rfeGridPane:mousedown, .dijitTreeRow:mousedown, .dgrid-row:mousedown', function(evt) {
+			on(this.panes.domNode, '.rfeTreePane:mousedown, .rfeGridPane:mousedown, .dijitTreeRow:mousedown, .dgrid-row:mousedown', function(evt) {
 				var node = this;
 //				console.log('setting context to', node)
 				lang.hitch(self, self._setContext(evt, node));

@@ -7,6 +7,7 @@ define([
 	'dgrid/Editor',
 	'dgrid/Keyboard',
 	'dgrid/extensions/ColumnResizer',
+	'dgrid/extensions/DijitRegistry',
 	'xstyle/has-class',
 	'xstyle/css',
 	'put-selector/put'

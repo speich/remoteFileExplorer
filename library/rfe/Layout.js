@@ -37,17 +37,13 @@ define([
 			},
 
 			init: function() {
-				console.log('Layout postCreate', this.store)
 				this.panes = new Panes({}, this.id);
-
 				this.toolbar = new Toolbar({
 					rfe: this
 				}, domConstruct.create('div'));
-
 				this.menubar = new Menubar({
 					rfe: this
 				}, domConstruct.create('div'));
-
 				this.editContextMenu = new EditContextMenu({
 					rfe: this
 				});
@@ -56,11 +52,10 @@ define([
 				this.toolbar.placeAt(this.panes.menuPane.domNode);
 
 				this.panes.setView('horizontal');
-
+				this.panes.startup();
 				this.initGrid();
 				this.initTree();
-				this.initDialogs();
-				this.panes.startup();
+//				this.initDialogs();
 			},
 
 			/**
@@ -68,7 +63,6 @@ define([
 			 */
 			initTree: function() {
 				var self = this;
-				var div = domConstruct.create('div', {}, this.panes.treePane.domNode);
 				this.tree = new Tree({
 					model: this.store,
 					childrenAttrs: [this.store.childrenAttr],
@@ -83,12 +77,13 @@ define([
 							singular: true
 						}))
 					}
-				}, div);
+				});
+				this.tree.placeAt(this.panes.treePane)
 			},
 
 			initGrid: function() {
 				var div = domConstruct.create('div', {}, this.panes.gridPane.domNode);
-				this.grid = new Grid({}, div)
+				this.grid = new Grid({}, div);
 			},
 
 			initDialogs: function() {

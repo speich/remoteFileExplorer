@@ -4,17 +4,11 @@ define([
 	'dojo/dom',
 	'dojo/dom-construct',
 	'dijit/layout/BorderContainer',
-	'dijit/layout/ContentPane',
-	'dijit/_WidgetBase',
-	'dijit/_TemplatedMixin',
-	'dojo/text!rfe/layout/Layout.html'
-], function(lang, declare, dom, domConstruct, BorderContainer, ContentPane, _WidgetBase, _TemplatedMixin, template) {
+	'dijit/layout/ContentPane'
+], function(lang, declare, dom, domConstruct, BorderContainer, ContentPane) {
 
-		return declare([BorderContainer, _WidgetBase, _TemplatedMixin], {
+		return declare([BorderContainer], {
 
-			widgetsInTemplate: true,
-			templateString: template,
-			baseClass: 'rfeLayout',
 			liveSplitters: true,
 			gutters: false,
 
@@ -24,21 +18,22 @@ define([
 			treePane: null,
 			gridPane: null,
 
-			constructor: function(props) {
-				lang.mixin(this, props || {});
-			},
-
 			postCreate: function() {
+				this.inherited('postCreate', arguments);
+
 				this.menuPane = new ContentPane({
-					region: 'top'	// menu is always on top
-				}, this.rfeMenuPaneNode);
-
+					region: 'top'
+				});
 				this.treePane = new ContentPane({
-				}, this.rfeTreePaneNode);
-
+					region: 'left'
+				});
 				this.gridPane = new ContentPane({
 					region: 'center'
-				}, this.rfeGridPaneNode);
+				});
+
+				this.addChild(this.menuPane);
+				this.addChild(this.treePane);
+				this.addChild(this.gridPane);
 			},
 
 			/**
