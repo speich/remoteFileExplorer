@@ -69,7 +69,14 @@ define([
 		initEvents: function() {
 			var self = this;
 			var grid = this.grid, tree = this.tree;
+			tree.onClick = function(object) {
+				console.log('tree.onClick');
+				self.displayChildrenInGrid(object);
+				self.setHistory(object.id);
+				self.currentTreeObject.set(object);
+			};
 			tree.onDblClick = function(object, nodeWidget, evt) {
+				console.log('tree.onDbouleClick');
 				if(nodeWidget.isExpandable){
 					this._onExpandoClick({ node: nodeWidget });
 				}
@@ -88,9 +95,10 @@ define([
 			});
 
 			// TODO: Set context also when using keyboard navigation
-			on(this.panes.domNode, '.rfeTreePane:mousedown, .rfeGridPane:mousedown, .dijitTreeRow:mousedown, .dgrid-row:mousedown', function(evt) {
+			//on(this.panes.domNode, '#rfeTreePane:mousedown, #rfeGridPane:mousedown, .dijitTreeRow:mousedown, .dgrid-row:mousedown', function(evt) {
+			on(this.panes.domNode, '.rfeTreePane:mousedown, .rfeGridPane:mousedown', function(evt) {
 				var node = this;
-//				console.log('setting context to', node)
+				console.log('setting context to', node)
 				lang.hitch(self, self._setContext(evt, node));
 			});
 		},
@@ -105,7 +113,7 @@ define([
 			var dfd = new Deferred();
 			if (object.dir) {
 				dfd = Deferred.when(this.store.getChildren(object), function() {  // TODO:  I think we can use memory store directly because they are already loaded
-					grid.setQuery({
+					grid.set('query', {
 						parId: object.id
 					});
 				});
@@ -293,7 +301,7 @@ define([
 
 				Deferred.when(store.get(id), lang.hitch(this, function(object) {
 					Deferred.when(store.getChildren(object), function() {	// load children first before setting store
-						grid.setStore(store.storeMemory, {	// also calls setQuery
+						grid.set('store', store.storeMemory, {	// also calls setQuery
 							parId: id
 						});
 					});

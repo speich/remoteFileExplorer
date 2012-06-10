@@ -22,13 +22,16 @@ define([
 				this.inherited('postCreate', arguments);
 
 				this.menuPane = new ContentPane({
-					region: 'top'
+					region: 'top',
+					'class': 'rfeMenuPane'
 				});
 				this.treePane = new ContentPane({
-					region: 'left'
+					region: 'left',
+					'class': 'rfeTreePane'
 				});
 				this.gridPane = new ContentPane({
-					region: 'center'
+					region: 'center',
+					'class': 'rfeGridPane'
 				});
 
 				this.addChild(this.menuPane);
