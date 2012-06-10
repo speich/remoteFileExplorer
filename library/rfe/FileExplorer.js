@@ -69,13 +69,14 @@ define([
 		initEvents: function() {
 			var self = this;
 			var grid = this.grid, tree = this.tree;
-			tree.on('click', function(object) {
-				if (object.id != self.currentTreeObject.id) {	// prevent executing twice (dblclick)
-					self.displayChildrenInGrid(object);
-					self.setHistory(object.id);
+			tree.onDblClick = function(object, nodeWidget, evt) {
+				if(nodeWidget.isExpandable){
+					this._onExpandoClick({ node: nodeWidget });
 				}
+				self.displayChildrenInGrid(object);
+				self.setHistory(object.id);
 				self.currentTreeObject.set(object);
-			});
+			};
 			tree.on('load', lang.hitch(this, this.initState));
 
 			grid.on('dblclick', function(evt){
