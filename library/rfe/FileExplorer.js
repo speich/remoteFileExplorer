@@ -95,10 +95,9 @@ define([
 			});
 
 			// TODO: Set context also when using keyboard navigation
-			//on(this.panes.domNode, '#rfeTreePane:mousedown, #rfeGridPane:mousedown, .dijitTreeRow:mousedown, .dgrid-row:mousedown', function(evt) {
-			on(this.panes.domNode, '.rfeTreePane:mousedown, .rfeGridPane:mousedown', function(evt) {
+			on(this.panes.domNode, '.rfeTreePane:mousedown, .rfeGridPane:mousedown, .dijitTreeRow:mousedown, .dgrid-row:mousedown', function(evt) {
 				var node = this;
-				console.log('setting context to', node)
+				//console.log('setting context to', node)
 				lang.hitch(self, self._setContext(evt, node));
 			});
 		},

@@ -66,8 +66,8 @@ define([
 				this.tree = new Tree({
 					model: this.store,
 					childrenAttrs: [this.store.childrenAttr],
-					openOnClick: false,
-					openOnDblClick: true,	// note: tree.on('dblclick') only fires when this is set to false
+					openOnClick: false,		//	If true, clicking a folder node's label will open it, rather than calling onClick()
+					openOnDblClick: false,	// If true, double-clicking a folder node's label will open it, rather than calling onDblClick()
 					showRoot: true,
 					persist: cookie(this._cnDialogSettingsFolderState) || true,
 					dndController: function(arg, params) {
@@ -83,7 +83,9 @@ define([
 
 			initGrid: function() {
 				var div = domConstruct.create('div', {}, this.panes.gridPane.domNode);
-				this.grid = new Grid({}, div);
+				this.grid = new Grid({
+					store: null	// store is set in FileExplorer.initState()
+				}, div);
 			},
 
 			initDialogs: function() {

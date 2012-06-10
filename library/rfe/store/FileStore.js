@@ -9,8 +9,10 @@ define([
 	'dojo/_base/array',
 	'dojo/store/Memory',
 	'dojo/store/JsonRest',
-	'dojo/store/Cache'
-], function(declare, lang, Deferred, array, Memory, JsonRest, Cache) {
+	'dojo/store/Observable',
+	'dojo/store/Cache',
+	'dojo/store/util/QueryResults'
+], function(declare, lang, Deferred, array, Memory, JsonRest, Observable, Cache, QueryResults) {
 
 	return declare(null, {
 		// references for MonkeyPatching the store.Cache
@@ -32,12 +34,16 @@ define([
 		 */
 		constructor: function() {
 
-			var storeMaster = this.storeMaster = new JsonRest({target: '/library/rfe/controller.php/'});
-			var storeMemory = this.storeMemory = new Memory({
+			var storeMaster = this.storeMaster = JsonRest({
+				target: '/library/rfe/controller.php/',
+				queryx: this.queryx
+			});
+			var storeMemory = this.storeMemory = Memory();
+			 	/*{
 				// Memory store does not add id to object when creating an object
 				// See bugs http://bugs.dojotoolkit.org/ticket/12835 and http://bugs.dojotoolkit.org/ticket/14281
 				// Will be fixed with dojo 1.8
-				/*
+
 				put: function(object, options) {
 					var data = this.data, index = this.index, idProperty = this.idProperty;
 					var id = object[idProperty] = (options && "id" in options) ? options.id : idProperty in object ? object[idProperty] : Math.random();
@@ -52,9 +58,10 @@ define([
 					}
 					return id;
 				}
-				*/
+
 			});
-			var storeCache = new Cache(storeMaster, storeMemory);
+			*/
+			var storeCache = Cache(storeMaster, Observable(storeMemory));
 
 			// Fix for cache not working with jsonrest
 			// See http://bugs.dojotoolkit.org/ticket/14704
@@ -77,14 +84,15 @@ define([
 				});
 			};
 			*/
-
 			this.refPut = storeCache.put;
 			this.refDel = storeCache.remove;
 			this.refAdd = storeCache.add;
 			storeCache.put = this.put;
 			storeCache.remove = this.remove;
 			storeCache.add = this.add;
+
 			lang.mixin(this, storeCache);
+
 
 /*									this.refPut = storeMemory.put;
 						this.refDel = storeMemory.remove;
@@ -95,6 +103,54 @@ define([
 						lang.mixin(this, storeMemory);*/
 
 		},
+
+		queryx: function(query, options){
+				// summary:
+				//		Queries the store for objects. This will trigger a GET request to the server, with the
+				//		query added as a query string.
+				// query: Object
+				//		The query to use for retrieving objects from the store.
+				//	options: Store.QueryOptions?
+				//		The optional arguments to apply to the resultset.
+				//	returns: Store.QueryResults
+				//		The results of the query, extended with iterative methods.
+				var headers = {Accept: this.accepts};
+				options = options || {};
+
+				if(options.start >= 0 || options.count >= 0){
+					headers.Range = headers["X-Range"] //set X-Range for Opera since it blocks "Range" header
+						 = "items=" + (options.start || '0') + '-' +
+						(("count" in options && options.count != Infinity) ?
+							(options.count + (options.start || 0) - 1) : '');
+				}
+				var hasQuestionMark = this.target.indexOf("?") > -1;
+				if(query && typeof query == "object"){
+
+					query = xhr.objectToQuery(query);
+					query = query ? (hasQuestionMark ? "&" : "?") + query: "";
+				}
+				if(options && options.sort){
+					var sortParam = this.sortParam;
+					query += (query || hasQuestionMark ? "&" : "?") + (sortParam ? sortParam + '=' : "sort(");
+					for(var i = 0; i<options.sort.length; i++){
+						var sort = options.sort[i];
+						query += (i > 0 ? "," : "") + (sort.descending ? '-' : '+') + encodeURIComponent(sort.attribute);
+					}
+					if(!sortParam){
+						query += ")";
+					}
+				}
+				var results = xhr("GET", {
+					url: this.target + (query || ""),
+					handleAs: "json",
+					headers: headers
+				});
+				results.total = results.then(function(){
+					var range = results.ioArgs.xhr.getResponseHeader("Content-Range");
+					return range && (range=range.match(/\/(.*)/)) && +range[1];
+				});
+				return QueryResults(results);
+			},
 
 		/*** extend put, add, remove to comply to dojo.data.api, e.g. notify tree ***/
 		put: function(object, options) {
@@ -214,7 +270,7 @@ define([
 
 			resultsDirOnly = results.filter(function(child) {
 				if (!cached) {
-					console.log('adding', child, 'to cache', self.storeMemory);
+//					console.log('adding', child, 'to cache', self.storeMemory);
 					self.storeMemory.add(child);	// saves looping twice, but should be in foreEach
 				}
 				return child[self.childrenAttr];	// only display directories in the tree

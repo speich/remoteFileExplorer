@@ -4,19 +4,19 @@ define([
 	'dojo/_base/declare',
 	'dgrid/OnDemandGrid',
 	'dgrid/Selection',
-	'dgrid/Editor',
+	'dgrid/editor',
 	'dgrid/Keyboard',
 	'dgrid/extensions/ColumnResizer',
 	'dgrid/extensions/DijitRegistry',
 	'xstyle/has-class',
 	'xstyle/css',
 	'put-selector/put'
-], function(lang, Deferred, declare, Grid, Selection, Editor, Keyboard, ColumnResizer) {
+], function(lang, Deferred, declare, Grid, Selection, editor, Keyboard, ColumnResizer) {
 
 
 	/**
 	 * Create HTML string to display file type icon in grid
-	 * @param {string} item
+	 * @param {Object} object
 	 */
 	function formatImg(object, data, td) {
 		var strClass = object.dir ? 'dijitFolderClosed' : 'dijitLeaf';
@@ -43,40 +43,45 @@ define([
 		return value ? 'directory' : 'file';
 	}
 
-	return declare([Grid, Selection, Editor, Keyboard, ColumnResizer], {
+	return declare([Grid, Selection, editor, Keyboard, ColumnResizer], {
 
+		//getBeforePut: false,	// if true save will re-fetch from the store via get, before applying changes represented by dirty data.
 		selectionMode: 'extended',
-		columns: [
-			Editor({
-					label: "name",
-					field: 'name',
-					sortable: false,
-					renderCell: function(object, data, td) {
-						formatImg(object, data, td)
-					}
-				}, 'text', 'click, dgrid-cellfocusin'
-			), {
+		columns: {
+			name: editor({
+				editor: 'text',
+				editOn: 'dummyEvent',
+				autoSave: true,
+				label: "name",
+				sortable: false,
+				renderCell: function(object, data, td) {
+					formatImg(object, data, td)
+				}
+			}),
+			size: {
 				label: 'size',
-				field: 'size',
 				sortable: false,
 				formatter: function(value) {
 					return formatFileSize(value)
 				}
-			}, {
+			},
+			dir: {
 				label: 'type',
-				field: 'dir',
 				sortable: false,
 				formatter: function(value) {
 					return formatType(value);
 				}
-			}, {
+			},
+			mod: {
 				label: 'last modified',
-				field: 'mod',
 				sortable: false
 			}
-		]
+		},
 
+		postCreate: function() {
+			this.inherited('postCreate', arguments);
 
+		}
 
 	});
 });

@@ -56,48 +56,35 @@ define([
 		/**
 		 * Create and rename an file or folder object
 		 * Creates a new item, selects it in the grid and switches to edit mode.
-		 * @param {object} itemProps
-         *
+		 * @param {object} object file/folder object
 		 */
 		createRename: function(object) {
 			var widget = this.context.isOnGrid || this.context.isOnGridPane ? this.grid : this.tree;
-
+			var store = this.store;
 			return Deferred.when(this.create(object), lang.hitch(this, function(object) {
-				console.log('created store object', object)
 				if (this.context.isOnGrid || this.context.isOnGridPane) {
-					var newRow = widget.row(object.id)	// properies are data, elememt, id
-					console.log(widget.editor, newRow)
+					var column = widget.columns[store.labelAttr];
+					var cell = widget.cell(object.id, column.field);
+					widget.edit(cell);
 				}
 			}))
 		},
 
+		/**
+		 * Create a new file or folder object.
+		 */
 		rename: function() {
 			var widget = this.context.isOnGrid || this.context.isOnGridPane ? this.grid : this.tree;
 			var store = this.store;
 			// TODO: make this work also for the tree which doesn't have the same selection object
 			// tree's selection is widget.selectedItems which is array of store objects
 
-			// find label column
-			var i = 0, len = widget.columns;
-			for (; i < len; i++) {
-				if (widget.columns[i].field == widget.store.labelAttr) {
-					return;
-				}
-			}
-			var column = widget.columns[i];
-			for (var id in widget.selection) {
-				if (widget.selection[id] === true) {
-					var row = widget.row(id);	// properies are data, elememt, id
-					var cell = widget.cell(id, 0);
-
-
-					//var column = widget.columns[0];	// should get by store.labelAttr
-					var editor = column.editorInstance;	// input field
-					console.log(widget, row, cell, column)
-					put(cell, editor.domNode || editor);
-
-					//column.onShowEditor();
-					//widget.editor.renderInput(value, cell, object);
+			var column = widget.columns[store.labelAttr];
+			var id, selection = widget.selection;
+			for (id in selection) {
+				if (selection.hasOwnProperty(id) && selection[id] === true) {
+					var cell = widget.cell(id, column.field);
+					widget.edit(cell);
 				}
 			}
 		}
