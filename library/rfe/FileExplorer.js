@@ -300,9 +300,8 @@ define([
 
 				Deferred.when(store.get(id), lang.hitch(this, function(object) {
 					Deferred.when(store.getChildren(object), function() {	// load children first before setting store
-						grid.set('store', store.storeMemory, {	// also calls setQuery
-							parId: id
-						});
+						//grid.set('store', store.storeMemory, {	parId: id });	// also calls setQuery
+						grid.set('store', store, {	parId: id });
 					});
 					this.currentTreeObject.set(object);
 				}));

@@ -19,6 +19,11 @@ else {
 	$_DATA = null;
 }
 
+
+if (isset($_GET['parId'])) {
+	$resource = $_GET['parId'].'/'.$resource;
+}
+
 // TODO: think about if it is necessary to sanitize input
 
 switch($moduleType) {

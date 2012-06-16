@@ -39,51 +39,9 @@ define([
 				queryx: this.queryx
 			});
 			var storeMemory = this.storeMemory = Memory();
-			 	/*{
-				// Memory store does not add id to object when creating an object
-				// See bugs http://bugs.dojotoolkit.org/ticket/12835 and http://bugs.dojotoolkit.org/ticket/14281
-				// Will be fixed with dojo 1.8
 
-				put: function(object, options) {
-					var data = this.data, index = this.index, idProperty = this.idProperty;
-					var id = object[idProperty] = (options && "id" in options) ? options.id : idProperty in object ? object[idProperty] : Math.random();
-					if (id in index) {
-						if (options && options.overwrite === false) {
-							throw new Error("Object already exists");
-						}
-						data[index[id]] = object;
-					}
-					else {
-						index[id] = data.push(object) - 1;
-					}
-					return id;
-				}
+			var storeCache = Observable(Cache(storeMaster, storeMemory));
 
-			});
-			*/
-			var storeCache = Cache(storeMaster, Observable(storeMemory));
-
-			// Fix for cache not working with jsonrest
-			// See http://bugs.dojotoolkit.org/ticket/14704
-			// Will be fixed with dojo 1.8
-			/*
-			storeCache.add = function(object, directives){
-				return Deferred.when(storeMaster.add(object, directives), function(result){
-					// now put result in cache
-					storeMemory.add(typeof result == "object" ? result : object, directives);
-					return result; // the result from the add should be dictated by the masterStore and be unaffected by the cachingStore
-				});
-			};
-			storeCache.put = function(object, directives){
-				// first remove from the cache, so it is empty until we get a response from the master store
-				storeMemory.remove((directives && directives.id) || this.getIdentity(object));
-				return Deferred.when(storeMaster.put(object, directives), function(result){
-					// now put result in cache
-					storeMemory.put(typeof result == "object" ? result : object, directives);
-					return result; // the result from the put should be dictated by the masterStore and be unaffected by the cachingStore
-				});
-			};
-			*/
 			this.refPut = storeCache.put;
 			this.refDel = storeCache.remove;
 			this.refAdd = storeCache.add;
@@ -92,16 +50,6 @@ define([
 			storeCache.add = this.add;
 
 			lang.mixin(this, storeCache);
-
-
-/*									this.refPut = storeMemory.put;
-						this.refDel = storeMemory.remove;
-						this.refAdd = storeMemory.add;
-			storeMemory.put = this.put;
-			storeMemory.remove = this.remove;
-			storeMemory.add = this.add;
-						lang.mixin(this, storeMemory);*/
-
 		},
 
 		queryx: function(query, options){
