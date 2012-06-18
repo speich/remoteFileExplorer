@@ -11,14 +11,15 @@ define([
 	'dojo/store/JsonRest',
 	'dojo/store/Observable',
 	'dojo/store/Cache',
-	'dojo/store/util/QueryResults'
-], function(declare, lang, Deferred, array, Memory, JsonRest, Observable, Cache, QueryResults) {
+	'dojo/io-query'
+], function(declare, lang, Deferred, array, Memory, JsonRest, Observable, Cache, ioQuery) {
 
 	return declare(null, {
 		// references for MonkeyPatching the store.Cache
 		refPut: null,
 		refDel: null,
 		refAdd: null,
+		refQuery: null,
 		storeMaster: null,
 		storeMemory: null,
 		childrenAttr: 'dir',
@@ -33,14 +34,11 @@ define([
 		 * @constructor
 		 */
 		constructor: function() {
-
 			var storeMaster = this.storeMaster = JsonRest({
-				target: '/library/rfe/controller.php/',
-				queryx: this.queryx
+				target: '/library/rfe/controller.php/'
 			});
-			var storeMemory = this.storeMemory = Memory();
-
-			var storeCache = Observable(Cache(storeMaster, storeMemory));
+			var storeMemory = this.storeMemory = Observable(Memory());
+			var storeCache = Cache(storeMaster, storeMemory);
 
 			this.refPut = storeCache.put;
 			this.refDel = storeCache.remove;
@@ -51,54 +49,6 @@ define([
 
 			lang.mixin(this, storeCache);
 		},
-
-		queryx: function(query, options){
-				// summary:
-				//		Queries the store for objects. This will trigger a GET request to the server, with the
-				//		query added as a query string.
-				// query: Object
-				//		The query to use for retrieving objects from the store.
-				//	options: Store.QueryOptions?
-				//		The optional arguments to apply to the resultset.
-				//	returns: Store.QueryResults
-				//		The results of the query, extended with iterative methods.
-				var headers = {Accept: this.accepts};
-				options = options || {};
-
-				if(options.start >= 0 || options.count >= 0){
-					headers.Range = headers["X-Range"] //set X-Range for Opera since it blocks "Range" header
-						 = "items=" + (options.start || '0') + '-' +
-						(("count" in options && options.count != Infinity) ?
-							(options.count + (options.start || 0) - 1) : '');
-				}
-				var hasQuestionMark = this.target.indexOf("?") > -1;
-				if(query && typeof query == "object"){
-
-					query = xhr.objectToQuery(query);
-					query = query ? (hasQuestionMark ? "&" : "?") + query: "";
-				}
-				if(options && options.sort){
-					var sortParam = this.sortParam;
-					query += (query || hasQuestionMark ? "&" : "?") + (sortParam ? sortParam + '=' : "sort(");
-					for(var i = 0; i<options.sort.length; i++){
-						var sort = options.sort[i];
-						query += (i > 0 ? "," : "") + (sort.descending ? '-' : '+') + encodeURIComponent(sort.attribute);
-					}
-					if(!sortParam){
-						query += ")";
-					}
-				}
-				var results = xhr("GET", {
-					url: this.target + (query || ""),
-					handleAs: "json",
-					headers: headers
-				});
-				results.total = results.then(function(){
-					var range = results.ioArgs.xhr.getResponseHeader("Content-Range");
-					return range && (range=range.match(/\/(.*)/)) && +range[1];
-				});
-				return QueryResults(results);
-			},
 
 		/*** extend put, add, remove to comply to dojo.data.api, e.g. notify tree ***/
 		put: function(object, options) {
@@ -116,7 +66,6 @@ define([
 			return Deferred.when(this.refAdd.apply(this, arguments), function(newId) {
 				object.id = newId;
 				self.onNewItem(object);	// notifies tree
-				console.log('is added also in storeMemory?', object, self.storeMemory)
 				return newId;
 			}, function(err) {
 				console.log('error', err);
@@ -156,48 +105,6 @@ define([
 
 		// METHODS BELOW ARE NEEDED BY THE TREE MODEL
 
-		/**
-		 * Get children of an object.
-		 * @param {dojo.store.object} object
-		 * @param {Function|Object} options can be function to call (for tree) or options object (dojo.store api)
-		 * @return {dojo.Deferred}
-		 */
-		getChildren_old: function(object, options) {
-			var self = this, results = [];
-			var obj = {};
-			var cached = true;
-			var id = object[this.idProperty];
-
-			obj[this.parentAttr] = id;
-
-			// check if children are available from cache
-			results = this.storeMemory.query(obj);	// query has to be an object
-
-			// children not cached yet, query master store and add them to cache
-			if (results.length === 0) {
-				cached = false;
-				results = self.storeMaster.query(id + '/');	// query has to be a string, otherwise will add querystring instead of REST resource
-			}
-
-			return Deferred.when(results, function(children) {
-				var childObjects = array.filter(children, function(child) {
-					if (!cached) {
-						self.storeMemory.add(child);
-					}
-					return child[self.childrenAttr];	// only display directories in the tree
-				});
-
-				childObjects = self.skipWithNoChildren ? childObjects : children;
-
-				if (lang.isFunction(options)) {
-					// tree only, e.g. onComplete
-					options(childObjects);
-				}
-
-				return results;
-			});
-		},
-
 		getChildren: function(object, options) {
 			var self = this;
 			var obj = {};
@@ -226,7 +133,6 @@ define([
 			children = this.skipWithNoChildren ? resultsDirOnly : results;
 			if (lang.isFunction(options)) {
 				// only used by tree
-				console.log('calling onComplete');
 				Deferred.when(children, function(result) {
 					options(result);	// calls onComplete
 				})

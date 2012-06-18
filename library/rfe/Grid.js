@@ -51,7 +51,7 @@ define([
 			name: editor({
 				editor: 'text',
 				editOn: 'dummyEvent',
-				autoSave: true,
+				autoSave: false,
 				label: "name",
 				sortable: false,
 				renderCell: function(object, data, td) {
@@ -76,11 +76,6 @@ define([
 				label: 'last modified',
 				sortable: false
 			}
-		},
-
-		postCreate: function() {
-			this.inherited('postCreate', arguments);
-
 		}
 
 	});

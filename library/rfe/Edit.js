@@ -2,9 +2,8 @@ define([
 	'dojo/_base/lang',
 	'dojo/_base/array',
 	'dojo/_base/declare',
-	'dojo/_base/Deferred',
-	'put-selector/put'
-], function(lang, array, declare, Deferred, put) {
+	'dojo/_base/Deferred'
+], function(lang, array, declare, Deferred) {
 
 	return declare(null, {
 

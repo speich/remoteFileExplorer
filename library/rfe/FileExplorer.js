@@ -69,6 +69,8 @@ define([
 		initEvents: function() {
 			var self = this;
 			var grid = this.grid, tree = this.tree;
+			var store = this.store;
+
 			tree.onClick = function(object) {
 				console.log('tree.onClick');
 				self.displayChildrenInGrid(object);
@@ -93,6 +95,15 @@ define([
 					self.setHistory(obj.id);
 				}
 			});
+			grid.on("dgrid-datachange", function(evt) {
+				var obj = evt.cell.row.data;
+				obj[store.labelAttr] = evt.value;
+				Deferred.when(store.put(obj), function() {
+					grid.save();
+				}, function() {
+					grid.revert();
+				});
+			});
 
 			// TODO: Set context also when using keyboard navigation
 			on(this.panes.domNode, '.rfeTreePane:mousedown, .rfeGridPane:mousedown, .dijitTreeRow:mousedown, .dgrid-row:mousedown', function(evt) {
@@ -109,9 +120,12 @@ define([
 		 */
 		displayChildrenInGrid: function(object) {
 			var grid = this.grid;
+			var store = this.store;
 			var dfd = new Deferred();
 			if (object.dir) {
-				dfd = Deferred.when(this.store.getChildren(object), function() {  // TODO:  I think we can use memory store directly because they are already loaded
+				dfd = Deferred.when(this.store.getChildren(object), function(children) {  // TODO:  I think we can use memory store directly because they are already loaded
+					//grid.renderArray(children)
+					// cache.query() always queries the master store -> no caching!
 					grid.set('query', {
 						parId: object.id
 					});
@@ -300,8 +314,9 @@ define([
 
 				Deferred.when(store.get(id), lang.hitch(this, function(object) {
 					Deferred.when(store.getChildren(object), function() {	// load children first before setting store
-						//grid.set('store', store.storeMemory, {	parId: id });	// also calls setQuery
-						grid.set('store', store, {	parId: id });
+						// Setting caching store for grid would not use cache, because cache.query() always uses the
+						// master store => use storeMemory.
+						grid.set('store', store.storeMemory, {	parId: id });
 					});
 					this.currentTreeObject.set(object);
 				}));
