@@ -37,7 +37,10 @@ define([
 			},
 
 			init: function() {
-				this.panes = new Panes({}, this.id);
+				this.panes = new Panes({
+					view: 'horizontal'
+				}, this.id);
+
 				this.toolbar = new Toolbar({
 					rfe: this
 				}, domConstruct.create('div'));
@@ -51,11 +54,10 @@ define([
 				this.menubar.placeAt(this.panes.menuPane.domNode);
 				this.toolbar.placeAt(this.panes.menuPane.domNode);
 
-				this.panes.setView('horizontal');
 				this.panes.startup();
 				this.initGrid();
 				this.initTree();
-//				this.initDialogs();
+				this.initDialogs();
 			},
 
 			/**

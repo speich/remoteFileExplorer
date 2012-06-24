@@ -1,0 +1,101 @@
+html, body {
+	width: 100%;
+	height: 100%;
+	font-size: 1.2em;
+}
+
+.claro .dgrid {
+	border: none;
+	height: 100%;
+}
+
+.dgrid th {
+	font-weight: normal;
+	font-size: 0.8em;
+}
+
+.claro .dijitContentPane {
+	padding: 0;
+}
+
+.claroxx .dijitBorderContainer-child {
+    border: none;
+}
+
+#remoteFileExplorer {
+	width: 100%;
+	height: 100%;
+	background-color: #ffffff;
+}
+#remoteFileExplorer .dijitMenuBar {
+	border-width: 0 0 1px 0;
+}
+#remoteFileExplorer .dijitSplitter {
+	border-width: 1px;
+	border-color: #B5BCC7;
+	border-style: solid;
+}
+#remoteFileExplorer .dijitSplitterH {
+	border-width: 1px 0;
+}
+#remoteFileExplorer .dijitSplitterV {
+	border-width: 0 1px;
+}
+.rfeTreePane, .rfeGridPane {
+	padding: 0;
+}
+.rfeLogPane {
+	height: 20%
+}
+
+.dgrid-row-table {border: none;}
+#remoteFileExplorer .dgrid-cell {
+	cursor: default;
+	border: none;
+}
+
+.dijitDisabled .rfeToolbarIcon {
+	background-image:url("/library/rfe/resources/images/rfeToolbarIconsDisabled.png");
+}
+.rfeToolbarIconDirUp {
+	background-position: 0 50%;
+}
+.rfeToolbarIcon {
+	background-image:url("/library/rfe/resources/images/rfeToolbarIconsEnabled.png");
+	background-repeat:no-repeat;
+	height: 18px;
+	text-align:center;
+	width: 18px;
+}
+
+.dijitMenuPopup .dijitMenuItemLabel {
+	min-width: 120px;
+}
+
+/*** Begin rfeDialogAbout ***/
+#rfeDialogAbout {
+	width: 320px;
+	font-size: 11px;
+}
+#rfeDialogAbout .dijitDialogPaneContent {
+	background-color: #eeeeee;
+	padding: 0;
+}
+
+#rfeDialogAboutLogo  {
+	float: right;
+	padding: 4px 8px;
+}
+#rfeDialogAboutText {
+	clear: both;
+	background-color: #ffffff;
+	padding: 10px 8px;
+}
+#rfeDialogAboutText h2 {
+	font-size: 12px;
+	margin: 0;
+}
+#rfeDialogAboutText p:nth-child(2) {
+	margin: 0;
+}
+/*** End rfeDialogAbout ***/

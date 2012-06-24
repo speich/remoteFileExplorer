@@ -28,8 +28,9 @@ define([
 			this.inherited('postCreate', arguments);	// in case we've overriden something
 
 			// TODO: reuse menu from edit.js?
+			var panes = this.rfe.panes;
 			var menuFile, menuView, menuHelp, menuTools;
-			var subMenuFile;
+			var menuItemV, subMenuFile;
 
 			// ********** menu file **************
 			menuFile = new DropDownMenu({	id: 'rfeMenuFile'	});
@@ -63,38 +64,27 @@ define([
 
 			// ******* menu layout ********
 			menuView = new DropDownMenu({ id: 'rfeMenuView' });
-			menuView.addChild(new CheckedMenuItem({
-				id: 'rfeMenuItemHorizontal',
-				label: 'Layout horizontal',
-				checked: true,
-				onClick: lang.hitch(this.rfe, function() {
-					this.panes.setView('horizontal');
-//					on.emit('rfe/menuView/setView');   // notify menuView/folders to set checked = true
-//					registry.byId('rfeMenuItemVertical').set('checked', false);
-				})
-			}));
-			menuView.addChild(new CheckedMenuItem({
-				id: 'rfeMenuItemVertical',
+			menuItemV = new CheckedMenuItem({
 				label: 'Layout vertical',
-				checked: false,
-				onClick: lang.hitch(this.rfe, function() {
-					this.panes.setView('vertical');
-//					on.emit('rfe/menuView/setView');   // notify menuView/folders to set checked = true
-//					registry.byId('rfeMenuItemHorizontal').set('checked', false);
+				checked: panes.get('view') != 'horizontal',
+				onClick: lang.hitch(this, function() {
+					if (menuItemV.get('checked') === true) {
+						panes.set('view', 'vertical');
+					}
+					else {
+						panes.set('view', 'horizontal');
+					}
 				})
-			}));
-			menuView.addChild(new MenuSeparator());
+			});
+			menuView.addChild(menuItemV);
+			//menuView.addChild(new MenuSeparator());
 			menuView.addChild(new CheckedMenuItem({
 				id: 'rfeMenuItemFolders',
 				label: 'Navigation pane',
 				checked: true,
 				onChange: lang.hitch(this.rfe.panes, this.rfe.panes.toggleTreePane)
 			}));
-/*
-			on('rfe/menuView/setView', function() {
-				var el = registry.byId('rfeMenuItemFolders');
-				el.set('checked', true);
-			});*/
+
 
 			// ********** menu tools ***************
 			menuTools = new DropDownMenu({ id: 'rfeMenuTools' });
