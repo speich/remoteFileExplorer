@@ -20,14 +20,9 @@ define([
 
 		rfe: null,
 
-		constructor: function(props) {
-			lang.mixin(this, props || {});
-		},
-
 		postCreate: function() {
-			this.inherited('postCreate', arguments);	// in case we've overriden something
+			this.inherited('postCreate', arguments);
 
-			// TODO: reuse menu from edit.js?
 			var panes = this.rfe.panes;
 			var menuFile, menuView, menuHelp, menuTools;
 			var menuItemV, subMenuFile;
@@ -81,8 +76,10 @@ define([
 			menuView.addChild(new CheckedMenuItem({
 				id: 'rfeMenuItemFolders',
 				label: 'Navigation pane',
-				checked: true,
-				onChange: lang.hitch(this.rfe.panes, this.rfe.panes.toggleTreePane)
+				checked: panes.get('treePaneVisible') === true,
+				onChange: function() {
+					panes.set('treePaneVisible', this.checked)
+				}
 			}));
 
 
