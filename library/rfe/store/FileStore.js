@@ -1,5 +1,6 @@
 /**
- * This stores caching algorithm has one flaw: If item doesn't have children it is not cached, since the cache checks for
+ * @module rfe/store/FileStore
+ * Note: This stores caching algorithm has one flaw: If item doesn't have children it is not cached, since the cache checks for
  * the items children in the cache.
  */
 define([
@@ -10,24 +11,34 @@ define([
 	'dojo/store/Memory',
 	'dojo/store/JsonRest',
 	'dojo/store/Observable',
-	'dojo/store/Cache',
-	'dojo/io-query'
-], function(declare, lang, Deferred, array, Memory, JsonRest, Observable, Cache, ioQuery) {
+	'dojo/store/Cache'
+], function(declare, lang, Deferred, array, Memory, JsonRest, Observable, Cache) {
 
-	return declare(null, {
-		// references for MonkeyPatching the store.Cache
-		refPut: null,
-		refDel: null,
-		refAdd: null,
-		refQuery: null,
+	// references for MonkeyPatching the store.Cache
+	var refPut, refDel, refAdd;
+
+	/**
+	 * Class which creates a store to work with remote files over REST and local caching.
+	 * @class
+	 * @name rfe.store.FileStore
+	 * @property {dojo.store.JsonRest} storeMaster
+	 * @property {dojo.store.Memory} storeMemory
+	 * @property {string} childrenAttr
+	 * @property {string} parentAttr
+	 * @property {string} rootId
+	 * @property {string} rootLabel
+	 * @property {boolean} skipWithNoChildren getChildren returns only folders
+	 * @extends {dojo.store.Cache}          	 *
+	 */
+	return declare(null, /** @lends rfe.store.FileStore.prototype */ {
 		storeMaster: null,
 		storeMemory: null,
 		childrenAttr: 'dir',
 		parentAttr: 'parId',
 		labelAttr: 'name',
-		rootId: 'root',	// for tree
-		rootLabel: 'web root',		// for tree
-		skipWithNoChildren: true, // getChildren returns only folders
+		rootId: 'root',
+		rootLabel: 'web root',
+		skipWithNoChildren: true,
 
 		/**
 		 * Constructs the caching file store.
@@ -40,9 +51,9 @@ define([
 			var storeMemory = this.storeMemory = Observable(Memory());
 			var storeCache = Cache(storeMaster, storeMemory);
 
-			this.refPut = storeCache.put;
-			this.refDel = storeCache.remove;
-			this.refAdd = storeCache.add;
+			refPut = storeCache.put;
+			refDel = storeCache.remove;
+			refAdd = storeCache.add;
 			storeCache.put = this.put;
 			storeCache.remove = this.remove;
 			storeCache.add = this.add;
@@ -50,10 +61,14 @@ define([
 			lang.mixin(this, storeCache);
 		},
 
-		/*** extend put, add, remove to comply to dojo.data.api, e.g. notify tree ***/
+		/**
+		 * Extend put to comply to dojo.data.api, e.g. notify tree
+		 * @param {object} object
+		 * @param {object} options
+		 */
 		put: function(object, options) {
 			var self = this;
-			return Deferred.when(this.refPut.apply(this, arguments), function(id) {
+			return Deferred.when(refPut.apply(this, arguments), function(id) {
 				self.onChange(object);
 				return id;
 			}, function(err) {
@@ -63,7 +78,7 @@ define([
 
 		add: function(object, options) {
 			var self = this;
-			return Deferred.when(this.refAdd.apply(this, arguments), function(newId) {
+			return Deferred.when(refAdd.apply(this, arguments), function(newId) {
 				object.id = newId;
 				self.onNewItem(object);	// notifies tree
 				return newId;
@@ -75,7 +90,7 @@ define([
 		remove: function(id) {
 			var self = this;
 			var object = this.get(id);
-			return Deferred.when(this.refDel.apply(this, arguments), function() {
+			return Deferred.when(refDel.apply(this, arguments), function() {
 				self.onDelete(object);	// notifies tree
 			}, function(err) {
 				console.log('error', err);

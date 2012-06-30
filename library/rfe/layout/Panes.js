@@ -1,14 +1,35 @@
+/**
+ * @module rfe/layout/Panes
+ */
 define([
 	'dojo/_base/lang',
 	'dojo/_base/declare',
 	'dojo/dom',
 	'dojo/dom-construct',
+	'dojo/dom-geometry',
 	'dojo/dom-style',
 	'dijit/layout/BorderContainer',
 	'dijit/layout/ContentPane'
-], function(lang, declare, dom, construct, style, BorderContainer, ContentPane) {
+], function(lang, declare, dom, construct, geometry, style, BorderContainer, ContentPane) {
+	var cpPosition;	// remember position of contentPane when show/hide treePane to restore layout
+							// this information is only available after child panes (treePane, gridPane) are added
 
-return declare([BorderContainer], {
+	/**
+	 * @class
+	 * @name rfe.layout.Panes
+	 * @property {boolean} liveSplitters
+	 * @property {boolean} gutters
+	 * @property {string} view
+	 * @propery {boolean} treePaneVisible
+	 * @property {dijit.layout.ContentPane} contentPane
+	 * @property {dijit.layout.BorderContainer} contentPaneBc
+	 * @property {dijit.layout.ContentPane} menuPane
+	 * @property {dijit.layout.ContentPane} logPane
+	 * @property {dijit.layout.ContentPane} treePane
+	 * @property {dijit.layout.ContentPane} gridPane
+	 * @extends {dijit.layout.BorderContainer}
+	 */
+return declare([BorderContainer], /** @lends rfe.layout.Panes.prototype */ {
 
 	liveSplitters: true,
 	gutters: false,
@@ -59,7 +80,6 @@ return declare([BorderContainer], {
 
 	postCreate: function() {
 		this.inherited('postCreate', arguments);
-
 		this.addChild(this.menuPane);
 		this.addChild(this.contentPane);
 		this.addChild(this.logPane);
@@ -67,19 +87,10 @@ return declare([BorderContainer], {
 
 	/**
 	 * Sets the layout view of the explorer.
-	 * @param {string} view
+	 * @param {string} view 'vertical' or 'horizontal'
 	 */
 	_setViewAttr: function(view) {
 		// TODO: add and respect this.persist
-
-		// TODO loop through children and set width
-		var w = style.get(this.menuPane.domNode, 'width');
-		style.set(this.contentPane.domNode, 'width', w + 'px');	// hiding treePane can put out of sync
-		style.set(this.contentPaneBc.domNode, 'width', w + 'px');	// hiding treePane can put out of sync
-		style.set(this.treePane.domNode, 'width', w + 'px');	// hiding treePane can put out of sync
-		style.set(this.gridPane.domNode, 'width', w + 'px');	// hiding treePane can put out of sync
-
-		//this.contentPaneBc.resize();	// propagate changes to children
 		if (this.treePaneVisible) {
 			this.contentPaneBc.removeChild(this.treePane);
 			if (view == 'vertical') {
@@ -94,6 +105,16 @@ return declare([BorderContainer], {
 					style: 'width: 25%; height: 100%'
 				});
 			}
+			// hiding treePane messes up layout, fix that
+			if (this.contentPane._started && cpWith !== 0 && cpHeight !== 0) {
+				style.set(this.contentPane.domNode, {
+					left: cpPosition.x + 'px',
+					top: cpPosition.y + 'px',
+					width: cpPosition.w + 'px',
+					height: cpPosition.h + 'px'
+				});
+				this.contentPaneBc.resize({w: cpPosition.w, h: cpPosition.h});	// propagates style to all children
+			}
 			this.contentPaneBc.addChild(this.treePane);
 		}
 		this._set('view', view);
@@ -105,12 +126,15 @@ return declare([BorderContainer], {
 	 */
 	_setTreePaneVisibleAttr: function(visible) {
 		var treePane = this.treePane;
-		if (visible === false) {
-			this.removeChild(treePane);
-		}
-		else {
-			this.addChild(treePane);
-		}
+		// before removing pane, remember position of contentPane when show/hide treePane to restore layout
+		cpPosition = geometry.position(this.contentPane.domNode);
+		cpWith = style.get(this.contentPane.domNode, 'width');
+		cpHeight = style.get(this.contentPane.domNode, 'height');
+		cpLeft = style.get(this.contentPane.domNode, 'left');
+		cpTop = style.get(this.contentPane.domNode, 'top');
+
+		visible === false  ? this.removeChild(treePane) : this.addChild(treePane);
+
 		this._set('treePaneVisible', visible);
 	}
 })

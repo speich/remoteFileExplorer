@@ -14,44 +14,53 @@ define([
 	'dijit/registry',
 	'rfe/Layout',
 	'rfe/Edit',
-	'rfe/Store/FileCache',
 	'rfe/Store/FileStore',
 	'rfe/dnd/Manager'
-], function(lang, array, declare, Deferred, cookie, keys, dom, domClass, locale, on, mouse, Stateful, registry, Layout, Edit, FileCache, FileStore) {
-	/**
-	 * File explorer allows you to browse files.
-	 * The file explorer consists of a tree and a grid. The tree loads file
-	 * data via php from disk.
-	 */
-
+], function(lang, array, declare, Deferred, cookie, keys, dom, domClass, locale, on, mouse, Stateful, registry, Layout, Edit, FileStore) {
 
 	// TODO: multiselect (in tree allow only of files but not of folders)
 	/**
+	 * File explorer allows you to browse files.
+	 * It consists of a tree and a grid. The tree loads file data over REST via php from remote server.
 	 * @class
+	 * @name rfe.FileExplorer
+	 * @property {string} version
+	 * @property {string} versionDate
+	 * @property {dojo.Stateful} currentTreeObject keeps track of currently selected store object in tree. Equals always parent of grid items
+	 * @property {dojo.Stateful} context keeps track of widget the context menu was created on (right clicked on)
+	 * @config {boolean} isOnGrid
+	 * @config {boolean} isOnTree
+	 * @config {boolean} isOnGridPane
+	 * @config {boolean} isOnTreePane
+	 * @property {object} history
+	 * @config {array} steps saves the steps
+	 * @config {int} curIdx index of current step we're on
+	 * @config {int} numSteps number of steps you can go forward/back
+	 * @property {rfe.store.FileStore}
+	 *
 	 */
-	return declare([Layout, Edit], {
+	return declare([Layout, Edit], /** @lends rfe.FileExplorer.prototype */ {
 		version: '1.0',
 		versionDate: '2012',
-		currentTreeObject: null,	// stateful object, which keeps track of currently selected store object in tree. Equals always parent of grid items
-		context: null,					// stateful object, which keeps track of widget the context menu was created on (right clicked on)
+		currentTreeObject: null,
+		context: null,
 		history: null,
+		store: null,
 
 		/**
 		 * Creates the file explorer.
 		 * The global property object contains the urls to communicate with PHP backend.
-		 * @param {object} props
 		 * @constructor
 		 */
 		constructor: function() {
 			// TODO: should tree connect also on right click as grid? If so, attache event to set currentTreeItem
 			this.currentTreeObject = new Stateful();	// allows Toolbar and Menubar to keep track of selected item in tree
 			this.history = {
-				steps: [],		// saves the steps
-				curIdx: null,	// index of current history array we're on
-				numSteps: 5		// number of steps you can go forward/back
+				steps: [],
+				curIdx: null,
+				numSteps: 5
 			};
 			this.store = new FileStore();
-			//this.store = new FileCache();
 			this.context = new Stateful({
 				isOnGrid: false,
 				isOnTree: false,
@@ -111,6 +120,7 @@ define([
 				//console.log('setting context to', node)
 				lang.hitch(self, self._setContext(evt, node));
 			});
+
 		},
 
 		/**
