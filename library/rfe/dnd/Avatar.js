@@ -12,7 +12,7 @@ function (lang, window, array, declare, construct, domClass, attr, query, Avatar
 
 	return declare([Avatar], {
 
-		construct: function () {
+		constructor: function () {
 			// preload icons
 			this.images = {
 				folder: new Image(),
@@ -69,7 +69,7 @@ function (lang, window, array, declare, construct, domClass, attr, query, Avatar
 			var source = this.manager.source;
 			var isDir = array.some(nodes, function (node) {
 				var item = source.getItem(node.id);
-				return item.data.item.dir;
+				return item.data.dir || item.data.item.dir;
 			}, this);
 			if (isDir) {
 				img = this.images.folder;

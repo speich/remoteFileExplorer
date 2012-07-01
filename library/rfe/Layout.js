@@ -13,13 +13,14 @@ define([
 	'rfe/Grid',
 	'dijit/registry',
 	'dijit/form/CheckBox',
-	"dijit/Dialog",
+	'dijit/Dialog',
 	'rfe/layout/Toolbar',
 	'rfe/layout/Menubar',
 	'rfe/layout/Panes',
+	'rfe/Console',
 	'rfe/EditContextMenu'
 ], function(array, lang, declare, event, aspect, on, cookie, domConstruct, query, Tree, TreeSource,
-				Grid, registry, CheckBox, Dialog, Toolbar, Menubar, Panes, EditContextMenu) {
+				Grid, registry, CheckBox, Dialog, Toolbar, Menubar, Panes, Console, EditContextMenu) {
 
 		return declare(null, {
 
@@ -28,6 +29,7 @@ define([
 			panes: null,
 			toolbar: null,
 			menubar: null,
+			console: null,
 
 			tree: null,
 			grid: null,
@@ -55,9 +57,12 @@ define([
 				this.toolbar.placeAt(this.panes.menuPane.domNode);
 
 				this.panes.startup();
+				this.console = new Console();
+				this.console.placeAt(this.panes.logPane.domNode)
 				this.initGrid();
 				this.initTree();
 				this.initDialogs();
+
 			},
 
 			/**

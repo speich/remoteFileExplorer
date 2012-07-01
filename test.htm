@@ -33,29 +33,24 @@ var dojoConfig = {
 		{name: 'put-selector', location: '/library/put-selector'},
 		{name: 'rfe', location: '/library/rfe'},
 		{name: 'original', location: '../'}
-	],
-	// redirect the following modules to my own modules
-	paths: {
-		'dijit/tree/_dndSelector': '/library/rfe/dnd/TreeSelector',
-		'dijit/tree/dndSource': '/library/rfe/dnd/TreeSource'
-	}
+	]
+
 };
 
 </script>
 <script type="text/javascript" src="library/dojo/trunk/dojo/dojo.js"></script>
 <!--<script src="http://ajax.googleapis.com/ajax/libs/dojo/1.7.1/dojo/dojo.js" type="text/javascript"></script>-->
 <script type="text/javascript">
-require(['dojo/ready', 'rfe/Store/FileCache', 'dijit/tree'], function(ready, FileCache, Tree) {
+require(['dojo/ready', 'rfe/store/FileStore_new', 'dijit/tree', 'dijit/tree/ObjectStoreModel', "dijit/tree/dndSource"], function(ready, FileCache, Tree, Model, dndSource) {
 	ready(function() {
 		var store = new FileCache();
 		var tree = new Tree({
 			id: 'rfeTree',
-			model: store,
-			childrenAttrs: [store.childrenAttr],
-			openOnClick: false,
-			openOnDblClick: true,
-			showRoot: true,
-			persist: true
+			model: new Model({
+				store: store,
+				query: {id: 'root'}
+			}),
+			dndController: dndSource
 		}, 'remoteFileExplorer');
 	});
 });

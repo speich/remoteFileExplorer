@@ -30,35 +30,6 @@ define([
 		getSelectedNodes: ref.getSelectedTreeNodes, // map two dnd method
 
 
-
-		/*** add state for selection to tree until patch http://bugs.dojotoolkit.org/ticket/14058 is checked in 1.8? ***/
-/*
-		_updateSelectionProperties: function(){
-			var selected = this.getSelectedTreeNodes();
-			var paths = [], nodes = [], selects = [];
-			array.forEach(selected, function(node){
-				var ary = node.getTreePath(), model = this.tree.model;
-				nodes.push(node);
-				paths.push(ary);
-				ary = array.map(ary, function(item){
-					return model.getIdentity(item);
-				}, this);
-				selects.push(ary.join("/"))
-			}, this);
-			var items = array.map(nodes,function(node){ return node.item; });
-			this.tree._set("paths", paths);
-			this.tree._set("path", paths[0] || []);
-			this.tree._set("selectedNodes", nodes);
-			this.tree._set("selectedNode", nodes[0] || null);
-			this.tree._set("selectedItems", items);
-			this.tree._set("selectedItem", items[0] || null);
-         if (this.tree.persist && selects.length > 0) {
-	         cookie(this.cookieName, selects.join(","), {expires:365});
-         }
-		},
-		*/
-		/*** end patch ***/
-
 		onMouseDown: function(evt) {
 			// Note: Overriding to remove doing nothing on right click and also to remove stopping event (we need to bubble up
 			// to know where user clicked at in FileExplorer.getWidget

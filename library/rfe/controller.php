@@ -59,7 +59,6 @@ switch($method) {
 }
 
 
-
 // PHP error
 // TODO: error class not implemented yet. use NAFIDAS dev
 /*if (!is_null($err->get())) {

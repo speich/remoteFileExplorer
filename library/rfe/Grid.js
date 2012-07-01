@@ -6,12 +6,13 @@ define([
 	'dgrid/Selection',
 	'dgrid/editor',
 	'dgrid/Keyboard',
+	'dgrid/extensions/Dnd',
 	'dgrid/extensions/ColumnResizer',
 	'dgrid/extensions/DijitRegistry',
 	'xstyle/has-class',
 	'xstyle/css',
 	'put-selector/put'
-], function(lang, Deferred, declare, Grid, Selection, editor, Keyboard, ColumnResizer) {
+], function(lang, Deferred, declare, Grid, Selection, editor, Keyboard, DnD, ColumnResizer) {
 
 
 	/**
@@ -43,7 +44,7 @@ define([
 		return value ? 'directory' : 'file';
 	}
 
-	return declare([Grid, Selection, editor, Keyboard, ColumnResizer], {
+	return declare([Grid, Selection, editor, Keyboard, DnD, ColumnResizer], {
 
 		//getBeforePut: false,	// if true save will re-fetch from the store via get, before applying changes represented by dirty data.
 		selectionMode: 'extended',
