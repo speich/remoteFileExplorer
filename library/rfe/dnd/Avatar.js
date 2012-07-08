@@ -68,8 +68,8 @@ function (lang, window, array, declare, construct, domClass, attr, query, Avatar
 			var img, nodes = this.manager.nodes;
 			var source = this.manager.source;
 			var isDir = array.some(nodes, function (node) {
-				var item = source.getItem(node.id);
-				return item.data.dir || item.data.item.dir;
+				var obj = source.getObject(node);
+				return obj.dir;
 			}, this);
 			if (isDir) {
 				img = this.images.folder;

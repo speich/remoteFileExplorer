@@ -28,6 +28,15 @@ define([
 				}
 			},
 
+			getObject: function(node){
+				// summary:
+				//		getObject is a method which should be defined on any source intending
+				// 		on interfacing with dgrid DnD
+				var item = this.getItem(node.id);
+				return item.data.item;
+			},
+
+
 			_onDragMouse: function(e) {
 				// called by dndSource.onMouseMove() if isDragging is true
 				// summary:
