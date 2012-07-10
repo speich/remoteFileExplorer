@@ -11,6 +11,7 @@ define([
 	'dijit/Tree',
 	'dijit/tree/dndSource',
 	'rfe/Grid',
+	'rfe/dnd/GridSource',
 	'dijit/registry',
 	'dijit/form/CheckBox',
 	'dijit/Dialog',
@@ -20,7 +21,7 @@ define([
 	'rfe/Console',
 	'rfe/EditContextMenu'
 ], function(array, lang, declare, event, aspect, on, cookie, domConstruct, query, Tree, TreeSource,
-				Grid, registry, CheckBox, Dialog, Toolbar, Menubar, Panes, Console, EditContextMenu) {
+				Grid, GridSource, registry, CheckBox, Dialog, Toolbar, Menubar, Panes, Console, EditContextMenu) {
 
 		return declare(null, {
 
@@ -79,7 +80,7 @@ define([
 					persist: cookie(this._cnDialogSettingsFolderState) || true,
 					dndController: function(arg, params) {
 						return new TreeSource(arg, lang.mixin(params || {}, {
-							accept: ['treeNode', 'gridNode'],
+							accept: ['treeNode', 'dgrid-row'],
 							store: self.store,
 							singular: true
 						}))
@@ -91,8 +92,10 @@ define([
 			initGrid: function() {
 				var div = domConstruct.create('div', {}, this.panes.gridPane.domNode);
 				this.grid = new Grid({
-					store: null	// store is set in FileExplorer.initState()
+					store: null,	// store is set in FileExplorer.initState()
+					dndConstructor: GridSource
 				}, div);
+				console.log(this.grid)
 			},
 
 			initDialogs: function() {

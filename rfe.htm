@@ -4,8 +4,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Remote File Explorer (rfe)</title>
 <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.7.2/dijit/themes/claro/document.css"/>
-<!--<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.7.2/dijit/themes/claro/claro.css"/>-->
-<link rel="stylesheet" type="text/css" href="/library/dojo/trunk/dijit/themes/claro/claro.css"/>
+<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.7.2/dijit/themes/claro/claro.css"/>
+<!--<link rel="stylesheet" type="text/css" href="/library/dojo/trunk/dijit/themes/claro/claro.css"/>-->
 <link rel="stylesheet" href="/library/dgrid/css/skins/claro.css">
 <link rel="stylesheet" href="/library/rfe/resources/rfe.css">
 
@@ -18,7 +18,6 @@ var dojoConfig = {
 	async: true,
 	ioPublish: true,
 //	baseUrl: 'http://ajax.googleapis.com/ajax/libs/dojo/1.7.2/dojo/',
-	//baseUrl: '/library/dojo/1.7.2/dojo/',
 	baseUrl: '/library/dojo/trunk/dojo/',
 	packages: [
 		{name: 'dgrid', location: '/library/dgrid'},
@@ -29,7 +28,7 @@ var dojoConfig = {
 	],
 	// redirect the following modules to my own modules
 	paths: {
-//		'dijit/tree/_dndSelector': '/library/rfe/dnd/TreeSelector',		// TODO: currently this generates when dnd
+		'dijit/tree/_dndSelector': '/library/rfe/dnd/TreeSelector',
 		'dijit/tree/dndSource': '/library/rfe/dnd/TreeSource'
 	}
 };

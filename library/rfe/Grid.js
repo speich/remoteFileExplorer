@@ -77,6 +77,9 @@ define([
 				label: 'last modified',
 				sortable: false
 			}
+		},
+		dndParams: {
+			accept: ['treeNode']
 		}
 
 	});

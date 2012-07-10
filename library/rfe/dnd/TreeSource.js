@@ -11,14 +11,12 @@ define([
 
 		return declare([dndSource], {
 
-			generateText: true,	// can be removed as soon as bug# is fixed
-
 			constructor: function(tree, params) {
 
 				lang.mixin(this, params || {});
 				lang.mixin(this, Drop);
 
-				var type = params.accept instanceof Array ? params.accept : ['treeNode', 'gridNode'];
+				var type = params.accept instanceof Array ? params.accept : ['treeNode', 'dgrid-row'];
 				this.accept = null;
 				if (type.length){
 					this.accept = {};
@@ -65,6 +63,7 @@ define([
 							droppable = !this._isParentChildDrop(m.source, newTarget.rowNode);
 						}
 					}
+					/*
 					else if (m.source.grid) {
 						// Note: To simplify things we (currently) do not differentiate between file or folder before
 						// dropping even though files (but not folders) could be dropped independent of the hierarchy.
@@ -72,12 +71,13 @@ define([
 						// sense to show the (-)avatar anymore. Windows Explorer does not prevent parentChildDrops but
 						// instead displays a warning message for each dropped file/folder afterwards.
 						var grid = m.source.grid;
-						var node, item = grid.getItem(0);	// we can use any row to get the parent
+						var node, item = grid.getObject(0);	// we can use any row to get the parent
 						node = this.tree.getNodesByItem(item);
 						node = node[0].rowNode;
 						droppable = !this._isParentChildDrop(m.target, node);
 						console.log('tree.canDrop', droppable, m.target)
 					}
+					*/
 					m.canDrop(droppable);
 					this.targetAnchor = newTarget;
 				}
