@@ -1,152 +1,140 @@
 define([
-	"dojo/_base/declare",
-	"dojo/_base/lang",
-	"dojo/_base/Deferred",
-	"dojo/dnd/Source"
+	'dojo/_base/declare',
+	'dojo/_base/lang',
+	'dojo/_base/Deferred',
+	'dojo/DeferredList',
+	'dojo/dnd/Source',
+	'dojo/dnd/Manager'
 ],
-function(declare, lang, Deferred, DnDSource){
+function(declare, lang, Deferred, DeferredList, DnDSource) {
+
 	// Requirements:
 	// * requires a store (sounds obvious, but not all Lists/Grids have stores...)
 	// * must support options.before in put calls
 	//   (if undefined, put at end)
 	// * should support copy
 	//   (copy should also support options.before as above)
-	
+
 	// TODOs:
 	// * consider sending items rather than nodes to onDropExternal/Internal
 	// * consider emitting store errors via OnDemandList._trackError
-	
+
 	return declare(DnDSource, {
+
 		grid: null,
-		getObject: function(node){
-			// summary:
-			//		getObject is a method which should be defined on any source intending
-			// 		on interfacing with dgrid DnD
-			var grid = this.grid;
-			return grid.store.get(grid.row(node).id);
+
+		fileStore: null,
+
+		getObject: function(node) {
+			return this.grid.row(node).data;
 		},
+
 		_legalMouseDown: function(evt){
 			// summary:
-			// 		fix _legalMouseDown to only allow starting drag from an item
-			// 		(not from bodyNode outside contentNode)
+			//		fix _legalMouseDown to only allow starting drag from an item
+			//		(not from bodyNode outside contentNode)
 			var legal = this.inherited("_legalMouseDown", arguments);
 			// DnDSource.prototype._legalMouseDown.apply(this, arguments);
-			return legal && evt.target != this.grid.bodyNode;
+			return legal && evt.target !== this.grid.bodyNode;
 		},
 
 		_onDragMouse: function() {
-			oldTarget = this.targetAnchor,	// TreeNode corresponding to TreeNode mouse was previously over
-			newTarget = this.current; 		// TreeNode corresponding to TreeNode mouse is currently over
+			// TODO: take care (in TreeSource?) of dropping on own descendant (by preventing from dropping in the first place?)
+			var oldTarget = this.targetAnchor,	// TreeNode corresponding to TreeNode mouse was previously over
+				newTarget = this.current;			// TreeNode corresponding to TreeNode mouse is currently over
 		},
 
-		// DnD method overrides
-		onDrop: function(sourceSource, nodes, copy){
+		/**
+		 * Topic event processor for /dnd/drop, called to finish the DnD operation.
+		 * @param {object} sourceSource dojo/dnd/Source dgrid or dijit/tree which is providing the items
+		 * @param {Array} nodes domNodes
+		 * @param {boolean} copy copy or move objects
+		 */
+		onDrop: function(sourceSource, nodes, copy) {
 			// summary:
-			// 		on drop, determine where to move/copy the objects
+			//		on drop, determine where to move/copy the objects
 			var targetSource = this,
-				targetRow = this._targetAnchor = this.targetAnchor, // save for Internal
+				targetRow = this.targetAnchor, // save for internal use to this._targetAnchor
 				grid = this.grid,
 				store = grid.store;
-			
-			if(!this.before && targetRow){
-				// target before next node if dropped within bottom half of this node
-				// (unless there's no node to target at all)
-				targetRow = targetRow.nextSibling;
-			}
+
 			targetRow = targetRow && grid.row(targetRow);
-			
-			Deferred.when(targetRow && store.get(targetRow.id), function(target){
+
+			Deferred.when(targetRow && store.get(targetRow.id), function(targetObject) {
+
 				// Note: if dropping after the last row, or into an empty grid,
-				// target will be undefined.  Thus, it is important for store to place
-				// item last in order if options.before is undefined.
-				
+				// target will be undefined.
+
 				// Delegate to onDropInternal or onDropExternal for rest of logic.
 				// These are passed the target item as an additional argument.
-				if(targetSource != sourceSource){
-					targetSource.onDropExternal(sourceSource, nodes, copy, target);
-				}else{
-					targetSource.onDropInternal(nodes, copy, target);
+				if (targetSource !== sourceSource) {
+					targetSource.onDropExternal(sourceSource, nodes, copy, targetObject);
+				} else {
+					targetSource.onDropInternal(nodes, copy, targetObject);
 				}
 			});
 		},
-		onDropInternal: function(nodes, copy, targetItem){
-			var store = this.grid.store,
+
+		onDropInternal: function(nodes, copy, newParentObject) {
+			var fileStore = this.fileStore,
+				storeMemory = fileStore.storeMemory,
 				targetSource = this,
-				grid = this.grid,
-				anchor = targetSource._targetAnchor,
-				targetRow;
-			
-			if(anchor){ // (falsy if drop occurred in empty space after rows)
-				targetRow = this.before ? anchor.previousSibling : anchor.nextSibling;
-			}
-			
-			// Don't bother continuing if the drop is really not moving anything.
+				oldParentObject;
+
+			// Don't bother continuing if not moving anything.
 			// (Don't need to worry about edge first/last cases since dropping
 			// directly on self doesn't fire onDrop, but we do have to worry about
-			// dropping last node into empty space beyond rendered rows.)
-			if(!copy && (targetRow === nodes[0] ||
-					(!targetItem && grid.down(grid.row(nodes[0])).element == nodes[0]))){
+			// dropping last node into empty space beyond rendered rows, if we don't copy)
+			// Also don't bother if moving onto a file (no reordering in rfe)
+			if (!copy && (!newParentObject || !newParentObject[fileStore.childrenAttr])) {
 				return;
 			}
-			
-			nodes.forEach(function(node){
-				Deferred.when(targetSource.getObject(node), function(object){
-					// For copy DnD operations, copy object, if supported by store;
-					// otherwise settle for put anyway.
-					// (put will relocate an existing item with the same id, i.e. move).
-					store[copy && store.copy ? "copy" : "put"](object, {
-						before: targetItem
-					});
-				});
-			});
-		},
-		onDropExternal: function(sourceSource, nodes, copy, targetItem){
-			// Note: this default implementation expects that two grids do not
-			// share the same store.  There may be more ideal implementations in the
-			// case of two grids using the same store (perhaps differentiated by
-			// query), dragging to each other.
-			var store = this.grid.store,
-				sourceGrid = sourceSource.grid;
-			
-			// TODO: bail out if sourceSource.getObject isn't defined?
-			nodes.forEach(function(node, i){
-				Deferred.when(sourceSource.getObject(node), function(object){
-					if(!copy){
-						if(sourceGrid){
-							// Remove original in the case of inter-grid move.
-							// (Also ensure dnd source is cleaned up properly)
-							Deferred.when(sourceGrid.store.getIdentity(object), function(id){
-								!i && sourceSource.selectNone(); // deselect all, one time
-								sourceSource.delItem(node.id);
-								sourceGrid.store.remove(id);
-							});
-						}else{
-							sourceSource.deleteSelectedNodes();
-						}
-					}
-					// Copy object, if supported by store; otherwise settle for put
-					// (put will relocate an existing item with the same id).
-					// Note that we use store.copy if available even for non-copy dnd:
-					// since this coming from another dnd source, always behave as if
-					// it is a new store item if possible, rather than replacing existing.
-					store[store.copy ? "copy" : "put"](object, {
-						before: targetItem
-					});
-				});
+
+			nodes.forEach(function(node) {
+				var object = targetSource.getObject(node);
+
+				// all nodes in grid share same parent, only get once from first node. Since you can only drag an object
+				// that's visible (hence loaded an cached) we can use the memoryStore
+				oldParentObject = oldParentObject || storeMemory.get(object[fileStore.parentAttr]);
+				fileStore.pasteItem(object, oldParentObject, newParentObject, copy);
 			});
 		},
 
-		
+		onDropExternal: function(sourceSource, nodes, copy, newParentObject) {
+			var fileStore = this.fileStore,
+				storeMemory = fileStore.storeMemory,
+				row, grid = this.grid,
+				oldParentObject;
+
+			if (newParentObject && !newParentObject[fileStore.childrenAttr]) {
+				// dropped on a file, so it's parent should become the new parent
+				newParentObject = storeMemory.get(newParentObject[fileStore.parentAttr]);
+			}
+			else if (!newParentObject) {
+				// dropping beyond rendered rows, so newParentObject is null. Since all displayed objects
+				// in grid share the same parent, just grab the parent of the first/last object in grid
+				row = grid.getFirstRow();
+				newParentObject = storeMemory.get(row.data[fileStore.parentAttr]);
+			}
+
+			nodes.forEach(function(node) {
+				var object = sourceSource.getObject(node);
+
+				// tree.dndController.singular = true so we can get the oldParentObject only once from first node
+				// Since you can only drag visible object (hence loaded an cached) we can use the memoryStore
+				oldParentObject = oldParentObject || storeMemory.get(object[fileStore.parentAttr]);
+				fileStore.pasteItem(object, oldParentObject, newParentObject, copy);
+			});
+		},
+
 		checkAcceptance: function(source, nodes){
 			// summary:
-			// 		augment checkAcceptance to block drops from sources without getObject
+			//		augment checkAcceptance to block drops from sources without getObject or
 			return source.getObject &&
+				//source.singular &&
 				DnDSource.prototype.checkAcceptance.apply(this, arguments);
-		}		
-		// TODO: could potentially also implement copyState to jive with default
-		// onDrop* implementations (checking whether store.copy is available);
-		// not doing that just yet until we're sure about default impl.
-	});
-	
+		}
 
+
+	});
 });

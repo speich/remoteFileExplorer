@@ -94,7 +94,7 @@ define([
 			// TODO: add and respect this.persist
 			if (this.treePaneVisible) {
 				this.contentPaneBc.removeChild(this.treePane);
-				if (view == 'vertical') {
+				if (view === 'vertical') {
 					this.treePane.set({
 						region: 'top',
 						style: 'width: 100%; height: 25%;'

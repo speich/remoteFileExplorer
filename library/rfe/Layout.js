@@ -59,7 +59,7 @@ define([
 
 				this.panes.startup();
 				this.console = new Console();
-				this.console.placeAt(this.panes.logPane.domNode)
+				this.console.placeAt(this.panes.logPane.domNode);
 				this.initGrid();
 				this.initTree();
 				this.initDialogs();
@@ -80,10 +80,10 @@ define([
 					persist: cookie(this._cnDialogSettingsFolderState) || true,
 					dndController: function(arg, params) {
 						return new TreeSource(arg, lang.mixin(params || {}, {
-							accept: ['treeNode', 'dgrid-row'],
-							store: self.store,
+							accept: ['dgrid-row'],
+							fileStore: self.store,
 							singular: true
-						}))
+						}));
 					}
 				});
 				this.tree.placeAt(this.panes.treePane)
@@ -93,9 +93,12 @@ define([
 				var div = domConstruct.create('div', {}, this.panes.gridPane.domNode);
 				this.grid = new Grid({
 					store: null,	// store is set in FileExplorer.initState()
-					dndConstructor: GridSource
+					dndConstructor: GridSource,
+					dndParams: {
+						accept: ['treeNode'],
+						fileStore: this.store
+					}
 				}, div);
-				console.log(this.grid)
 			},
 
 			initDialogs: function() {

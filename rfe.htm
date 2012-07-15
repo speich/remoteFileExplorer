@@ -4,8 +4,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Remote File Explorer (rfe)</title>
 <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.7.2/dijit/themes/claro/document.css"/>
-<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.7.2/dijit/themes/claro/claro.css"/>
-<!--<link rel="stylesheet" type="text/css" href="/library/dojo/trunk/dijit/themes/claro/claro.css"/>-->
+<!--<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.7.2/dijit/themes/claro/claro.css"/>-->
+<link rel="stylesheet" type="text/css" href="/library/dojo/trunk/dijit/themes/claro/claro.css"/><!-- contains fix to borders in tree -->
 <link rel="stylesheet" href="/library/dgrid/css/skins/claro.css">
 <link rel="stylesheet" href="/library/rfe/resources/rfe.css">
 
@@ -41,11 +41,10 @@ var dojoConfig = {
 require(['dojo/ready', 'rfe/FileExplorer'], function(ready, FileExplorer) {
 
 	ready(function() {
-		var fe = new FileExplorer({
+		var rfe = new FileExplorer({
 			id: 'remoteFileExplorer'
 		});
-		fe.startup();
-
+		rfe.startup();
 	});
 });
 </script>

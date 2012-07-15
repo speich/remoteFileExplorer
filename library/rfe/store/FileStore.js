@@ -28,7 +28,7 @@ define([
 	 * @property {string} rootId
 	 * @property {string} rootLabel
 	 * @property {boolean} skipWithNoChildren getChildren returns only folders
-	 * @extends {dojo.store.Cache}          	 *
+	 * @extends {dojo.store.Cache}
 	 */
 	return declare(null, /** @lends rfe.store.FileStore.prototype */ {
 		storeMaster: null,
@@ -45,20 +45,26 @@ define([
 		 * @constructor
 		 */
 		constructor: function() {
-			var storeMaster = this.storeMaster = JsonRest({
+			var storeMaster, storeMemory, storeCache;
+
+			storeMaster = new JsonRest({
 				target: '/library/rfe/controller.php/'
 			});
-			var storeMemory = this.storeMemory = Observable(Memory());
-			var storeCache = Cache(storeMaster, storeMemory);
+			this.storeMaster = storeMaster;
 
+			storeMemory = new Observable(new Memory({}));
+			this.storeMemory = storeMemory;
+
+			storeCache = new Cache(storeMaster, storeMemory);
 			refPut = storeCache.put;
 			refDel = storeCache.remove;
 			refAdd = storeCache.add;
 			storeCache.put = this.put;
 			storeCache.remove = this.remove;
 			storeCache.add = this.add;
-
 			lang.mixin(this, storeCache);
+
+			this.childrenCached = {};	// Deferred map from id to boolean is cached
 		},
 
 		/**
@@ -88,13 +94,151 @@ define([
 		},
 
 		remove: function(id) {
-			var self = this;
-			var object = this.get(id);
+			var self = this, object = this.get(id);
 			return Deferred.when(refDel.apply(this, arguments), function() {
 				self.onDelete(object);	// notifies tree
 			}, function(err) {
 				console.log('error', err);
 			});
+		},
+
+		/**
+		 * Iterates over the objects in the cache to find first
+		 * .r, it stops and returns true as soon as it encounters an item for which the provided callback returns true.
+		 * If the callback doesn’t return true for even a single item, dojo.some returns false.
+		 */
+		queryCacheSome: function(query) {
+			var results, callback, data = this.storeMemory.data;
+
+			// create filter callback function
+			callback = function(object) {
+				for (var key in query) {
+					var required = query[key];
+					if (required != object[key]) {
+						return false;
+					}
+				}
+				return true;
+			};
+
+			results = array.some(data, callback);
+			return results;
+		},
+
+
+		/**
+		 * Returns a folders (cached) children.
+		 * If children were previously load returns the cached result otherwise master store is
+		 * queried and cached.
+		 * @param object
+		 * @param options
+		 * @return {dojo/Deferred}
+		 */
+		getChildren: function(object, options) {
+			var self = this, cached, queryObj = {},
+				id = object[this.idProperty],
+				results, resultsDirOnly, children;
+
+			// check if children are already cached
+			if (this.childrenCached[id]) {
+				queryObj[this.parentAttr] = id;
+				results = this.storeMemory.query(queryObj);
+				cached = true;
+			}
+			// children not cached yet, query master store and add them to cache
+			else {
+				results = self.storeMaster.query(id + '/');	// query has to be a string, otherwise will add querystring instead of REST resource
+				cached = false;
+			}
+
+			resultsDirOnly = results.filter(function(child) {
+				if (!cached) {
+					self.storeMemory.add(child);	// saves looping twice, but should logically be in own foreEach
+				}
+				return child[self.childrenAttr];	// only display directories in the tree
+			});
+			children = this.skipWithNoChildren ? resultsDirOnly : results;
+
+			// notify tree by calling onComplete
+			if (lang.isFunction(options)) {
+				Deferred.when(children, function(result) {
+					options(result);
+				});
+			}
+			this.childrenCached[id] = children;
+			return children;
+		},
+
+
+		/**
+		 * Move or copy an store object from one folder (parent object) to another.
+		 * Used in drag & drop by the tree and the grid.
+		 * @param {object} object object being pasted
+		 * @param {object} oldParentObject old parent object where the object was dragged from
+		 * @param {object} newParentObject new parent of the object, where the child was dragged to
+		 * @param {boolean} copy copy or move object
+		 * @return {dojo/Deferred}
+		 */
+		pasteItem: function(object, oldParentObject, newParentObject, copy) {
+			var cachedChildren, dfd, self = this, newObject,
+				oldParentId, newParentId;
+
+			oldParentId = object[this.parentAttr];
+			newParentId = newParentObject.id;
+
+			// copy object
+			if (copy) {
+				// create new object based on child and use same id -> when server sees POST with id this means copy (implicitly)
+				// TODO: if object is a folder then recursively copy all its children
+				newObject = lang.clone(object);
+				newObject[this.parentAttr] = newParentId;
+				dfd = this.add(newObject, {
+					incremental: true   // otherwise store JsonRest does POST instead of PUT even if object has an id
+					// TODO: use  overwrite: true instead of incremental?
+				});
+				dfd = Deferred.when(dfd, function(newId) {
+					newObject.id = newId;
+					return newId;
+				});
+			}
+			// move object
+			else {
+				// target folder might be cached (was visible at least once) then add to cache
+				// otherwise (its not visible) and we just put it to the server (master store)
+
+				// put updates the cache and consequently getChildren() will return the cached items
+				// and not query the masterStore anymore. If the new parent's children have not been cached previously,
+				// only the moved object(s) will be returned from cache and the potential children will not be loaded
+				// from the masterStore -> check if cached previously and if not, remove putted objects from cache
+
+				// Set object's parent attribute to new parent id
+				object[this.parentAttr] = newParentId;
+
+				dfd = Deferred.when(this.storeMaster.put(object), function() {
+
+					// only add to cache if folder was cached previously
+					if (self.childrenCached[newParentId]) {
+						self.storeMemory.put(object);
+					}
+
+					// Notify tree to update old parent (its children)
+					// Note: load children after put has completed, because put might modify the cache
+					return Deferred.when(self.getChildren(oldParentObject), function(children) {
+						self.onChildrenChange(oldParentObject, children);
+					});
+				}, function() {
+					object[self.parentAttr] = oldParentId;
+				});
+			}
+
+			// notify tree to update new parent (its children)
+			dfd = Deferred.when(dfd, function() {
+				return Deferred.when(self.getChildren(newParentObject), function(children) {
+					self.onChildrenChange(newParentObject, children);
+				});
+			});
+
+			return dfd;
 		},
 
 
@@ -105,8 +249,7 @@ define([
 		 * @return {Array}
 		 */
 		getPath: function(object) {
-			var store = this.storeMemory;
-			var arr = [];
+			var store = this.storeMemory, arr = [];
 			while (object[this.parentAttr]) {
 				// Convert ids to string, since tree.set(path) expects strings
 				arr.unshift(String(object[this.idProperty]));
@@ -120,40 +263,6 @@ define([
 
 		// METHODS BELOW ARE NEEDED BY THE TREE MODEL
 
-		getChildren: function(object, options) {
-			var self = this;
-			var obj = {};
-			var cached = true;
-			var id = object[this.idProperty];
-			var results, resultsDirOnly, children;
-
-			obj[this.parentAttr] = id;
-
-			// check if children are available from cache
-			results = this.storeMemory.query(obj);	// query has to be an object
-
-			// children not cached yet, query master store and add them to cache
-			if (results.length === 0) {
-				cached = false;
-				results = self.storeMaster.query(id + '/');	// query has to be a string, otherwise will add querystring instead of REST resource
-			}
-
-			resultsDirOnly = results.filter(function(child) {
-				if (!cached) {
-//					console.log('adding', child, 'to cache', self.storeMemory);
-					self.storeMemory.add(child);	// saves looping twice, but should be in foreEach
-				}
-				return child[self.childrenAttr];	// only display directories in the tree
-			});
-			children = this.skipWithNoChildren ? resultsDirOnly : results;
-			if (lang.isFunction(options)) {
-				// only used by tree
-				Deferred.when(children, function(result) {
-					options(result);	// calls onComplete
-				})
-			}
-			return children;
-		},
 
 		/**
 		 * Callback to do notifications about new, updated, or deleted items.
@@ -209,59 +318,6 @@ define([
 			Deferred.when(this.getChildren(parent), lang.hitch(this, function(children) {
 				this.onChildrenChange(parent, children);
 			}));
-		},
-
-		/**
-		 * Move or copy an item from one parent item to another.
-		 * Used in drag & drop by the tree and the grid.
-		 * @param {object} child child object beeing pasted
-		 * @param {object} oldParent parent object where the child was dragged from
-		 * @param {object} newParent new parent of the child object, where the child was dragged to
-		 * @param {boolean} copy copy or move item
-		 * @return {dojo/_base/Deferred}
-		 */
-		pasteItem: function(child, oldParent, newParent, copy) {
-			var dfd;
-			var self = this, newObject;
-
-			// copy item
-			if (copy) {
-				// create new object based on child and use same id -> when server sees POST with id this means copy (implicitly)
-				// TODO: also recursively copy all children
-				newObject = lang.clone(child);
-				newObject[this.parentAttr] = newParent.id;
-				dfd = Deferred.when(this.add(newObject, {
-					incremental: true	// otherwise store JsonRest does POST instead of PUT even if object has an id
-				}), function(newId) {
-					newObject.id = newId;
-					return newId;
-				});
-			}
-			// move item
-			else {
-				// TODO: Maybe I need to use the id instead of the items, because this.put calls remove on the cache and then
-				// re-indexes the cache. Items get a new index while newParent and oldParent use the old?
-
-				// Update object's parent attribute to new parent id
-				//			console.log('pasteItem', item)
-				child[this.parentAttr] = newParent.id;
-				dfd = Deferred.when(this.put(child), function() {
-					// Notify tree to update old parent (its children)
-					// Note: load children after put has completed, because put modifies the cache
-					return Deferred.when(self.getChildren(oldParent), function(children) {
-						self.onChildrenChange(oldParent, children);
-					});
-				});
-			}
-
-			// notify tree to update new parent (its children)
-			dfd = Deferred.when(dfd, function() {
-				return Deferred.when(self.getChildren(newParent), function(children) {
-					self.onChildrenChange(newParent, children);
-				});
-			});
-
-			return dfd;
 		}
 
 	});

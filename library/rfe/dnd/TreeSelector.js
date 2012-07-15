@@ -17,10 +17,10 @@ define([
 	'original/dijit/tree/_dndSelector'
 ], function(array, lang, event, connect, mouse, cookie, _dndSelector) {
 
-	// set references to be able to call overriden methods
-	var ref = _dndSelector.prototype;
-	var oldMouseUp = ref.onMouseUp;
-	var oldMouseMove = ref.onMouseMove;
+	// set references to be able to call overridden methods
+	var ref = _dndSelector.prototype,
+		oldMouseUp = ref.onMouseUp,
+		oldMouseMove = ref.onMouseMove;
 
 	// TODO: make right click (context menu) select the tree node (also see dnd/GridSelector.js)
 	return _dndSelector.extend({

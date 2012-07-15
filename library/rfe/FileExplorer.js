@@ -19,6 +19,8 @@ define([
 ], function(lang, array, declare, Deferred, cookie, keys, dom, domClass, locale, on, mouse, Stateful, registry, Layout, Edit, FileStore) {
 
 	// TODO: multiselect (in tree allow only of files but not of folders)
+	// TODO: override dgrid.renderRow() to create different views for grid content (e.g. view = list, details, thumbnails, etc.)
+
 	/**
 	 * File explorer allows you to browse files.
 	 * It consists of a tree and a grid. The tree loads file data over REST via php from remote server.
@@ -76,18 +78,16 @@ define([
 		},
 
 		initEvents: function() {
-			var self = this;
-			var grid = this.grid, tree = this.tree;
-			var store = this.store;
+			var self = this,
+				grid = this.grid, tree = this.tree,
+				store = this.store;
 
 			tree.onClick = function(object) {
-				console.log('tree.onClick');
 				self.displayChildrenInGrid(object);
 				self.setHistory(object.id);
 				self.currentTreeObject.set(object);
 			};
 			tree.onDblClick = function(object, nodeWidget, evt) {
-				console.log('tree.onDbouleClick');
 				if(nodeWidget.isExpandable){
 					this._onExpandoClick({ node: nodeWidget });
 				}
@@ -129,9 +129,9 @@ define([
 		 * @return {dojo.Deferred}
 		 */
 		displayChildrenInGrid: function(object) {
-			var grid = this.grid;
+			var grid = this.grid,
+				dfd = new Deferred();
 
-			var dfd = new Deferred();
 			if (object.dir) {
 				dfd = Deferred.when(this.store.getChildren(object), function(children) {  // TODO:  I think we can use memory store directly because they are already loaded
 					//grid.renderArray(children)
@@ -155,9 +155,9 @@ define([
 		 * @return {dojo/Deferred}
 		 */
 		display: function(object) {
-			var dfd = new Deferred();
+			var path, dfd = new Deferred();
 			if (object.dir) {
-				var path = this.store.getPath(object);
+				path = this.store.getPath(object);
 				dfd = this.tree.set('path', path);
 			}
 			else {
@@ -220,7 +220,7 @@ define([
 			var hist = this.history;
 
 			// first use: initialize history array
-			if (hist.curIdx == null) {
+			if (hist.curIdx === null) {
 				hist.curIdx = 0;
 			}
 			// move index since we have not used up all available steps yet
@@ -232,7 +232,7 @@ define([
 				hist.steps = hist.steps.slice(0, hist.curIdx);
 			}
 			// keep hist array at constant length of number of steps
-			if (hist.steps.length == hist.numSteps + 1) {
+			if (hist.steps.length === hist.numSteps + 1) {
 				hist.steps.shift();
 			}
 			hist.steps.push(itemId);
@@ -244,7 +244,7 @@ define([
 		 */
 		removeHistory: function(itemId) {
 			var hist = this.history;
-			hist.steps = dojo.filter(hist.steps, function(object) {
+			hist.steps = array.filter(hist.steps, function(object) {
 				return object !== itemId;
 			});
 			hist.curIdx--;
@@ -256,16 +256,16 @@ define([
 		 * @return {object} dojo.Deferred
 		 */
 		goHistory: function(direction) {
-			var def = new Deferred();
-			var hist = this.history;
-			var id = null;
-			if (direction == 'back' && hist.curIdx > 0) {
+			var def = new Deferred(),
+				hist = this.history,
+				id = null;
+			if (direction === 'back' && hist.curIdx > 0) {
 				id = hist.steps[--hist.curIdx];
 			}
-			else if (direction == 'forward' && hist.curIdx < hist.steps.length) {
+			else if (direction === 'forward' && hist.curIdx < hist.steps.length) {
 				id = hist.steps[++hist.curIdx];
 			}
-			if (id != null) {
+			if (id !== null) {
 				return Deferred.when(this.store.get(id), lang.hitch(this, function(object) {
 					return this.display(object);
 				}));
@@ -308,9 +308,8 @@ define([
 		 * Expects the tree to be loaded and expanded otherwise it will be set to root, then displays the correct folder in the grid.
 		 */
 		initState: function() {
-			var tree = this.tree, grid = this.grid;
-			var store = this.store;
-			var object, oreo, arr, id, paths = [];
+			var tree = this.tree, grid = this.grid, store = this.store,
+				object, oreo, arr, id, paths = [];
 
 			oreo = tree.dndController.cookieName ? cookie(tree.dndController.cookieName) : false;	// not available in 1.7.2
 			if (tree.persist && oreo) {
