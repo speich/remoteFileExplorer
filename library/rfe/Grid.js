@@ -2,17 +2,18 @@ define([
 	'dojo/_base/lang',
 	'dojo/_base/Deferred',
 	'dojo/_base/declare',
+	'dojo/query',
 	'dgrid/OnDemandGrid',
 	'dgrid/Selection',
 	'dgrid/editor',
 	'dgrid/Keyboard',
-	'dgrid/extensions/Dnd',
+	'dgrid/extensions/DnD',
 	'dgrid/extensions/ColumnResizer',
 	'dgrid/extensions/DijitRegistry',
 	'xstyle/has-class',
 	'xstyle/css',
 	'put-selector/put'
-], function(lang, Deferred, declare, Grid, Selection, editor, Keyboard, DnD, ColumnResizer) {
+], function(lang, Deferred, declare, query, Grid, Selection, editor, Keyboard, DnD, ColumnResizer) {
 
 
 	/**
@@ -20,8 +21,8 @@ define([
 	 * @param {Object} object
 	 */
 	function formatImg(object, data, td) {
-		var strClass = object.dir ? 'dijitFolderClosed' : 'dijitLeaf';
-		var str = '<span>';
+		var str, strClass = object.dir ? 'dijitFolderClosed' : 'dijitLeaf';
+		str = '<span>';
 		str += '<img class="dijitTreeIcon ' + strClass;
 		str += '" alt="" src="' + require.toUrl("dojo/resources/blank.gif") + '"/>' + object.name;
 		str += '</span>';
@@ -48,6 +49,7 @@ define([
 
 		//getBeforePut: false,	// if true save will re-fetch from the store via get, before applying changes represented by dirty data.
 		selectionMode: 'extended',
+		allowSelectAll: true,
 		columns: {
 			name: editor({
 				editor: 'text',
@@ -56,14 +58,14 @@ define([
 				label: "name",
 				sortable: false,
 				renderCell: function(object, data, td) {
-					formatImg(object, data, td)
+					formatImg(object, data, td);
 				}
 			}),
 			size: {
 				label: 'size',
 				sortable: false,
 				formatter: function(value) {
-					return formatFileSize(value)
+					return formatFileSize(value);
 				}
 			},
 			dir: {
@@ -78,8 +80,18 @@ define([
 				sortable: false
 			}
 		},
-		dndParams: {
-			accept: ['treeNode']
+
+		/**
+		 * Returns the first row object.
+		 * A row object has the properties:
+		 *		id: the data object's id
+		 *		data: the data object represented by the row
+		 *		element: the row's DOM element
+		 * @return {object}
+		 */
+		getFirstRow: function() {
+			var nodes = query('.dgrid-row', this.bodyNode);
+			return this.row(nodes[0]);
 		}
 
 	});
