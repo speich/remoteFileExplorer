@@ -10,22 +10,7 @@ define([
 ], function(lang, array, declare, Deferred, on, domClass, dndSource, dndManager) {
 
 		return declare([dndSource], {
-			  /*
-			constructor: function(tree, params) {
 
-				lang.mixin(this, params || {});
-				lang.mixin(this, Drop);
-
-				var type = params.accept instanceof Array ? params.accept : ['treeNode', 'dgrid-row'];
-				this.accept = null;
-				if (type.length){
-					this.accept = {};
-					for (var i = 0; i < type.length; ++i) {
-						this.accept[type[i]] = 1;
-					}
-				}
-			},
-             */
 			getObject: function(node){
 				// summary:
 				//		getObject is a method which should be defined on any source intending
