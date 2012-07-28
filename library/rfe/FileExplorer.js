@@ -99,8 +99,7 @@ define([
 			};
 			tree.on('load', lang.hitch(this, this.initState));
 
-			grid.on('dblclick', function(evt) {
-				// TODO: prevent that this also fires  on header dblclick
+			grid.on('.dgrid-row:dblclick', function(evt) {
 				var obj = grid.row(evt.target).data;
 				if (obj.dir){
 					self.display(obj);
