@@ -97,7 +97,8 @@ define([
 			};
 			tree.on('load', lang.hitch(this, this.initState));
 
-			grid.on('dblclick', function(evt){
+			grid.on('dblclick', function(evt) {
+				// TODO: prevent that this also fires  on header dblclick
 				var obj = grid.row(evt.target).data;
 				if (obj.dir){
 					self.display(obj);
@@ -130,15 +131,18 @@ define([
 		 */
 		displayChildrenInGrid: function(object) {
 			var grid = this.grid,
+				store = this.store,
 				dfd = new Deferred();
 
 			if (object.dir) {
-				dfd = Deferred.when(this.store.getChildren(object), function(children) {  // TODO:  I think we can use memory store directly because they are already loaded
+				dfd = Deferred.when(store.getChildren(object), function() {  // TODO:  I think we can use memory store directly because they are already loaded
 					//grid.renderArray(children)
 					// cache.query() always queries the master store -> no caching!
-					grid.set('query', {
-						parId: object.id
-					});
+					var sort = grid.get('sort');
+					if (sort.length === 1) {
+						sort.unshift({attribute: store.childrenAttr, descending: false});
+					}
+					grid.set('query', {parId: object.id}, {sort: sort});
 				});
 			}
 			else {
@@ -325,7 +329,7 @@ define([
 					Deferred.when(store.getChildren(object), function() {	// load children first before setting store
 						// Setting caching store for grid would not use cache, because cache.query() always uses the
 						// master store => use storeMemory.
-						grid.set('store', store.storeMemory, {	parId: id });
+						grid.set('store', store.storeMemory, { parId: id });
 					});
 					this.currentTreeObject.set(object);
 				}));

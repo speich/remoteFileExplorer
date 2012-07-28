@@ -52,7 +52,11 @@ define([
 			});
 			this.storeMaster = storeMaster;
 
-			storeMemory = new Observable(new Memory({}));
+			storeMemory = new Observable(new Memory({
+				parentAttr: this.parentAttr,
+				childrenAttr: this.childrenAttr,
+				labelAttr: this.labelAttr
+			}));
 			this.storeMemory = storeMemory;
 
 			storeCache = new Cache(storeMaster, storeMemory);

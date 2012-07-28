@@ -121,7 +121,7 @@ function(declare, lang, Deferred, DeferredList, DnDSource) {
 				var object = sourceSource.getObject(node);
 
 				// tree.dndController.singular = true so we can get the oldParentObject only once from first node
-				// Since you can only drag visible object (hence loaded an cached) we can use the memoryStore
+				// Since you can only drag visible object (hence loaded an cached) we can directly use the memoryStore
 				oldParentObject = oldParentObject || storeMemory.get(object[fileStore.parentAttr]);
 				fileStore.pasteItem(object, oldParentObject, newParentObject, copy);
 			});

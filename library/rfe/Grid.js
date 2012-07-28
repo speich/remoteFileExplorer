@@ -2,6 +2,8 @@ define([
 	'dojo/_base/lang',
 	'dojo/_base/Deferred',
 	'dojo/_base/declare',
+	'dojo/_base/array',
+	'dojo/on',
 	'dojo/query',
 	'dgrid/OnDemandGrid',
 	'dgrid/Selection',
@@ -13,7 +15,7 @@ define([
 	'xstyle/has-class',
 	'xstyle/css',
 	'put-selector/put'
-], function(lang, Deferred, declare, query, Grid, Selection, editor, Keyboard, DnD, ColumnResizer) {
+], function(lang, Deferred, declare, array, listen, query, Grid, Selection, editor, Keyboard, DnD, ColumnResizer) {
 
 
 	/**
@@ -47,51 +49,153 @@ define([
 
 	return declare([Grid, Selection, editor, Keyboard, DnD, ColumnResizer], {
 
-		//getBeforePut: false,	// if true save will re-fetch from the store via get, before applying changes represented by dirty data.
 		selectionMode: 'extended',
 		allowSelectAll: true,
 		columns: {
 			name: editor({
+				sortable: false, // lets us apply own header click sort
 				editor: 'text',
 				editOn: 'dummyEvent',
 				autoSave: false,
 				label: "name",
-				sortable: false,
 				renderCell: function(object, data, td) {
 					formatImg(object, data, td);
 				}
 			}),
 			size: {
+				sortable: false, // lets us apply own header click sort
 				label: 'size',
-				sortable: false,
 				formatter: function(value) {
 					return formatFileSize(value);
 				}
 			},
 			dir: {
+				sortable: false, // lets us apply own header click sort
 				label: 'type',
-				sortable: false,
 				formatter: function(value) {
 					return formatType(value);
 				}
 			},
 			mod: {
-				label: 'last modified',
-				sortable: false
+				sortable: false, // lets us apply own header click sort
+				label: 'last modified'
 			}
+		},
+
+		renderHeader: function() {
+			var grid = this, headerNode;
+
+			//target = grid._sortNode;	// access before sort is called, because Grid._setSort will delete the sort node
+			this.inherited('renderHeader', arguments);
+
+//			console.log(this.get('columns'), this.headerNode)
+
+			headerNode = this.headerNode;
+
+			// if it columns are sortable, resort on clicks
+			listen(headerNode.firstChild, "click,keydown", function(event) {
+
+				// respond to click or space keypress
+				if (event.type === "click" || event.keyCode === 32) {
+					var target = event.target, field, descending, sort, sortObj;
+
+
+					// remove previous added sorting by store.childrenAttr, e.g. group by folder
+					sort = array.filter(grid._sort, function(sortObj) {
+						return sortObj.attribute !== grid.store.childrenAttr;
+					});
+
+
+					do {
+						if (target.field) {
+							// stash node subject to DOM manipulations,
+							// to be referenced then removed by sort()
+							grid._sortNode = target;
+
+							field = target.field || target.columnId;
+
+							sortObj = sort[0];	// might be undefined
+
+							// if the click is on same column as the active sort, reverse direction
+							descending = sortObj && sortObj.attribute === field && !sortObj.descending;
+							sortObj = {
+								attribute: field,
+								descending: descending
+							};
+
+
+							sort = [sortObj];
+
+							if (sortObj.attribute !== grid.store.childrenAttr) {
+								sort.unshift({
+									attribute: grid.store.childrenAttr,
+									descending: descending
+								});
+
+							}
+
+
+							return grid.set("sort", sort);
+						}
+					} while ((target = target.parentNode) && target !== headerNode);
+				}
+
+			});
+
 		},
 
 		/**
 		 * Returns the first row object.
 		 * A row object has the properties:
-		 *		id: the data object's id
-		 *		data: the data object represented by the row
-		 *		element: the row's DOM element
+		 *      id: the data object's id
+		 *      data: the data object represented by the row
+		 *      element: the row's DOM element
 		 * @return {object}
 		 */
 		getFirstRow: function() {
 			var nodes = query('.dgrid-row', this.bodyNode);
 			return this.row(nodes[0]);
+		},
+
+		/**
+		 * Sort the content
+		 * Always sorts by folders then files first (e.g. store.childrenAttr true/false) before sorting according to arguments.
+		 * @param {string|array} property field name to sort by, or actual array of objects with attribute and descending properties
+		 * @param {boolean} descending whether to sort ascending (false) or descending (true) in case where property is a string
+		 * @private
+		 */
+		_xxxsetSort: function(property, descending) {
+			// Note: sorting can be done by the following:
+			//		- grid.set('store', query, queryOptions) where queryOptions contains a sort attribute
+			//		- grid.set('query', queryOptions)
+			//		- store.query(query, queryOptions)
+			//		- grid.set('sort', sortOptions);
+			//
+			// When called from clicking on a grid column, only the first item in the sort array is used, but we
+			// always want to also sort by childrenAttr first (e.g. folder, files), we just add it in front before calling sort
+			// Order of inheritance:  _StoreMixin->setSort -> Grid._setSort -> List._setSort ->
+
+			var sortObj, sort, store = this.store;
+			sortObj = {attribute: store.childrenAttr, descending: descending};
+			if (store) {
+				if (typeof property === 'string') {   // sorting by clicking on column, where only first array item gets passed to sort
+					sort = [
+						sortObj,
+						{attribute: property, descending: descending}
+					];
+				}
+				else {
+					if (property.length === 1 && !property[0][store.childrenAttr]) {
+						property.unshift(sortObj);
+					}
+					sort = property;
+				}
+
+			}
+
+			console.log(this.store, property);
+			Grid.prototype._setSort.call(this, sort || property, descending);
+
 		}
 
 	});
