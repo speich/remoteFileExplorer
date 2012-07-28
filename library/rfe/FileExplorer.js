@@ -18,6 +18,7 @@ define([
 	'rfe/dnd/Manager'
 ], function(lang, array, declare, Deferred, cookie, keys, dom, domClass, locale, on, mouse, Stateful, registry, Layout, Edit, FileStore) {
 
+	// TODO: use dijit._WidgetBase
 	// TODO: multiselect (in tree allow only of files but not of folders)
 	// TODO: override dgrid.renderRow() to create different views for grid content (e.g. view = list, details, thumbnails, etc.)
 
@@ -69,6 +70,7 @@ define([
 				isOnTreePane: false,
 				isOnGridPane: false
 			});
+			this.domNode = dom.byId(this.id);	// TODO: remove when using dijit._WidgetBase
 		},
 
 		startup: function() {
@@ -106,6 +108,7 @@ define([
 				}
 			});
 			grid.on("dgrid-datachange", function(evt) {
+				// catch using editor when renaming
 				var obj = evt.cell.row.data;
 				obj[store.labelAttr] = evt.value;
 				Deferred.when(store.put(obj), function() {
@@ -115,13 +118,16 @@ define([
 				});
 			});
 
-			// TODO: Set context also when using keyboard navigation
-			on(this.panes.domNode, '.rfeTreePane:mousedown, .rfeGridPane:mousedown, .dijitTreeRow:mousedown, .dgrid-row:mousedown', function(evt) {
+			// TODO: Use focus instead of mousedown to set context for keyboard navigation?
+/*			on(this.domNode, 'mousedown, keydown', function(evt) {
+				console.log(evt.target, evt.currentTarget)
+				var node = evt.target;
+				lang.hitch(self, self._setContext(evt, node));
+			});*/
+			on(this.panes.domNode, '.rfeTreePane:mousedown, .rfeGridPane:mousedown, .dijitTreeRow:mousedown, .dgrid-row:mousedown, dgrid-select', function(evt) {
 				var node = this;
-				//console.log('setting context to', node)
 				lang.hitch(self, self._setContext(evt, node));
 			});
-
 		},
 
 		/**
@@ -295,16 +301,13 @@ define([
 		 * @param {Event} evt
 		 */
 		_setContext: function(evt, node) {
-			/*if (!mouse.isRight(evt)) {
-				return;
-			}*/
 			this.context.set({
 				isOnGrid: domClass.contains(node, 'dgrid-row'),
 				isOnGridPane: domClass.contains(node, 'rfeGridPane'),
 				isOnTree: domClass.contains(node, 'dijitTreeRow'),
 				isOnTreePane: domClass.contains(node, 'rfeTreePane')
 			});
-
+			console.log('context set to', this.context, evt, node);
 		},
 
 		/**

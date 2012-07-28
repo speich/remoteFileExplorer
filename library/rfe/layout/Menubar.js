@@ -23,9 +23,9 @@ define([
 		postCreate: function() {
 			this.inherited('postCreate', arguments);
 
-			var panes = this.rfe.panes;
-			var menuFile, menuView, menuHelp, menuTools;
-			var menuItemV, subMenuFile;
+			var context = this.rfe.context,
+				panes = this.rfe.panes,
+				menuFile, menuView, menuHelp, menuTools, menuItemV, subMenuFile;
 
 			// ********** menu file **************
 			menuFile = new DropDownMenu({	id: 'rfeMenuFile'	});
@@ -33,7 +33,7 @@ define([
 			menuFile.addChild(new PopupMenuItem({
 				label: 'New',
 				popup: subMenuFile,
-				iconClass: "dijitEditorIcon dijitEditorIconNewPage"
+				iconClass: 'dijitEditorIcon dijitEditorIconNewPage'
 			}));
 			subMenuFile.addChild(new MenuItem({
 				label: 'File',
@@ -51,17 +51,22 @@ define([
 				label: 'Rename',
 				onClick: lang.hitch(this.rfe, this.rfe.rename)
 			}));
+			context.watch(function(prop, oldVal, newVal) {
+				//console.log(prop, oldVal, newVal)
+				//context.isOnTree || context.isOnTreePane
+			});
+
 			menuFile.addChild(new MenuItem({
 				label: 'Delete',
-				onClick: lang.hitch(this.rfe, this.rfe.del)
+				onClick: lang.hitch(this.rfe, this.rfe.del),
+				context: 'grid'
 			}));
-
 
 			// ******* menu layout ********
 			menuView = new DropDownMenu({ id: 'rfeMenuView' });
 			menuItemV = new CheckedMenuItem({
 				label: 'Layout vertical',
-				checked: panes.get('view') != 'horizontal',
+				checked: panes.get('view') !== 'horizontal',
 				onClick: lang.hitch(this, function() {
 					if (menuItemV.get('checked') === true) {
 						panes.set('view', 'vertical');
@@ -116,7 +121,7 @@ define([
 				popup: menuHelp
 			}));
 
-			var context = this.rfe.context;
+
 			context.watch(lang.hitch(this, function() {
 				this.enableMenuItems(menuFile, context);
 			}));
@@ -129,6 +134,13 @@ define([
 		 * @param {dojo/Stateful} context
 		 */
 		enableMenuItems: function(menu, context) {
+			array.filter(menu.getChildren(), function(item) {
+				var cx = item.get('context');
+				item.set('disabled', true);
+			});
+
+		},
+		enableMenuItems_old: function(menu, context) {
 			// TODO: this does not work with i18n since it uses the labels...
 			// If not clicked on a item (tree.node or grid.row), but below widget and nothing is selected,
 			// then set all menuItems to disabled except create/upload
@@ -136,7 +148,7 @@ define([
 			if (context.isOnTree || context.isOnTreePane) {
 				array.filter(menu.getChildren(), function(item) {
 					label = item.get('label');
-					if (label != 'New' && label != 'Upload') {
+					if (label !== 'New' && label !== 'Upload') {
 						item.set('disabled', true);
 					}
 				});
@@ -144,7 +156,7 @@ define([
 			else if (context.isOnGridPane) {
 				array.filter(menu.getChildren(), function(item) {
 					label = item.get('label');
-					if (label == 'Rename' || label == 'Delete') {
+					if (label === 'Rename' || label === 'Delete') {
 						item.set('disabled', true);
 					}
 				});
