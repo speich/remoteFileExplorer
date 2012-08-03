@@ -83,6 +83,7 @@ define([
 		},
 
 		renderHeader: function() {
+			// Note: overriding to be able to manipulate sorting, when clicking on header
 			var grid = this, headerNode;
 
 			//target = grid._sortNode;	// access before sort is called, because Grid._setSort will delete the sort node
@@ -97,45 +98,40 @@ define([
 
 				// respond to click or space keypress
 				if (event.type === "click" || event.keyCode === 32) {
-					var target = event.target, field, descending, sort, sortObj;
+					var target = event.target, field, descending, arrSort, sortObj;
 
-
-					// remove previous added sorting by store.childrenAttr, e.g. group by folder
-					sort = array.filter(grid._sort, function(sortObj) {
-						return sortObj.attribute !== grid.store.childrenAttr;
-					});
-
+					// remove previous added sorting by childrenAttr, e.g. group by folder
+					arrSort = grid._sort;
+					if (arrSort && arrSort.length === 2) {
+						arrSort.shift();
+					}
 
 					do {
-						if (target.field) {
-							// stash node subject to DOM manipulations,
-							// to be referenced then removed by sort()
+						if (target.field) {	// true = found the right node
+							// stash node subject to DOM manipulations to be referenced then removed by sort()
 							grid._sortNode = target;
 
 							field = target.field || target.columnId;
+							sortObj = arrSort[0];	// might be undefined
 
-							sortObj = sort[0];	// might be undefined
-
-							// if the click is on same column as the active sort, reverse direction
+							// if the click is on same column as the active sort, reverse direction of corresponding sort object
 							descending = sortObj && sortObj.attribute === field && !sortObj.descending;
 							sortObj = {
 								attribute: field,
 								descending: descending
 							};
 
+							arrSort = [sortObj];
 
-							sort = [sortObj];
-
+							// sort by childrenAttr first
 							if (sortObj.attribute !== grid.store.childrenAttr) {
-								sort.unshift({
+								arrSort.unshift({
 									attribute: grid.store.childrenAttr,
 									descending: descending
 								});
-
 							}
 
-
-							return grid.set("sort", sort);
+							return grid.set("sort", arrSort);
 						}
 					} while ((target = target.parentNode) && target !== headerNode);
 				}

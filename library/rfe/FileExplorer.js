@@ -144,9 +144,6 @@ define([
 					//grid.renderArray(children)
 					// cache.query() always queries the master store -> no caching!
 					var sort = grid.get('sort');
-					if (sort.length === 1) {
-						sort.unshift({attribute: store.childrenAttr, descending: false});
-					}
 					grid.set('query', {parId: object.id}, {sort: sort});
 				});
 			}
