@@ -16,7 +16,13 @@ define([
 ], function(lang, declare, array, on, aspect, registry,
 				MenuBar, PopupMenuBarItem, DropDownMenu, MenuItem, MenuSeparator, PopupMenuItem, CheckedMenuItem) {
 
-	return declare([MenuBar], {
+	/**
+	 * @class
+	 * @name rfe.layout.Menubar
+	 * @extends dijit.MenuBar
+	 * @property {rfe} rfe reference to remoteFileExplorer
+	 */
+	return declare([MenuBar], /** @lends rfe.layout.Menubar.prototype */ {
 
 		rfe: null,
 

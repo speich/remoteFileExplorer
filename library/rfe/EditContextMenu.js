@@ -15,10 +15,17 @@ define([
 	'dijit/PopupMenuItem'
 ], function(lang, array, declare, Deferred, on, aspect, mouse, dom, domClass, _WidgetBase, registry, Menu, MenuItem, PopupMenuItem) {
 
-	return declare([_WidgetBase], {
+	/**
+	 * @class
+	 * @name rfe.EditContextMenu
+	 * @extends {dijit._WidgetBase}
+	 * @property {rfe} rfe reference to remoteFileExplorer
+	 */
+	return declare([_WidgetBase], /** @lends rfe.EditContextMenu.prototype */ {
 
 		rfe: null,
 
+		/** @constructor */
 		constructor: function(props) {
 			lang.mixin(this, props || {});
 		},
@@ -28,28 +35,30 @@ define([
 		 * @target {object} target domNode
 		 */
 		postCreate: function() {
-			var p = this.rfe.panes;
-			var menu = Menu({
+			var p, menu, subMenu, context;
+
+			p = this.rfe.panes;
+			menu = new Menu({
 				targetNodeIds: [p.treePane.id, p.gridPane.id], // grid extends to same size as pane, tree not
 				popUpDelay: 10
 			});
-			var subMenu = Menu();
-			menu.addChild(PopupMenuItem({
+			subMenu = new Menu();
+			menu.addChild(new PopupMenuItem({
 				label: 'New',
 				popup: subMenu,
 				iconClass: "dijitEditorIcon dijitEditorIconNewPage"
 			}));
-			menu.addChild(MenuItem({
+			menu.addChild(new MenuItem({
 				label: 'Rename',
 				onClick: lang.hitch(this.rfe, this.rfe.rename)
 			}));
-			menu.addChild(MenuItem({
+			menu.addChild(new MenuItem({
 				label: 'Delete',
 				onClick: lang.hitch(this.rfe, this.rfe.del)
 			}));
 
 			// subMenu New
-			subMenu.addChild(MenuItem({
+			subMenu.addChild(new MenuItem({
 				label: 'Directory',
 				onClick: lang.hitch(this.rfe, function() {
 					this.createRename({
@@ -57,14 +66,14 @@ define([
 					});
 				})
 			}));
-			subMenu.addChild(MenuItem({
+			subMenu.addChild(new MenuItem({
 				label: 'File',
 				onClick: lang.hitch(this.rfe, this.rfe.createRename)
 			}));
 
 			menu.startup();
 
-			var context = this.rfe.context;
+			context = this.rfe.context;
 			context.watch(lang.hitch(this, function() {
 				this.enableMenuItems(menu, context);
 			}));
@@ -72,8 +81,8 @@ define([
 
 		/**
 		 * Enables or disables context menu items depending on the clicked context.
-		 * @param {dijit/Menu} menu
-		 * @param {dojo/Stateful} context
+		 * @param {dijit.Menu} menu
+		 * @param {dojo.Stateful} context
 		 */
 		enableMenuItems: function(menu, context) {
 			// TODO: this does not work with i18n since it uses the labels...
@@ -83,7 +92,7 @@ define([
 			if (context.isOnTree || context.isOnTreePane) {
 				array.filter(menu.getChildren(), function(item) {
 					label = item.get('label');
-					if (label != 'New' && label != 'Upload') {
+					if (label !== 'New' && label !== 'Upload') {
 						item.set('disabled', true);
 					}
 				});
@@ -91,7 +100,7 @@ define([
 			else if (context.isOnGridPane) {
 				array.filter(menu.getChildren(), function(item) {
 					label = item.get('label');
-					if (label == 'Rename' || label == 'Delete') {
+					if (label === 'Rename' || label === 'Delete') {
 						item.set('disabled', true);
 					}
 				});

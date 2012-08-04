@@ -47,7 +47,20 @@ define([
 		return value ? 'directory' : 'file';
 	}
 
-	return declare([Grid, Selection, editor, Keyboard, DnD, ColumnResizer], {
+	/**
+	 * @class
+	 * @name rfe.Grid
+	 * @extends {dgrid.OnDemandGrid} Grid
+	 * @extends {dgrid.Selection} Selection
+	 * @extends {dgrid.editor} editor
+	 * @extends {dgrid.Keyboard} Keyboard
+	 * @extends {dgrid.extensions.DnD} DnD
+	 * @extends {dgrid.extensions.ColumnResizer} ColumnResizer
+	 * @property {string} selectionMode
+	 * @property {string} allowSelectAll
+	 * @property {object} columns
+	 */
+	return declare([Grid, Selection, editor, Keyboard, DnD, ColumnResizer], /** @lends rfe.Grid.prototype */ {
 
 		selectionMode: 'extended',
 		allowSelectAll: true,
@@ -151,47 +164,6 @@ define([
 		getFirstRow: function() {
 			var nodes = query('.dgrid-row', this.bodyNode);
 			return this.row(nodes[0]);
-		},
-
-		/**
-		 * Sort the content
-		 * Always sorts by folders then files first (e.g. store.childrenAttr true/false) before sorting according to arguments.
-		 * @param {string|array} property field name to sort by, or actual array of objects with attribute and descending properties
-		 * @param {boolean} descending whether to sort ascending (false) or descending (true) in case where property is a string
-		 * @private
-		 */
-		_xxxsetSort: function(property, descending) {
-			// Note: sorting can be done by the following:
-			//		- grid.set('store', query, queryOptions) where queryOptions contains a sort attribute
-			//		- grid.set('query', queryOptions)
-			//		- store.query(query, queryOptions)
-			//		- grid.set('sort', sortOptions);
-			//
-			// When called from clicking on a grid column, only the first item in the sort array is used, but we
-			// always want to also sort by childrenAttr first (e.g. folder, files), we just add it in front before calling sort
-			// Order of inheritance:  _StoreMixin->setSort -> Grid._setSort -> List._setSort ->
-
-			var sortObj, sort, store = this.store;
-			sortObj = {attribute: store.childrenAttr, descending: descending};
-			if (store) {
-				if (typeof property === 'string') {   // sorting by clicking on column, where only first array item gets passed to sort
-					sort = [
-						sortObj,
-						{attribute: property, descending: descending}
-					];
-				}
-				else {
-					if (property.length === 1 && !property[0][store.childrenAttr]) {
-						property.unshift(sortObj);
-					}
-					sort = property;
-				}
-
-			}
-
-			console.log(this.store, property);
-			Grid.prototype._setSort.call(this, sort || property, descending);
-
 		}
 
 	});

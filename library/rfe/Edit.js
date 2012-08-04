@@ -5,7 +5,11 @@ define([
 	'dojo/_base/Deferred'
 ], function(lang, array, declare, Deferred) {
 
-	return declare(null, {
+	/**
+	 * @class
+	 * @name rfe.Edit
+	 */
+	return declare(null, /** @lends rfe.Edit.prototype */ {
 
 		/**
 		 * Delete selected file or folder object(s).
@@ -35,7 +39,7 @@ define([
 
 		/**
 		 * Creates a new file or folder object.
-		 * @param {object} itemProps
+		 * @param {object} object
 		 * @return {object} dojo.store object
 		 */
 		create: function(object) {

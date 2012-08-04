@@ -7,10 +7,17 @@ define([
 	'dijit/form/Button'
 ], function(lang, declare, aspect, registry, Toolbar, Button) {
 
-	return declare([Toolbar], {
+	/**
+	 * @class
+	 * @name rfe.layout.Toolbar
+	 * @extends dijit.Toolbar
+	 * @property {rfe} rfe reference to remoteFileExplorer
+	 */
+	return declare([Toolbar], /** @lends rfe.layout.Toolbar.prototype */ {
 
 		rfe: null,
 
+		/** #constructor */
 		constructor: function(props) {
 			lang.mixin(this, props || {});
 		},
@@ -21,8 +28,9 @@ define([
 		postCreate: function() {
 			this.inherited('postCreate', arguments);	// in case we've overriden something
 
-			var rfe = this.rfe;
-			var bt1 = new Button({
+			var rfe = this.rfe, bt1, bt2, bt3;
+
+			bt1 = new Button({
 				label: 'up',
 				showLabel: true,
 				iconClass: 'rfeToolbarIcon rfeToolbarIconDirUp',
@@ -37,11 +45,11 @@ define([
 				}
 			});
 			rfe.currentTreeObject.watch('id', function(prop, oldVal, newVal) {
-				bt1.set('disabled', newVal == rfe.tree.rootNode.item.id);
+				bt1.set('disabled', newVal === rfe.tree.rootNode.item.id);
 			});
 			this.addChild(bt1);
 
-			var bt2 = new Button({
+			bt2 = new Button({
 				label: 'history back',
 				showLabel: false,
 				iconClass: 'dijitEditorIcon dijitEditorIconUndo',
@@ -58,7 +66,7 @@ define([
 			});
 			this.addChild(bt2);
 
-			var bt3 = new Button({
+			bt3 = new Button({
 				label: 'history forward',
 				showLabel: false,
 				iconClass: 'dijitEditorIcon dijitEditorIconRedo',

@@ -23,10 +23,12 @@ define([
 	// TODO: override dgrid.renderRow() to create different views for grid content (e.g. view = list, details, thumbnails, etc.)
 
 	/**
-	 * File explorer allows you to browse files.
-	 * It consists of a tree and a grid. The tree loads file data over REST via php from remote server.
+	 * File explorer class creates an application that allows you to manage and browse files and directories
+	 * on a remote webserver server. It consists of tree and a grid. The tree loads file data over REST via php from remote server.
 	 * @class
 	 * @name rfe.FileExplorer
+	 * @extends {rfe.Layout}
+	 * @extends {rfe.Edit}
 	 * @property {string} version
 	 * @property {string} versionDate
 	 * @property {dojo.Stateful} currentTreeObject keeps track of currently selected store object in tree. Equals always parent of grid items
@@ -52,7 +54,6 @@ define([
 
 		/**
 		 * Creates the file explorer.
-		 * The global property object contains the urls to communicate with PHP backend.
 		 * @constructor
 		 */
 		constructor: function() {
@@ -123,7 +124,7 @@ define([
 				var node = evt.target;
 				lang.hitch(self, self._setContext(evt, node));
 			});*/
-			on(this.panes.domNode, '.rfeTreePane:mousedown, .rfeGridPane:mousedown, .dijitTreeRow:mousedown, .dgrid-row:mousedown, dgrid-select', function(evt) {
+			on(this.panes.domNode, '.rfeTreePane:mousedown, .rfeGridPane:mousedown, .dijitTreeRow:mousedown, .dgrid-row:mousedown, ', function(evt) {
 				var node = this;
 				lang.hitch(self, self._setContext(evt, node));
 			});
@@ -140,9 +141,7 @@ define([
 				dfd = new Deferred();
 
 			if (object.dir) {
-				dfd = Deferred.when(store.getChildren(object), function() {  // TODO:  I think we can use memory store directly because they are already loaded
-					//grid.renderArray(children)
-					// cache.query() always queries the master store -> no caching!
+				dfd = Deferred.when(store.getChildren(object), function() {
 					var sort = grid.get('sort');
 					grid.set('query', {parId: object.id}, {sort: sort});
 				});
