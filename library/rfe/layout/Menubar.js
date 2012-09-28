@@ -3,7 +3,7 @@ define([
 	'dojo/_base/declare',
 	'dojo/_base/array',
 	'dojo/on',
-	'dojo/aspect',
+	'dojo/topic',
 	'dijit/registry',
 	'dijit/MenuBar',
 	'dijit/PopupMenuBarItem',
@@ -13,8 +13,7 @@ define([
 	'dijit/PopupMenuItem',
 	'dijit/CheckedMenuItem'
 
-], function(lang, declare, array, on, aspect, registry,
-				MenuBar, PopupMenuBarItem, DropDownMenu, MenuItem, MenuSeparator, PopupMenuItem, CheckedMenuItem) {
+], function(lang, declare, array, on, topic, registry, MenuBar, PopupMenuBarItem, DropDownMenu, MenuItem, MenuSeparator, PopupMenuItem, CheckedMenuItem) {
 
 	/**
 	 * @class
@@ -31,10 +30,10 @@ define([
 
 			var context = this.rfe.context,
 				panes = this.rfe.panes,
-				menuFile, menuView, menuHelp, menuTools, menuItemV, subMenuFile;
+				menuItemDetails, menuItemIcons, menuFile, menuView, menuHelp, menuTools, menuItemV, subMenuFile;
 
 			// ********** menu file **************
-			menuFile = new DropDownMenu({	id: 'rfeMenuFile'	});
+			menuFile = new DropDownMenu({   id: 'rfeMenuFile'   });
 			subMenuFile = new DropDownMenu();
 			menuFile.addChild(new PopupMenuItem({
 				label: 'New',
@@ -57,42 +56,54 @@ define([
 				label: 'Rename',
 				onClick: lang.hitch(this.rfe, this.rfe.rename)
 			}));
-			context.watch(function(prop, oldVal, newVal) {
-				//console.log(prop, oldVal, newVal)
-				//context.isOnTree || context.isOnTreePane
-			});
 
 			menuFile.addChild(new MenuItem({
 				label: 'Delete',
-				onClick: lang.hitch(this.rfe, this.rfe.del),
-				context: 'grid'
+				onClick: lang.hitch(this.rfe, this.rfe.del)
 			}));
 
 			// ******* menu layout ********
-			menuView = new DropDownMenu({ id: 'rfeMenuView' });
+			menuView = new DropDownMenu();
+			menuItemDetails = new CheckedMenuItem({
+				label: 'As Details',
+				checked: false,
+				onClick: lang.hitch(this, function() {
+					topic.publish('grid/views/state', 'details');
+				})
+			});
+			// TODO: is this the best way ?
+			topic.subscribe('grid/views/state', function(state) {
+				menuItemDetails.set('checked', state === 'details');
+			});
+			menuView.addChild(menuItemDetails);
+			menuItemIcons = new CheckedMenuItem({
+				label: 'As Icons',
+				checked: false,
+				onClick: lang.hitch(this, function() {
+					topic.publish('grid/views/state', 'icons');
+				})
+			});
+			topic.subscribe('grid/views/state', function(state) {
+				menuItemIcons.set('checked', state === 'icons');
+			});
+			menuView.addChild(menuItemIcons);
+			menuView.addChild(new MenuSeparator());
 			menuItemV = new CheckedMenuItem({
 				label: 'Layout vertical',
 				checked: panes.get('view') !== 'horizontal',
-				onClick: lang.hitch(this, function() {
-					if (menuItemV.get('checked') === true) {
-						panes.set('view', 'vertical');
-					}
-					else {
-						panes.set('view', 'horizontal');
-					}
-				})
+				onClick: function() {
+					panes.set('view', menuItemV.get('checked') === true ? 'vertical' : 'horizontal');
+				}
 			});
 			menuView.addChild(menuItemV);
-			//menuView.addChild(new MenuSeparator());
 			menuView.addChild(new CheckedMenuItem({
 				id: 'rfeMenuItemFolders',
 				label: 'Navigation pane',
 				checked: panes.get('treePaneVisible') === true,
 				onChange: function() {
-					panes.set('treePaneVisible', this.checked)
+					panes.set('treePaneVisible', this.checked);
 				}
 			}));
-
 
 			// ********** menu tools ***************
 			menuTools = new DropDownMenu({ id: 'rfeMenuTools' });
@@ -127,51 +138,39 @@ define([
 				popup: menuHelp
 			}));
 
-
 			context.watch(lang.hitch(this, function() {
+				console.log('watching context', context)
 				this.enableMenuItems(menuFile, context);
 			}));
-
 		},
 
 		/**
 		 * Enable/disable menu items depending on the context
-		 * @param {dijit/DropDownMenu} menu
-		 * @param {dojo/Stateful} context
+		 * @param {dijit.DropDownMenu} menu
+		 * @param {dojo.Stateful} context
 		 */
 		enableMenuItems: function(menu, context) {
-			array.filter(menu.getChildren(), function(item) {
-				var cx = item.get('context');
-				item.set('disabled', true);
-			});
-
-		},
-		enableMenuItems_old: function(menu, context) {
 			// TODO: this does not work with i18n since it uses the labels...
 			// If not clicked on a item (tree.node or grid.row), but below widget and nothing is selected,
 			// then set all menuItems to disabled except create/upload
 			var label = '';
-			if (context.isOnTree || context.isOnTreePane) {
-				array.filter(menu.getChildren(), function(item) {
-					label = item.get('label');
-					if (label !== 'New' && label !== 'Upload') {
-						item.set('disabled', true);
+			array.filter(menu.getChildren(), function(item) {
+				label = item.get('label');
+				item.set('disabled', true);
+				if (context.isOnTree) {
+					if (label === 'New' || label === 'Upload') {
+						item.set('disabled', false);
 					}
-				});
-			}
-			else if (context.isOnGridPane) {
-				array.filter(menu.getChildren(), function(item) {
-					label = item.get('label');
-					if (label === 'Rename' || label === 'Delete') {
-						item.set('disabled', true);
+				}
+				else if (context.isOnGridPane) {
+					if (label === 'New') {
+						item.set('disabled', false);
 					}
-				});
-			}
-			else if (context.isOnGrid) {
-				array.forEach(menu.getChildren(), function(item) {
+				}
+				else if (context.isOnGrid) {
 					item.set('disabled', false);
-				});
-			}
+				}
+			});
 		}
 
 	});

@@ -19,9 +19,9 @@ function (lang, window, array, declare, construct, domClass, attr, query, Avatar
 				files: new Image(),
 				file: new Image()
 			};
-			this.images.folder.src = '/library/rfe/resources/images/folder_yellow.png';
-			this.images.files.src = '/library/rfe/resources/images/files.png';
-			this.images.file.src = '/library/rfe/resources/images/file.png';
+			this.images.folder.src = '/library/rfe/resources/images/icons-64/folder.png';
+			this.images.files.src = '/library/rfe/resources/images/icons-64/files.png';
+			this.images.file.src = '/library/rfe/resources/images/icons-64/file.png';
 
 			this.isA11y = domClass.contains(window.body(), "dijit_a11y");
 			var a = construct.create("table", {

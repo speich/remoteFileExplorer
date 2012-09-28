@@ -39,7 +39,8 @@ define([
 
 			p = this.rfe.panes;
 			menu = new Menu({
-				targetNodeIds: [p.treePane.id, p.gridPane.id], // grid extends to same size as pane, tree not
+				//targetNodeIds: [p.treePane.id, p.gridPane.id],
+				selector: '.dgrid-content, dijitTreeContainer',
 				popUpDelay: 10
 			});
 			subMenu = new Menu();
@@ -112,5 +113,5 @@ define([
 			}
 		}
 
-	})
+	});
 });

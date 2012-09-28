@@ -7,7 +7,7 @@
  * Solution: The idea is to defer de-/selection on mouseDown to mouseUp (@see setSelection())
  */
 
-define([
+define('test', [
 	'dojo/_base/array',
 	'dojo/_base/lang',
 	'dojo/_base/event',
@@ -28,7 +28,6 @@ define([
 		_selectByMouse: false,
 		_dragged: false,
 		getSelectedNodes: ref.getSelectedTreeNodes, // map two dnd method
-
 
 		onMouseDown: function(evt) {
 			// Note: Overriding to remove doing nothing on right click and also to remove stopping event (we need to bubble up

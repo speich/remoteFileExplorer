@@ -65,19 +65,13 @@ define([
 				numSteps: 5
 			};
 			this.store = new FileStore();
-			this.context = new Stateful({
-				isOnGrid: false,
-				isOnTree: false,
-				isOnTreePane: false,
-				isOnGridPane: false
-			});
+			this.context = new Stateful();
 			this.domNode = dom.byId(this.id);	// TODO: remove when using dijit._WidgetBase
 		},
 
 		startup: function() {
 			this.init();
 			this.initEvents();
-//			this.initContextMenu(dom.byId(this.id));
 		},
 
 		initEvents: function() {
@@ -124,7 +118,8 @@ define([
 				var node = evt.target;
 				lang.hitch(self, self._setContext(evt, node));
 			});*/
-			on(this.panes.domNode, '.rfeTreePane:mousedown, .rfeGridPane:mousedown, .dijitTreeRow:mousedown, .dgrid-row:mousedown, ', function(evt) {
+
+			on(this.panes.domNode, '.rfeTreePane:mousedown, .rfeGridPane:mousedown, .dijitTreeRow:mousedown, .dgrid-row:click, ', function(evt) {
 				var node = this;
 				lang.hitch(self, self._setContext(evt, node));
 			});
@@ -297,12 +292,11 @@ define([
 		 */
 		_setContext: function(evt, node) {
 			this.context.set({
-				isOnGrid: domClass.contains(node, 'dgrid-row'),
-				isOnGridPane: domClass.contains(node, 'rfeGridPane'),
-				isOnTree: domClass.contains(node, 'dijitTreeRow'),
-				isOnTreePane: domClass.contains(node, 'rfeTreePane')
+				isOnGrid: node ? domClass.contains(node, 'dgrid-row') : false,
+				isOnGridPane: node ? domClass.contains(node, 'rfeGridPane') : false,
+				isOnTree: node ? domClass.contains(node, 'dijitTreeRow') : false,
+				isOnTreePane: node ? domClass.contains(node, 'rfeTreePane') : false
 			});
-			console.log('context set to', this.context, evt, node);
 		},
 
 		/**
@@ -314,6 +308,7 @@ define([
 				object, oreo, arr, id, paths = [];
 
 			oreo = tree.dndController.cookieName ? cookie(tree.dndController.cookieName) : false;	// not available in 1.7.2
+
 			if (tree.persist && oreo) {
 				// extract information to display folder content in grid
 				paths = array.map(oreo.split(","), function(path) {
@@ -322,24 +317,25 @@ define([
 				// we only use last object in array to set the folders in the grid (normally there would be one selection only anyway)
 				arr = paths[paths.length - 1];
 				id = arr[arr.length - 1];
-
-				Deferred.when(store.get(id), lang.hitch(this, function(object) {
-					Deferred.when(store.getChildren(object), function() {	// load children first before setting store
-						// Setting caching store for grid would not use cache, because cache.query() always uses the
-						// master store => use storeMemory.
-						grid.set('store', store.storeMemory, { parId: id });
-					});
-					this.currentTreeObject.set(object);
-				}));
 			}
 			else {
 				// no cookie available use root
 				object = tree.rootNode.item;
 				id = object.id;
-				this.display(object);
 			}
 
+			Deferred.when(store.get(id), lang.hitch(this, function(object) {
+				Deferred.when(store.getChildren(object), function() {	// load children first before setting store
+					// Setting caching store for grid would not use cache, because cache.query() always uses the
+					// master store => use storeMemory.
+					grid.set('store', store.storeMemory, { parId: id });
+				});
+				this.currentTreeObject.set(object);
+			}));
+
+			this.context.set('isOnTree', true);
 			this.setHistory(id);   // do not set history in display() since history uses display too in goHistory()
+
 		}
 	});
 

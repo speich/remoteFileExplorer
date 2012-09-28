@@ -5,9 +5,11 @@ define([
 	'dojo/_base/event',
 	'dojo/aspect',
 	'dojo/on',
+	'dojo/topic',
 	'dojo/cookie',
 	'dojo/dom-construct',
 	'dojo/query',
+	'dojo/Stateful',
 	'dijit/Tree',
 	'dijit/tree/dndSource',
 	'rfe/Grid',
@@ -20,7 +22,8 @@ define([
 	'rfe/layout/Panes',
 	'rfe/Console',
 	'rfe/EditContextMenu'
-], function(array, lang, declare, event, aspect, on, cookie, domConstruct, query, Tree, TreeSource, Grid, GridSource, registry, CheckBox, Dialog, Toolbar, Menubar, Panes, Console, EditContextMenu) {
+
+], function(array, lang, declare, event, aspect, on, topic, cookie, domConstruct, query, Stateful, Tree, TreeSource, Grid, GridSource, registry, CheckBox, Dialog, Toolbar, Menubar, Panes, Console, EditContextMenu) {
 
 	/**
 	 * @class
@@ -72,7 +75,15 @@ define([
 			this.console.placeAt(this.panes.logPane.domNode);
 			this.initGrid();
 			this.initTree();
+			this.initTopics();
 			this.initDialogs();
+		},
+
+		initTopics: function() {
+			topic.publish('grid/views/state', 'details');
+			topic.subscribe('grid/views/state', lang.hitch(this, function(state) {
+				this.grid.set('view', state);
+			}));
 
 		},
 
@@ -100,7 +111,7 @@ define([
 		},
 
 		initGrid: function() {
-			var div = domConstruct.create('div', {}, this.panes.gridPane.domNode);
+			var div = domConstruct.create('div', null, this.panes.gridPane.domNode);
 			this.grid = new Grid({
 				store: null, // store is set in FileExplorer.initState()
 				dndConstructor: GridSource,
@@ -109,6 +120,10 @@ define([
 					fileStore: this.store
 				}
 			}, div);
+		},
+
+		initMenuitems: function() {
+
 		},
 
 		initDialogs: function() {

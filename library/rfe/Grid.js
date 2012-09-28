@@ -11,11 +11,13 @@ define([
 	'dgrid/Keyboard',
 	'dgrid/extensions/DnD',
 	'dgrid/extensions/ColumnResizer',
+	'dgrid/extensions/ColumnHider',
+	"dgrid/extensions/Views",
 	'dgrid/extensions/DijitRegistry',
 	'xstyle/has-class',
 	'xstyle/css',
 	'put-selector/put'
-], function(lang, Deferred, declare, array, listen, query, Grid, Selection, editor, Keyboard, DnD, ColumnResizer) {
+], function(lang, Deferred, declare, array, listen, query, Grid, Selection, editor, Keyboard, DnD, ColumnResizer, ColumnHider, Views) {
 
 
 	/**
@@ -60,7 +62,7 @@ define([
 	 * @property {string} allowSelectAll
 	 * @property {object} columns
 	 */
-	return declare([Grid, Selection, editor, Keyboard, DnD, ColumnResizer], /** @lends rfe.Grid.prototype */ {
+	return declare([Grid, Selection, editor, Keyboard, DnD, ColumnResizer, ColumnHider, Views], /** @lends rfe.Grid.prototype */ {
 
 		selectionMode: 'extended',
 		allowSelectAll: true,
@@ -101,8 +103,6 @@ define([
 
 			//target = grid._sortNode;	// access before sort is called, because Grid._setSort will delete the sort node
 			this.inherited('renderHeader', arguments);
-
-//			console.log(this.get('columns'), this.headerNode)
 
 			headerNode = this.headerNode;
 
