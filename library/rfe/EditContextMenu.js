@@ -12,48 +12,38 @@ define([
 	'dijit/registry',
 	'dijit/Menu',
 	'dijit/MenuItem',
-	'dijit/PopupMenuItem'
+	'dijit/PopupMenuItem',
+    "dojo/query!css2"
 ], function(lang, array, declare, Deferred, on, aspect, mouse, dom, domClass, _WidgetBase, registry, Menu, MenuItem, PopupMenuItem) {
 
 	/**
 	 * @class
 	 * @name rfe.EditContextMenu
-	 * @extends {dijit._WidgetBase}
+	 * @extends {dijit.Menu}
 	 * @property {rfe} rfe reference to remoteFileExplorer
+	 * @property {number} popUpDelay
 	 */
-	return declare([_WidgetBase], /** @lends rfe.EditContextMenu.prototype */ {
+	return declare([Menu], /** @lends rfe.EditContextMenu.prototype */ {
 
 		rfe: null,
+        popUpDelay: 10,
 
-		/** @constructor */
-		constructor: function(props) {
-			lang.mixin(this, props || {});
-		},
-
-		/**
-		 * Initialize context menu for the file explorer.
-		 * @target {object} target domNode
-		 */
 		postCreate: function() {
-			var p, menu, subMenu, context;
+            this.inherited('postCreate', arguments);
 
-			p = this.rfe.panes;
-			menu = new Menu({
-				//targetNodeIds: [p.treePane.id, p.gridPane.id],
-				selector: '.dgrid-content, dijitTreeContainer',
-				popUpDelay: 10
-			});
+			var subMenu, context;
+
 			subMenu = new Menu();
-			menu.addChild(new PopupMenuItem({
+			this.addChild(new PopupMenuItem({
 				label: 'New',
 				popup: subMenu,
 				iconClass: "dijitEditorIcon dijitEditorIconNewPage"
 			}));
-			menu.addChild(new MenuItem({
+			this.addChild(new MenuItem({
 				label: 'Rename',
 				onClick: lang.hitch(this.rfe, this.rfe.rename)
 			}));
-			menu.addChild(new MenuItem({
+            this.addChild(new MenuItem({
 				label: 'Delete',
 				onClick: lang.hitch(this.rfe, this.rfe.del)
 			}));
@@ -72,11 +62,11 @@ define([
 				onClick: lang.hitch(this.rfe, this.rfe.createRename)
 			}));
 
-			menu.startup();
+            this.startup();
 
 			context = this.rfe.context;
 			context.watch(lang.hitch(this, function() {
-				this.enableMenuItems(menu, context);
+				this.enableMenuItems(this, context);
 			}));
 		},
 
@@ -89,7 +79,9 @@ define([
 			// TODO: this does not work with i18n since it uses the labels...
 			// If not clicked on a item (tree.node or grid.row), but below widget and nothing is selected,
 			// then set all menuItems to disabled except create/upload
-			var label = '';
+			var label = ''//,
+                    //context = this.rfe.context;
+
 			if (context.isOnTree || context.isOnTreePane) {
 				array.filter(menu.getChildren(), function(item) {
 					label = item.get('label');

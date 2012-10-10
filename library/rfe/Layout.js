@@ -63,16 +63,16 @@ define([
 			this.menubar = new Menubar({
 				rfe: this
 			}, domConstruct.create('div'));
-			this.editContextMenu = new EditContextMenu({
-				rfe: this
-			});
 
 			this.menubar.placeAt(this.panes.menuPane.domNode);
 			this.toolbar.placeAt(this.panes.menuPane.domNode);
-
-			this.panes.startup();
-			this.console = new Console();
-			this.console.placeAt(this.panes.logPane.domNode);
+            this.panes.startup();
+            this.editContextMenu = new EditContextMenu({
+                rfe: this,
+                targetNodeIds: [this.panes.treePane.id, this.panes.gridPane.id]
+            });
+            this.console = new Console();
+            this.console.placeAt(this.panes.logPane.domNode);
 			this.initGrid();
 			this.initTree();
 			this.initTopics();
@@ -84,7 +84,6 @@ define([
 			topic.subscribe('grid/views/state', lang.hitch(this, function(state) {
 				this.grid.set('view', state);
 			}));
-
 		},
 
 		/**
@@ -118,7 +117,8 @@ define([
 				dndParams: {
 					accept: ['treeNode'],
 					fileStore: this.store
-				}
+				},
+                contextMenu: null
 			}, div);
 		},
 
