@@ -36,10 +36,6 @@ function (lang, window, array, declare, construct, domClass, attr, query, Avatar
 			b = construct.create("tbody", null, a),
 			tr = construct.create("tr", null, b),
 			td = construct.create("td", null, tr),
-			icon = this.isA11y ? construct.create("span", {
-				id: "a11yIcon",
-				innerHTML: this.manager.copy ? '+' : "<"
-			}, td) : null,
 			span = construct.create("span", {
 				innerHTML: source.generateText ? this._generateText() : ""
 			}, td);
@@ -65,12 +61,14 @@ function (lang, window, array, declare, construct, domClass, attr, query, Avatar
 		},
 
 		createIcon: function () {
-			var img, nodes = this.manager.nodes;
-			var source = this.manager.source;
-			var isDir = array.some(nodes, function (node) {
-				var obj = source.getObject(node);
-				return obj.dir;
-			}, this);
+			var img,
+				nodes = this.manager.nodes,
+				source = this.manager.source,
+				isDir = array.some(nodes, function (node) {
+					var obj = source.getObject(node);
+					return obj.dir;
+				}, this);
+
 			if (isDir) {
 				img = this.images.folder;
 			}
@@ -85,8 +83,9 @@ function (lang, window, array, declare, construct, domClass, attr, query, Avatar
 
 		_generateText: function () {
 			// summary: generates a proper text to reflect copying or moving of items
-			var numItems = this.manager.nodes.length.toString();
-			var action = this.manager.copy ? 'Copy to' : 'Move to';
+			var numItems = this.manager.nodes.length.toString(),
+				action = this.manager.copy ? 'Copy to' : 'Move to';
+
 			return numItems + ', ' + action;
 		}
 	});
