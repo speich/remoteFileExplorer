@@ -4,6 +4,7 @@ define([
 	'dojo/_base/declare',
 	'dojo/_base/array',
 	'dojo/on',
+	'dojo/aspect',
 	'dojo/query',
 	'dgrid/OnDemandGrid',
 	'dgrid/Selection',
@@ -12,17 +13,18 @@ define([
 	'dgrid/extensions/DnD',
 	'dgrid/extensions/ColumnResizer',
 	'dgrid/extensions/ColumnHider',
-	"dgrid/extensions/Views",
+//	"dgrid/extensions/Views",
 	'dgrid/extensions/DijitRegistry',
 	'xstyle/has-class',
 	'xstyle/css',
 	'put-selector/put'
-], function(lang, Deferred, declare, array, listen, query, Grid, Selection, editor, Keyboard, DnD, ColumnResizer, ColumnHider, Views) {
-
+], function(lang, Deferred, declare, array, on, aspect, query, Grid, Selection, editor, Keyboard, DnD, ColumnResizer, ColumnHider/*, Views*/) {
 
 	/**
 	 * Create HTML string to display file type icon in grid
 	 * @param {Object} object
+	 * @param {Object} data
+	 * @param {Object} td
 	 */
 	function formatImg(object, data, td) {
 		var str, strClass = object.dir ? 'dijitFolderClosed' : 'dijitLeaf';
@@ -52,20 +54,21 @@ define([
 	/**
 	 * @class
 	 * @name rfe.Grid
-	 * @extends {dgrid.OnDemandGrid} Grid
-	 * @extends {dgrid.Selection} Selection
+	 * @extends {OnDemandGrid} Grid
+	 * @extends {dgrid/Selection} Selection
 	 * @extends {dgrid.editor} editor
-	 * @extends {dgrid.Keyboard} Keyboard
+	 * @extends {dgrid/Keyboard} Keyboard
 	 * @extends {dgrid.extensions.DnD} DnD
 	 * @extends {dgrid.extensions.ColumnResizer} ColumnResizer
 	 * @property {string} selectionMode
 	 * @property {string} allowSelectAll
 	 * @property {object} columns
 	 */
-	return declare([Grid, Selection, editor, Keyboard, DnD, ColumnResizer, ColumnHider, Views], /** @lends rfe.Grid.prototype */ {
+	return declare([Grid, Selection, editor, Keyboard, ColumnResizer, ColumnHider, DnD/*, Views*/], /** @lends rfe.Grid.prototype */ {
 
 		selectionMode: 'extended',
 		allowSelectAll: true,
+		maintainOddEven: false,
 		columns: {
 			name: editor({
 				sortable: false, // lets us apply own header click sort
@@ -97,6 +100,21 @@ define([
 			}
 		},
 
+		postCreate: function() {
+			this.inherited('postCreate', arguments);
+			// prevent bubbling of double click on editor content to allow selecting of words,
+			// otherwise on a folder object its contents would be loaded and displayed instead.
+			aspect.after(this, 'edit', function(promise) {
+				promise.then(function(widget) {
+					if (!widget.signal) {
+						widget.signal = on(widget, 'dblclick', function(evt) {
+							evt.stopPropagation();
+						});
+					}
+				});
+			});
+		},
+
 		renderHeader: function() {
 			// Note: overriding to be able to manipulate sorting, when clicking on header
 			var grid = this, headerNode;
@@ -107,7 +125,7 @@ define([
 			headerNode = this.headerNode;
 
 			// if it columns are sortable, resort on clicks
-			listen(headerNode.firstChild, "click,keydown", function(event) {
+			on(headerNode.firstChild, "click,keydown", function(event) {
 
 				// respond to click or space keypress
 				if (event.type === "click" || event.keyCode === 32) {
@@ -148,9 +166,7 @@ define([
 						}
 					} while ((target = target.parentNode) && target !== headerNode);
 				}
-
 			});
-
 		},
 
 		/**
@@ -165,6 +181,7 @@ define([
 			var nodes = query('.dgrid-row', this.bodyNode);
 			return this.row(nodes[0]);
 		}
+
 
 	});
 });
