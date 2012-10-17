@@ -3,13 +3,13 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Remote File Explorer (rfe)</title>
-<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.8/dijit/themes/claro/document.css"/>
-<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.8/dijit/themes/claro/claro.css"/>
-<!--<link rel="stylesheet" type="text/css" href="/library/dojo/trunk/dijit/themes/claro/claro.css"/>--><!-- contains fix to borders in tree -->
+<!--<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.8/dijit/themes/claro/document.css"/>
+<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.8/dijit/themes/claro/claro.css"/>-->
+<link rel="stylesheet" type="text/css" href="/library/dojo/1.8.0/dijit/themes/claro/document.css"/>
+<link rel="stylesheet" type="text/css" href="/library/dojo/1.8.0/dijit/themes/claro/claro.css"/>
 <link rel="stylesheet" href="/library/dgrid/css/skins/claro.css">
-<link rel="stylesheet" href="/library/dgrid/css/extensions/Views.css">
+<!-- <link rel="stylesheet" href="/library/dgrid/css/extensions/Views.css"> -->
 <link rel="stylesheet" href="/library/rfe/resources/rfe.css">
-
 </head>
 
 <body class="claro">
@@ -19,12 +19,13 @@ var dojoConfig = {
 	async: true,
 	ioPublish: true,
 	//baseUrl: 'http://ajax.googleapis.com/ajax/libs/dojo/1.8/dojo/',
-	baseUrl: '/library/dojo/trunk/dojo/',
+	baseUrl: '/library/dojo/1.8.0/dojo/',
 	packages: [
 		{name: 'dgrid', location: '/library/dgrid'},
 		{name: 'xstyle', location: '/library/xstyle'},
 		{name: 'put-selector', location: '/library/put-selector'},
 		{name: 'rfe', location: '/library/rfe'},
+		{name: 'DialogConfirm', location: '/library/DialogConfirm'},
 		{name: 'original', location: '../'}
 	],
 	// redirect the following modules to my own modules
@@ -35,11 +36,10 @@ var dojoConfig = {
 };
 
 </script>
-<script type="text/javascript" src="library/dojo/trunk/dojo/dojo.js"></script>
+<script type="text/javascript" src="library/dojo/1.8.0/dojo/dojo.js"></script>
 <!--<script src="http://ajax.googleapis.com/ajax/libs/dojo/1.8/dojo/dojo.js" type="text/javascript"></script>-->
 <script type="text/javascript">
 require(['dojo/ready', 'rfe/FileExplorer'], function(ready, FileExplorer) {
-
 	ready(function() {
 		var rfe = new FileExplorer({
 			id: 'remoteFileExplorer'

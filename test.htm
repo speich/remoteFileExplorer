@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Remote File Explorer (rfe)</title>
-<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.7.1/dijit/themes/claro/claro.css"/>
+<link rel="stylesheet" type="text/css" href="library/dojo/1.8.0/dijit/themes/claro/claro.css"/>
 <link rel="stylesheet" href="/library/dgrid/css/skins/claro.css">
 <style type="text/css">
 body, html {
@@ -22,11 +22,12 @@ body, html {
 
 <body class="claro">
 <div id="fileExplorer"></div>
+<div id="test" style="width: 200px; height: 200px; border: 1px solid #8a2be2;">test</div>
 <script type="text/javascript">
 var dojoConfig = {
 	async: true,
 	//baseUrl: 'http://ajax.googleapis.com/ajax/libs/dojo/1.7.1/dojo/',
-	baseUrl: '/library/dojo/trunk/dojo/',
+	baseUrl: '/library/dojo/1.8.0/dojo/',
 	packages: [
 		{name: 'dgrid', location: '/library/dgrid'},
 		{name: 'xstyle', location: '/library/xstyle'},
@@ -38,10 +39,11 @@ var dojoConfig = {
 };
 
 </script>
-<script type="text/javascript" src="library/dojo/trunk/dojo/dojo.js"></script>
+<script type="text/javascript" src="library/dojo/1.8.0/dojo/dojo.js"></script>
 <!--<script src="http://ajax.googleapis.com/ajax/libs/dojo/1.7.1/dojo/dojo.js" type="text/javascript"></script>-->
 <script type="text/javascript">
-require(['dojo/ready', 'dojo/_base/lang', 'dojo/_base/Deferred', 'dojo/on', 'rfe/store/FileStore', 'rfe/Grid'], function(ready, lang, Deferred, on, FileStore, Grid) {
+require(['dojo/ready', 'dojo/query', 'dojo/_base/lang', 'dojo/_base/Deferred', 'dojo/on', 'rfe/store/FileStore', 'rfe/Grid'],
+function(ready, query, lang, Deferred, on, FileStore, Grid) {
 	ready(function() {
 		var store = new FileStore();
         var grid = new Grid({
@@ -58,9 +60,14 @@ require(['dojo/ready', 'dojo/_base/lang', 'dojo/_base/Deferred', 'dojo/on', 'rfe
 
         }));
 
-        grid.on('.dgrid-row:mousedown,dgrid-cellfocusin', function(evt) {
-            console.log(evt);
-        })
+			on(document, '.claro:mousedown', function(evt) {
+				// for the time being we have to rely on the order of the selectors to prevent execute this twice in
+				// case we are on the grid/tree. Note: grid cancels bubbling or parent container for left mousedown only
+	//			evt.stopImmediatePropagation();
+				console.log(this, evt.type) //), evt.parentType);
+			});
+
+
 
     });
 });
