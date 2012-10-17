@@ -74,6 +74,7 @@ define([
 			 * @param {object} sourceSource dojo/dnd/Source dgrid or tree which is providing the items
 			 * @param {Array} nodes domNodes
 			 * @param {boolean} copy copy or move objects
+			 * @param target
 			 */
 			onDndDrop: function(sourceSource, nodes, copy, target) {
 				// Note: target parameter references whole tree and not a single tree node

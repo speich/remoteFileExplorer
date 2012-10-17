@@ -77,11 +77,8 @@ if ($json) {
 	// ressource not found
 else {
 	header($protocol.' 404 Not Found');
-	echo '[{"msg": "Ressource nicht gefunden."}]';
+	echo '[{"msg": "Ressource not found."}]';
 }
 
-
-
-	
 
 ?>

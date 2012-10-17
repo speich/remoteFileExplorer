@@ -22,22 +22,23 @@ define([
 						- no other checks necessary
 			*/
 
-			var grid  = source.grid;
-			var store = source.grid.store;
-			var i = 0, len = nodes.length;
+			var grid = source.grid,
+				store = source.grid.store,
+				object,
+				i = 0, len = nodes.length;
 
-			if (this.currentRowIndex == -1) {	// dropped onto grid, but not onto a grid row
-											oldParent = grid.getItem(0);		// -> we can use the parent of any row to get the parentItem
-										}
-										else {
-											oldParent = grid.getItem(this.currentRowIndex);
-										}
-										oldParent = grid.store.storeMemory.get(oldParent.parId);
+			if (this.currentRowIndex === -1) {   // dropped onto grid, but not onto a grid row
+				oldParent = grid.getItem(0);		// -> we can use the parent of any row to get the parentItem
+			}
+			else {
+				oldParent = grid.getItem(this.currentRowIndex);
+			}
+			oldParent = grid.store.storeMemory.get(oldParent.parId);
 
 
 			for (; i < len; i++) {
-				var object = source.getItem(nodes[i].id).data.item;
-				var oldParent = store.storeMemory.get(object.parId);
+				object = source.getItem(nodes[i].id).data.item,
+				oldParent = store.storeMemory.get(object.parId);
 				store.pasteItem(object, oldParent, oldParent, copy);
 			}
 		},

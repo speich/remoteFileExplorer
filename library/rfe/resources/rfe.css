@@ -72,6 +72,15 @@ html, body {
 	min-width: 120px;
 }
 
+.tblFileProperties {
+    padding: 2px;
+}
+.tblFileProperties td:first-child {
+    color: #a6a6a6;
+    text-align: right;
+    padding-right: 8px;
+}
+
 /*** Begin rfeDialogAbout ***/
 #rfeDialogAbout {
 	width: 320px;

@@ -21,14 +21,14 @@ define([
 	 * Class which creates a store to work with remote files over REST and local caching.
 	 * @class
 	 * @name rfe.store.FileStore
-	 * @property {dojo.store.JsonRest} storeMaster
-	 * @property {dojo.store.Memory} storeMemory
+	 * @property {JsonRest} storeMaster
+	 * @property {Memory} storeMemory
 	 * @property {string} childrenAttr
 	 * @property {string} parentAttr
 	 * @property {string} rootId
 	 * @property {string} rootLabel
 	 * @property {boolean} skipWithNoChildren getChildren returns only folders
-	 * @extends {dojo.store.Cache}
+	 * @extends {Cache}
 	 */
 	return declare(null, /** @lends rfe.store.FileStore.prototype */ {
 		storeMaster: null,
@@ -181,10 +181,10 @@ define([
 		 * @param {object} oldParentObject old parent object where the object was dragged from
 		 * @param {object} newParentObject new parent of the object, where the child was dragged to
 		 * @param {boolean} copy copy or move object
-		 * @return {dojo/Deferred}
+		 * @return {dojo.Deferred}
 		 */
 		pasteItem: function(object, oldParentObject, newParentObject, copy) {
-			var cachedChildren, dfd, self = this, newObject,
+			var dfd, self = this, newObject,
 				oldParentId, newParentId;
 
 			oldParentId = object[this.parentAttr];
@@ -198,7 +198,7 @@ define([
 				newObject[this.parentAttr] = newParentId;
 				dfd = this.add(newObject, {
 					incremental: true   // otherwise store JsonRest does POST instead of PUT even if object has an id
-					// TODO: use  overwrite: true instead of incremental?
+					// TODO: use overwrite: true instead of incremental?
 				});
 				dfd = Deferred.when(dfd, function(newId) {
 					newObject.id = newId;
@@ -208,9 +208,9 @@ define([
 			// move object
 			else {
 				// target folder might be cached (was visible at least once) then add to cache
-				// otherwise (its not visible) and we just put it to the server (master store)
+				// otherwise (its not visible) and we just put it to the server (master store):
 
-				// put updates the cache and consequently getChildren() will return the cached items
+				// Put updates the cache and consequently getChildren() will return the cached items
 				// and not query the masterStore anymore. If the new parent's children have not been cached previously,
 				// only the moved object(s) will be returned from cache and the potential children will not be loaded
 				// from the masterStore -> check if cached previously and if not, remove putted objects from cache
@@ -271,7 +271,7 @@ define([
 		/**
 		 * Callback to do notifications about new, updated, or deleted items.
 		 * @param {object} parent item
-		 * @param {array} newChildrenList
+		 * @param {array} children
 		 */
 		onChildrenChange: function(parent, children) {},
 

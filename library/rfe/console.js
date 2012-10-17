@@ -6,12 +6,20 @@ define([
 	'dojo/query',
 	'dojo/date/locale',
    'dijit/_WidgetBase'
-], function(lang, declare, connect, construct, query, locale, WidgetBase) {
+], function(lang, declare, connect, construct, query, locale, _WidgetBase) {
 
-	return declare([WidgetBase], {
+	/**
+	 * Simple log window for http requests.
+	 * @class
+	 * @name rfe.Console
+	 * @extends {dijit._WidgetBase}
+	 * @property {string} baseClass
+	 */
+	return declare([_WidgetBase], /** @lends rfe.Console */ {
 
 		baseClass: 'rfeConsole',
 
+		/** @constructor */
 		constructor: function(props) {
 
 			lang.mixin(this, props || {});
@@ -22,10 +30,8 @@ define([
 				this.netLog((dfd.ioArgs.error ? 'Error: ' : '') + xhr.status + ' ' + xhr.statusText + '<br>' + xhr.responseText)
 			}));
 			connect.subscribe("/dojo/io/send", lang.hitch(this, function(dfd) {
-				this.netLog(dfd.ioArgs.url, dfd)
+				this.netLog(dfd.ioArgs.url, dfd);
 			}));
-
-
 		},
 
 		postCreate: function() {
@@ -34,8 +40,7 @@ define([
 		},
 
 		netLog: function(msg, data) {
-			this.print(msg)
-
+			this.print(msg);
 		},
 
 		log: function(msg, data) {
@@ -103,8 +108,5 @@ define([
 		clear: function() {
 			this.domNode.innerHTML = '';
 		}
-
-
-
 	});
 });

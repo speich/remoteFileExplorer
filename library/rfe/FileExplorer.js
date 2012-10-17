@@ -9,14 +9,16 @@ define([
 	'dojo/dom-class',
 	'dojo/date/locale',
 	'dojo/on',
-	'dojo/mouse',
+	'dojo/topic',
+	'dojo/query',	// required for dojo/on event delegation
 	'dojo/Stateful',
 	'dijit/registry',
 	'rfe/Layout',
 	'rfe/Edit',
 	'rfe/Store/FileStore',
-	'rfe/dnd/Manager'
-], function(lang, array, declare, Deferred, cookie, keys, dom, domClass, locale, on, mouse, Stateful, registry, Layout, Edit, FileStore) {
+	'rfe/dialogs/dialogs',
+	'rfe/dnd/Manager'	// needs to be loaded for dnd
+], function(lang, array, declare, Deferred, cookie, keys, dom, domClass, locale, on, topic, query, Stateful, registry, Layout, Edit, FileStore, dialogs) {
 
 	// TODO: use dijit._WidgetBase
 	// TODO: multiselect (in tree allow only of files but not of folders)
@@ -52,20 +54,22 @@ define([
 		history: null,
 		store: null,
 
-		/**
-		 * Creates the file explorer.
-		 * @constructor
-		 */
+		/** @constructor  */
 		constructor: function() {
 			// TODO: should tree connect also on right click as grid? If so, attache event to set currentTreeItem
-			this.currentTreeObject = new Stateful();	// allows Toolbar and Menubar to keep track of selected item in tree
+			this.currentTreeObject = new Stateful();	// allows Toolbar and Edit to keep track of selected object in tree
 			this.history = {
 				steps: [],
 				curIdx: null,
 				numSteps: 5
 			};
 			this.store = new FileStore();
-			this.context = new Stateful();
+			this.context = new Stateful({
+				isOnGrid: false,
+				isOnGridPane: false,
+				isOnTree: false,
+				isOnTreePane: false
+			});
 			this.domNode = dom.byId(this.id);	// TODO: remove when using dijit._WidgetBase
 		},
 
@@ -76,22 +80,23 @@ define([
 
 		initEvents: function() {
 			var self = this,
-				grid = this.grid, tree = this.tree,
+				grid = this.grid,
+				tree = this.tree,
 				store = this.store;
 
-			tree.onClick = function(object) {
+			tree.on('click', function(object) {
 				self.displayChildrenInGrid(object);
 				self.setHistory(object.id);
 				self.currentTreeObject.set(object);
-			};
-			tree.onDblClick = function(object, nodeWidget, evt) {
+			});
+			tree.on('dblclick', function(object, nodeWidget) {
 				if(nodeWidget.isExpandable){
 					this._onExpandoClick({ node: nodeWidget });
 				}
 				self.displayChildrenInGrid(object);
 				self.setHistory(object.id);
 				self.currentTreeObject.set(object);
-			};
+			});
 			tree.on('load', lang.hitch(this, this.initState));
 
 			grid.on('.dgrid-row:dblclick', function(evt) {
@@ -112,16 +117,11 @@ define([
 				});
 			});
 
-			// TODO: Use focus instead of mousedown to set context for keyboard navigation?
-/*			on(this.domNode, 'mousedown, keydown', function(evt) {
-				console.log(evt.target, evt.currentTarget)
-				var node = evt.target;
-				lang.hitch(self, self._setContext(evt, node));
-			});*/
-
-			on(this.panes.domNode, '.rfeTreePane:mousedown, .rfeGridPane:mousedown, .dijitTreeRow:mousedown, .dgrid-row:click, ', function(evt) {
-				var node = this;
-				lang.hitch(self, self._setContext(evt, node));
+			// TODO: Set context on keyboard navigation too
+			on(this.panes.domNode, '.rfeTreePane:mousedown, .rfeGridPane:mousedown', function(evt) {
+				// note: can't add selectors .dijitTreeRow:mousedown and .dgrid-row:mousedown' since this handler would be called twice,
+				// once for the pane (parent container) and once for the widget (tree/grid)
+				lang.hitch(self, self._setContext(evt, this));
 			});
 		},
 
@@ -289,14 +289,20 @@ define([
 		/**
 		 * Returns an object describing on which part of the file explorer we are on
 		 * @param {Event} evt
+		 * @param {HTMLElement} node
 		 */
 		_setContext: function(evt, node) {
-			this.context.set({
-				isOnGrid: node ? domClass.contains(node, 'dgrid-row') : false,
-				isOnGridPane: node ? domClass.contains(node, 'rfeGridPane') : false,
-				isOnTree: node ? domClass.contains(node, 'dijitTreeRow') : false,
-				isOnTreePane: node ? domClass.contains(node, 'rfeTreePane') : false
-			});
+			var widget = registry.getEnclosingWidget(evt.target),
+				isGridRow = typeof this.grid.row(evt) !== 'undefined',
+				isTreeRow = widget && widget.baseClass === 'dijitTreeNode';
+
+			this.context = {
+				isOnGrid: isGridRow,
+				isOnGridPane: domClass.contains(node, 'rfeGridPane') && !isGridRow,
+				isOnTree: isTreeRow,
+				isOnTreePane: domClass.contains(node, 'rfeTreePane') && !isTreeRow
+			};
+			topic.publish('rfe/context/set', this.context);
 		},
 
 		/**
@@ -336,6 +342,33 @@ define([
 			this.context.set('isOnTree', true);
 			this.setHistory(id);   // do not set history in display() since history uses display too in goHistory()
 
+		},
+
+		showFileDetails: function() {
+			// Note: A visible file/folder object is always loaded
+			var dialog, id, store = this.store,
+				i = 0, len,
+				widget = this.context.isOnGrid || this.context.isOnGridPane ? this.grid : this.tree;
+
+			// TODO: if multiple selected file objects, only use one dialog with multiple values (and sum of all file sizes). Requires preloading folder contents first!
+			// grid
+			if (widget.selection) {
+				for (id in widget.selection) {
+					if (widget.selection[id] === true) {
+						dialog = dialogs.getByFileObj('fileProperties', store.get(id));
+						dialog.show();
+					}
+				}
+			}
+			// TODO: extend dijit.tree._dndSelector to work same way as grid.selection ? so we don't need to differentiate here
+			// tree
+			else if (widget.selectedItems) {
+				len = widget.selectedItems.length;
+				for (i; i < len; i++) {
+					dialog = dialogs.getByFileObj('fileProperties', widget.selectedItems[i]);
+					dialog.show();
+				}
+			}
 		}
 	});
 

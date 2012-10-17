@@ -30,8 +30,7 @@ define('test', [
 		getSelectedNodes: ref.getSelectedTreeNodes, // map two dnd method
 
 		onMouseDown: function(evt) {
-			// Note: Overriding to remove doing nothing on right click and also to remove stopping event (we need to bubble up
-			// to know where user clicked at in FileExplorer.getWidget
+			// Note: Overriding to remove doing nothing on right click
 			this._selectByMouse = true;
 			this._dragged = false;
 

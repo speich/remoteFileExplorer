@@ -21,9 +21,9 @@ define([
 	'rfe/layout/Menubar',
 	'rfe/layout/Panes',
 	'rfe/Console',
-	'rfe/EditContextMenu'
+	'rfe/ContextMenu'
 
-], function(array, lang, declare, event, aspect, on, topic, cookie, domConstruct, query, Stateful, Tree, TreeSource, Grid, GridSource, registry, CheckBox, Dialog, Toolbar, Menubar, Panes, Console, EditContextMenu) {
+], function(array, lang, declare, event, aspect, on, topic, cookie, domConstruct, query, Stateful, Tree, TreeSource, Grid, GridSource, registry, CheckBox, Dialog, Toolbar, Menubar, Panes, Console, ContextMenu) {
 
 	/**
 	 * @class
@@ -67,7 +67,7 @@ define([
 			this.menubar.placeAt(this.panes.menuPane.domNode);
 			this.toolbar.placeAt(this.panes.menuPane.domNode);
             this.panes.startup();
-            this.editContextMenu = new EditContextMenu({
+            this.editContextMenu = new ContextMenu({
                 rfe: this,
                 targetNodeIds: [this.panes.treePane.id, this.panes.gridPane.id]
             });
@@ -113,18 +113,15 @@ define([
 			var div = domConstruct.create('div', null, this.panes.gridPane.domNode);
 			this.grid = new Grid({
 				store: null, // store is set in FileExplorer.initState()
-				dndConstructor: GridSource,
+				dndConstructor: GridSource,	// dgrid/extension/dnd can't be overriden directly
 				dndParams: {
 					accept: ['treeNode'],
 					fileStore: this.store
-				},
-                contextMenu: null
+				}
 			}, div);
 		},
 
-		initMenuitems: function() {
 
-		},
 
 		initDialogs: function() {
 			// TODO: use dijit template for all dialogs

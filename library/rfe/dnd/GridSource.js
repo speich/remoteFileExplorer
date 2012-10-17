@@ -2,24 +2,22 @@ define([
 	'dojo/_base/declare',
 	'dojo/_base/lang',
 	'dojo/_base/Deferred',
-	'dojo/DeferredList',
-	'dojo/dnd/Source',
-	'dojo/dnd/Manager'
+	'dojo/on',
+	'dojo/mouse', // mouse.isLeft
+	'dojo/dnd/Source'
 ],
-function(declare, lang, Deferred, DeferredList, DnDSource) {
+function(declare, lang, Deferred, on, mouse, DnDSource) {
 
-	// Requirements:
-	// * requires a store (sounds obvious, but not all Lists/Grids have stores...)
-	// * must support options.before in put calls
-	//   (if undefined, put at end)
-	// * should support copy
-	//   (copy should also support options.before as above)
-
-	// TODOs:
-	// * consider sending items rather than nodes to onDropExternal/Internal
-	// * consider emitting store errors via OnDemandList._trackError
-
-	return declare(DnDSource, {
+	/**
+	 * Class to handle drag and drop of the dgrid.
+	 * @class
+	 * @name rfe.dnd.GridSource
+	 * @extends {dojo.dnd.Source}
+	 * @see dgrid/extensions/DnD.js
+	 * @property {OnDemandGrid} grid
+	 * @property {FileStore}
+	 */
+	return declare(DnDSource, /** @lends rfe.dnd.GridSource.prototype */ {
 
 		grid: null,
 
@@ -27,6 +25,25 @@ function(declare, lang, Deferred, DeferredList, DnDSource) {
 
 		getObject: function(node) {
 			return this.grid.row(node).data;
+		},
+
+		// Allow bubbling up by fixing dojo/dnd/Selector.js calling event.stop(et
+		// make sure event is only emitted once if necessary, e.g. left mouse down on grid.row
+		onMouseDown: function(evt) {
+			// Note: Overriding to bubble up
+						// to know where user clicked at in FileExplorer.getWidget
+			if (evt._dndSelf || !this.grid.row(evt) || mouse.isRight(evt)) {
+				// prevent endless loop when called from grid.row mousedown,
+				// also ignore when not on row or when right mousedown, which is not canceled by parent mouse down
+				return;
+			}
+			this.inherited('onMouseDown', arguments);
+			on.emit(evt.target, 'mousedown', {
+				bubbles: true,
+				cancelable: true,
+				_dndSelf: true
+			});
+			evt.preventDefault();
 		},
 
 		_legalMouseDown: function(evt){
@@ -75,6 +92,12 @@ function(declare, lang, Deferred, DeferredList, DnDSource) {
 			});
 		},
 
+		/**
+		 * Handle objects dropped from the grid onto the grid.
+		 * @param nodes
+		 * @param copy
+		 * @param newParentObject
+		 */
 		onDropInternal: function(nodes, copy, newParentObject) {
 			var fileStore = this.fileStore,
 				storeMemory = fileStore.storeMemory,
@@ -93,13 +116,16 @@ function(declare, lang, Deferred, DeferredList, DnDSource) {
 			nodes.forEach(function(node) {
 				var object = targetSource.getObject(node);
 
-				// all nodes in grid share same parent, only get once from first node. Since you can only drag an object
+				// all nodes in grid share same parent, only get it once from first node. Since you can only drag an object
 				// that's visible (hence loaded an cached) we can use the memoryStore
 				oldParentObject = oldParentObject || storeMemory.get(object[fileStore.parentAttr]);
 				fileStore.pasteItem(object, oldParentObject, newParentObject, copy);
 			});
 		},
 
+		/**
+		 * Handle objects dropped from an external source onto the grid.
+		 */
 		onDropExternal: function(sourceSource, nodes, copy, newParentObject) {
 			var fileStore = this.fileStore,
 				storeMemory = fileStore.storeMemory,

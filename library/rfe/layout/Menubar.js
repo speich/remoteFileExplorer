@@ -139,8 +139,8 @@ define([
 			}));
 
 			context.watch(lang.hitch(this, function() {
-				console.log('watching context', context)
-				this.enableMenuItems(menuFile, context);
+	//			console.log('watching context', context)
+				this.enableMenuItem(menuFile, context);
 			}));
 		},
 
@@ -149,7 +149,7 @@ define([
 		 * @param {dijit.DropDownMenu} menu
 		 * @param {dojo.Stateful} context
 		 */
-		enableMenuItems: function(menu, context) {
+		enableMenuItem: function(menu, context) {
 			// TODO: this does not work with i18n since it uses the labels...
 			// If not clicked on a item (tree.node or grid.row), but below widget and nothing is selected,
 			// then set all menuItems to disabled except create/upload
