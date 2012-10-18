@@ -2,8 +2,6 @@ define([
 	'dojo/_base/array',
 	'dojo/_base/lang',
 	'dojo/_base/declare',
-	'dojo/_base/event',
-	'dojo/aspect',
 	'dojo/on',
 	'dojo/topic',
 	'dojo/cookie',
@@ -23,7 +21,7 @@ define([
 	'rfe/Console',
 	'rfe/ContextMenu'
 
-], function(array, lang, declare, event, aspect, on, topic, cookie, domConstruct, query, Stateful, Tree, TreeSource, Grid, GridSource, registry, CheckBox, Dialog, Toolbar, Menubar, Panes, Console, ContextMenu) {
+], function(array, lang, declare, on, topic, cookie, domConstruct, query, Stateful, Tree, TreeSource, Grid, GridSource, registry, CheckBox, Dialog, Toolbar, Menubar, Panes, Console, ContextMenu) {
 
 	/**
 	 * @class
@@ -66,13 +64,13 @@ define([
 
 			this.menubar.placeAt(this.panes.menuPane.domNode);
 			this.toolbar.placeAt(this.panes.menuPane.domNode);
-            this.panes.startup();
-            this.editContextMenu = new ContextMenu({
-                rfe: this,
-                targetNodeIds: [this.panes.treePane.id, this.panes.gridPane.id]
-            });
-            this.console = new Console();
-            this.console.placeAt(this.panes.logPane.domNode);
+			this.panes.startup();
+			this.editContextMenu = new ContextMenu({
+				rfe: this,
+				targetNodeIds: [this.panes.treePane.id, this.panes.gridPane.id]
+			});
+			this.console = new Console();
+			this.console.placeAt(this.panes.logPane.domNode);
 			this.initGrid();
 			this.initTree();
 			this.initTopics();

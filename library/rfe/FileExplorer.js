@@ -64,12 +64,12 @@ define([
 				numSteps: 5
 			};
 			this.store = new FileStore();
-			this.context = new Stateful({
+			this.context = {
 				isOnGrid: false,
 				isOnGridPane: false,
 				isOnTree: false,
 				isOnTreePane: false
-			});
+			};
 			this.domNode = dom.byId(this.id);	// TODO: remove when using dijit._WidgetBase
 		},
 
@@ -287,7 +287,7 @@ define([
 		},
 
 		/**
-		 * Returns an object describing on which part of the file explorer we are on
+		 * Set object properties describing on which part of the file explorer we are on.
 		 * @param {Event} evt
 		 * @param {HTMLElement} node
 		 */
@@ -339,7 +339,7 @@ define([
 				this.currentTreeObject.set(object);
 			}));
 
-			this.context.set('isOnTree', true);
+			this.context.isOnTree = true;
 			this.setHistory(id);   // do not set history in display() since history uses display too in goHistory()
 
 		},

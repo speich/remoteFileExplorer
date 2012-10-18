@@ -1,10 +1,7 @@
 define([
 	'dojo/_base/lang',
 	'dojo/_base/declare',
-	'dojo/_base/array',
-	'dojo/on',
 	'dojo/topic',
-	'dijit/registry',
 	'dijit/MenuBar',
 	'dijit/PopupMenuBarItem',
 	'dijit/DropDownMenu',
@@ -13,27 +10,31 @@ define([
 	'dijit/PopupMenuItem',
 	'dijit/CheckedMenuItem'
 
-], function(lang, declare, array, on, topic, registry, MenuBar, PopupMenuBarItem, DropDownMenu, MenuItem, MenuSeparator, PopupMenuItem, CheckedMenuItem) {
+], function(lang, declare, topic, MenuBar, PopupMenuBarItem, DropDownMenu, MenuItem, MenuSeparator, PopupMenuItem, CheckedMenuItem) {
 
 	/**
 	 * @class
 	 * @name rfe.layout.Menubar
-	 * @extends dijit.MenuBar
+	 * @extends {dijit.MenuBar}
 	 * @property {rfe} rfe reference to remoteFileExplorer
 	 */
 	return declare([MenuBar], /** @lends rfe.layout.Menubar.prototype */ {
 
 		rfe: null,
+		menuItems: null,
 
 		postCreate: function() {
 			this.inherited('postCreate', arguments);
 
-			var context = this.rfe.context,
-				panes = this.rfe.panes,
+			var panes = this.rfe.panes,
 				menuItemDetails, menuItemIcons, menuFile, menuView, menuHelp, menuTools, menuItemV, subMenuFile;
 
+			this.menuItems = {};
+
 			// ********** menu file **************
-			menuFile = new DropDownMenu({   id: 'rfeMenuFile'   });
+			menuFile = new DropDownMenu({
+				id: 'rfeMenuFile'
+			});
 			subMenuFile = new DropDownMenu();
 			menuFile.addChild(new PopupMenuItem({
 				label: 'New',
@@ -52,15 +53,29 @@ define([
 					});
 				})
 			}));
-			menuFile.addChild(new MenuItem({
-				label: 'Rename',
-				onClick: lang.hitch(this.rfe, this.rfe.rename)
-			}));
 
-			menuFile.addChild(new MenuItem({
+			this.menuItems.rename = new MenuItem({
+				label: 'Rename',
+				onClick: lang.hitch(this.rfe, this.rfe.rename),
+				disabled: true
+			});
+			menuFile.addChild(this.menuItems.rename);
+
+			this.menuItems.del = new MenuItem({
 				label: 'Delete',
-				onClick: lang.hitch(this.rfe, this.rfe.del)
-			}));
+				onClick: lang.hitch(this.rfe, this.rfe.del),
+				disabled: true
+			});
+			menuFile.addChild(this.menuItems.del);
+
+			menuFile.addChild(new MenuSeparator());
+			this.menuItems.properties = new MenuItem({
+				label: 'Properties',
+				onClick: lang.hitch(this.rfe, this.rfe.showFileDetails),
+				disabled: true
+			});
+			menuFile.addChild(this.menuItems.properties);
+			menuFile.onOpen = lang.hitch(this, this.onMenuFileOpen);
 
 			// ******* menu layout ********
 			menuView = new DropDownMenu();
@@ -71,7 +86,6 @@ define([
 					topic.publish('grid/views/state', 'details');
 				})
 			});
-			// TODO: is this the best way ?
 			topic.subscribe('grid/views/state', function(state) {
 				menuItemDetails.set('checked', state === 'details');
 			});
@@ -137,40 +151,32 @@ define([
 				label: 'Help',
 				popup: menuHelp
 			}));
+		},
 
-			context.watch(lang.hitch(this, function() {
-	//			console.log('watching context', context)
-				this.enableMenuItem(menuFile, context);
-			}));
+		onMenuFileOpen: function() {
+			// note: handle enabling of contextmenu items after selecting and not on mousedown since we need to now if an item is selected or deselected
+			this.enableMenuItems(this.rfe.context);
+			this.inherited('_openMyself', arguments);
 		},
 
 		/**
-		 * Enable/disable menu items depending on the context
-		 * @param {dijit.DropDownMenu} menu
-		 * @param {dojo.Stateful} context
+		 * Enables or disables context menu items depending on the context.
+		 * @param {object} context
 		 */
-		enableMenuItem: function(menu, context) {
-			// TODO: this does not work with i18n since it uses the labels...
-			// If not clicked on a item (tree.node or grid.row), but below widget and nothing is selected,
-			// then set all menuItems to disabled except create/upload
-			var label = '';
-			array.filter(menu.getChildren(), function(item) {
-				label = item.get('label');
-				item.set('disabled', true);
-				if (context.isOnTree) {
-					if (label === 'New' || label === 'Upload') {
-						item.set('disabled', false);
-					}
+		enableMenuItems: function(context) {
+			// Note: to prevent ambiguity, delete, rename and properties is only available for grid contextmenu
+			var id, selected = false, selection = this.rfe.grid.selection;
+
+			for (id in selection) {
+				if (selection.hasOwnProperty(id) && selection[id] === true) {
+					selected = true;
+					break;
 				}
-				else if (context.isOnGridPane) {
-					if (label === 'New') {
-						item.set('disabled', false);
-					}
-				}
-				else if (context.isOnGrid) {
-					item.set('disabled', false);
-				}
-			});
+			}
+
+			this.menuItems.rename.set('disabled', !selected); // not implemented for tree yet
+			this.menuItems.del.set('disabled', !selected);
+			this.menuItems.properties.set('disabled', !selected);
 		}
 
 	});

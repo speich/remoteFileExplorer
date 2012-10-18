@@ -1,12 +1,11 @@
 define([
 	'dojo/_base/lang',
 	'dojo/_base/declare',
-	'dojo/topic',
 	'dijit/Menu',
 	'dijit/MenuItem',
 	'dijit/MenuSeparator',
 	'dijit/PopupMenuItem'
-], function(lang, declare, topic, Menu, MenuItem, MenuSeparator, PopupMenuItem) {
+], function(lang, declare, Menu, MenuItem, MenuSeparator, PopupMenuItem) {
 
 	/**
 	 * Provides a context menu with items to edit files and folders.
@@ -21,12 +20,6 @@ define([
 		rfe: null,
 		popUpDelay: 10,
 		menuItems: null,
-
-		constructor: function() {
-			topic.subscribe('rfe/context/set', lang.hitch(this, function(context) {
-				this.enableMenuItems(context);
-			}));
-		},
 
 		postCreate: function() {
 			this.inherited('postCreate', arguments);
@@ -74,6 +67,12 @@ define([
 				label: 'File',
 				onClick: lang.hitch(this.rfe, this.rfe.createRename)
 			}));
+		},
+
+		_openMyself: function() {
+			// note: handle enabling of contextmenu items after selecting and not on mousedown since we need to now if an item is selected or deselected
+			this.enableMenuItems(this.rfe.context);
+			this.inherited('_openMyself', arguments);
 		},
 
 		/**

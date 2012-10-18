@@ -26,7 +26,6 @@ define([
 
 			function remove(id, parId) {
 				return function() {
-					console.log(id, parId);
 					var obj;
 					self.removeHistory(id);
 					if (self.context.isOnTree || self.context.isOnTreePane) {
@@ -95,7 +94,6 @@ define([
 				if (this.context.isOnGrid || this.context.isOnGridPane) {
 					var column = widget.columns[store.labelAttr],
 						cell = widget.cell(object.id, column.field);
-					console.log(widget)
 					widget.edit(cell);
 				}
 			}))
@@ -105,7 +103,7 @@ define([
 		 * Create a new file or folder object.
 		 */
 		rename: function() {
-			// TODO: make this work also for the tree which doesn't have the same selection object
+			// TODO: make this work also for the tree which doesn't have the same selection object. Use dijit.inlineEditBox
 			// tree's selection is widget.selectedItems which is array of store objects
 			var widget = this.context.isOnGrid || this.context.isOnGridPane ? this.grid : this.tree,
 				store = this.store,
@@ -115,9 +113,7 @@ define([
 			for (id in selection) {
 				if (selection.hasOwnProperty(id) && selection[id] === true) {
 					var cell = widget.cell(id, column.field);
-					console.log(widget)
 					widget.edit(cell);
-					console.log(widget)
 				}
 			}
 		}

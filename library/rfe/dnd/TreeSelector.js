@@ -23,6 +23,7 @@ define('test', [
 		oldMouseMove = ref.onMouseMove;
 
 	// TODO: make right click (context menu) select the tree node (also see dnd/GridSelector.js)
+	// TODO: emit events tree-select and tree-deselect as dgrid
 	return _dndSelector.extend({
 		_oldSelection: [],
 		_selectByMouse: false,
