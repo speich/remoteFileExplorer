@@ -55,13 +55,13 @@ html, body {
 }
 
 .dijitDisabled .rfeToolbarIcon {
-	background-image:url("/library/rfe/resources/images/rfeToolbarIconsDisabled.png");
+	background-image:url("images/rfeToolbarIconsDisabled.png");
 }
 .rfeToolbarIconDirUp {
 	background-position: 0 50%;
 }
 .rfeToolbarIcon {
-	background-image:url("/library/rfe/resources/images/rfeToolbarIconsEnabled.png");
+	background-image:url("images/rfeToolbarIconsEnabled.png");
 	background-repeat:no-repeat;
 	height: 18px;
 	text-align:center;
