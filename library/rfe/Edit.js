@@ -2,8 +2,9 @@ define([
 	'dojo/_base/lang',
 	'dojo/_base/array',
 	'dojo/_base/declare',
-	'dojo/_base/Deferred'
-], function(lang, array, declare, Deferred) {
+	'dojo/_base/Deferred',
+	'rfe/dialogs/dialogs'
+], function(lang, array, declare, Deferred, dialogs) {
 
 	/**
 	 * Provides functionality to edit files and folders.
@@ -21,19 +22,26 @@ define([
 			// Notes:
 			// A. When deleting from toolbar we only use selected items from the grid (or use focus?). Currently this
 			// happens from the different menu in layout.js -> move here?
-			// B. When deleting from context menu use source to decide which selected items to use
+			// B. When deleting from context menu use context to decide which selected items to use
 			var self = this, id, parId, store = this.store, widget, selection;
 
 			function remove(id, parId) {
-				return function() {
-					var obj;
+				// note: remove creates closure for id in loop
+				var dfd, obj, dialog;
+				dialog = dialogs.getByFileObj('deleteFile', store.storeMemory.get(id));
+				dfd = dialog.show();
+				dfd = dfd.then(function() {
+					return store.remove(id);
+				});
+				dfd.then(function() {
 					self.removeHistory(id);
 					if (self.context.isOnTree || self.context.isOnTreePane) {
 						obj = self.store.storeMemory.get(parId);
 						self.display(obj);
 					}
-				};
+				}, error);
 			}
+
 			function error() {
 				return function(err) {
 					console.log(err);
@@ -45,7 +53,7 @@ define([
 				selection =  widget.selection;
 				for (id in selection) {
 					if (selection.hasOwnProperty(id) && selection[id] === true) {
-						Deferred.when(store.remove(id), remove(id), error());
+						remove(id);
 					}
 				}
 			}
@@ -56,7 +64,7 @@ define([
 				if (selection.length > 0) {
 					id = selection[0].id;
 					parId = selection[0].parId;
-					Deferred.when(store.remove(id), remove(id, parId), error());
+					remove(id, parId);
 				}
 			}
 		},
@@ -71,8 +79,8 @@ define([
 				parId = this.currentTreeObject.get('id');
 
 			object = lang.mixin(object || {}, {
-				size: 0,
 				parId: parId,
+				size: 0,
 				mod: this.getDate()
 			});
 			object.name = object.dir ? 'new directory' : object.name = 'new text file.txt';

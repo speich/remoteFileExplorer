@@ -1,7 +1,8 @@
 define([
 	'dijit/registry',
-	'rfe/dialogs/DialogFileProperties'
-], function(registry, DialogFileProperties) {
+	'rfe/dialogs/DialogFileProperties',
+	'DialogConfirm/DialogConfirm'
+], function(registry, DialogFileProperties, DialogConfirm) {
 
 	return {
 
@@ -49,17 +50,23 @@ define([
 						'<p>' + args.newParentObj.name + '<br>' + args.newParentObj.mod + '</p>'
 					});
 					break;*/
+				case 'deleteFile':
+					var str = (args.obj.dir ? 'folder' : 'file');
+					dialog = new DialogConfirm({
+						id: id,
+						hasUnderlay: false,
+						title: 'Delete ' + this.ucfirst(str),
+						content: '<p>Do you really want to delete this ' + str + '?</p>' +
+							'<p><img src="' + require.toUrl('rfe/resources/images/icons-64/' + str + '.png') + '" alt="' + str + ' icon" class="dialogContentImg">' +
+							args.obj.name + '<br>Modified: ' + args.obj.mod + '</p>'
+					});
+					break;
 				case 'fileProperties':
 					dialog = new DialogFileProperties({
 						id: id,
-						title: args.obj.folder ? 'Folder' : 'File' + ' Properties',
-						content: args.obj/*,
-						destroy: function() {
-							manager.remove(dialog.id);
-							this.inherited('destroy', arguments);
-						}*/
+						title: (args.obj.dir ? 'Folder' : 'File') + ' Properties',
+						content: args.obj
 					});
-		//			manager.add(dialog);
 					break;
 			}
 			return dialog;

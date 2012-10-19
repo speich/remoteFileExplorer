@@ -19,9 +19,10 @@ define([
 	'rfe/layout/Menubar',
 	'rfe/layout/Panes',
 	'rfe/Console',
-	'rfe/ContextMenu'
-
-], function(array, lang, declare, on, topic, cookie, domConstruct, query, Stateful, Tree, TreeSource, Grid, GridSource, registry, CheckBox, Dialog, Toolbar, Menubar, Panes, Console, ContextMenu) {
+	'rfe/ContextMenu',
+	'dijit/focus'
+], function(array, lang, declare, on, topic, cookie, domConstruct, query, Stateful, Tree, TreeSource, Grid, GridSource,
+				registry, CheckBox, Dialog, Toolbar, Menubar, Panes, Console, ContextMenu, focusUtil) {
 
 	/**
 	 * @class
@@ -55,12 +56,18 @@ define([
 				view: 'horizontal'
 			}, this.id);
 
-			this.toolbar = new Toolbar({
-				rfe: this
-			}, domConstruct.create('div'));
 			this.menubar = new Menubar({
-				rfe: this
+				rfe: this,
+				tabIndex: 1
 			}, domConstruct.create('div'));
+
+			this.toolbar = new Toolbar({
+				rfe: this,
+				tabIndex: 10
+			}, domConstruct.create('div'));
+
+			this.panes.treePane.set('tabIndex', 20);
+			this.panes.gridPane.set('tabIndex', 30);
 
 			this.menubar.placeAt(this.panes.menuPane.domNode);
 			this.toolbar.placeAt(this.panes.menuPane.domNode);
@@ -71,10 +78,19 @@ define([
 			});
 			this.console = new Console();
 			this.console.placeAt(this.panes.logPane.domNode);
-			this.initGrid();
 			this.initTree();
+			this.initGrid();
+			this.initEvents();
 			this.initTopics();
 			this.initDialogs();
+		},
+
+		initEvents: function() {
+/*			focusUtil.focus(this.tree.domNode);
+			focusUtil.on("widget-blur", function() {
+				console.log(arguments)
+			});*/
+
 		},
 
 		initTopics: function() {
@@ -90,11 +106,13 @@ define([
 		initTree: function() {
 			var self = this;
 			this.tree = new Tree({
+				rfe: this,
 				model: this.store,
 				childrenAttrs: [this.store.childrenAttr],
 				openOnClick: false, //	If true, clicking a folder node's label will open it, rather than calling onClick()
 				openOnDblClick: false, // If true, double-clicking a folder node's label will open it, rather than calling onDblClick()
 				showRoot: true,
+				tabIndex: 21,
 				persist: cookie(this._cnDialogSettingsFolderState) || true,
 				dndController: function(arg, params) {
 					return new TreeSource(arg, lang.mixin(params || {}, {
@@ -110,8 +128,10 @@ define([
 		initGrid: function() {
 			var div = domConstruct.create('div', null, this.panes.gridPane.domNode);
 			this.grid = new Grid({
+				rfe: this,
+				tabIndex: 31,
 				store: null, // store is set in FileExplorer.initState()
-				dndConstructor: GridSource,	// dgrid/extension/dnd can't be overriden directly
+				dndConstructor: GridSource,	// dgrid/extension/dnd can't be overridden directly
 				dndParams: {
 					accept: ['treeNode'],
 					fileStore: this.store
@@ -119,10 +139,8 @@ define([
 			}, div);
 		},
 
-
-
 		initDialogs: function() {
-			// TODO: use dijit template for all dialogs
+			// TODO: move to dialog.js
 			new Dialog({
 				id: 'rfeDialogAbout',
 				title: "About Remote File Explorer (rfe)",

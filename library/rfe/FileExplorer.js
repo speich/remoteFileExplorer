@@ -119,8 +119,6 @@ define([
 
 			// TODO: Set context on keyboard navigation too
 			on(this.panes.domNode, '.rfeTreePane:mousedown, .rfeGridPane:mousedown', function(evt) {
-				// note: can't add selectors .dijitTreeRow:mousedown and .dgrid-row:mousedown' since this handler would be called twice,
-				// once for the pane (parent container) and once for the widget (tree/grid)
 				lang.hitch(self, self._setContext(evt, this));
 			});
 		},

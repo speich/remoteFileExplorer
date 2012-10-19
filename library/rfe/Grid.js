@@ -113,6 +113,28 @@ define([
 					}
 				});
 			});
+			this.bodyNode.tabIndex = this.tabIndex;
+
+			this.initEvents();
+		},
+
+		initEvents: function() {
+			var rfe = this.rfe;
+
+			on(this.contentNode, 'keydown', function(evt) {
+				var fnc, keyCode = evt.keyCode;
+				if (evt.target.type === 'text') {
+					// text boxes should be ignored when deleting etc.
+					return;
+				}
+				fnc = {
+					46: rfe.del // delete key // TODO: mac is same keyCode?
+				}[keyCode];
+
+				if (typeof(fnc) !== 'undefined') {
+					fnc.apply(rfe, arguments);
+				}
+			});
 		},
 
 		renderHeader: function() {
