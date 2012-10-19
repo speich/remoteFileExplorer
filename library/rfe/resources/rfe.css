@@ -81,6 +81,15 @@ html, body {
     padding-right: 8px;
 }
 
+.dialogContentIconImg, .dialogContentIconTxt {
+    display:  inline-block;
+
+}
+.dialogContentIconImg {
+    margin: 0 12px 12px 0;
+}
+
+
 /*** Begin rfeDialogAbout ***/
 #rfeDialogAbout {
 	width: 320px;
