@@ -6,13 +6,13 @@
 define([
 	'dojo/_base/declare',
 	'dojo/_base/lang',
-	'dojo/_base/Deferred',
+	'dojo/when',
 	'dojo/_base/array',
 	'dojo/store/Memory',
 	'dojo/store/JsonRest',
 	'dojo/store/Observable',
 	'dojo/store/Cache'
-], function(declare, lang, Deferred, array, Memory, JsonRest, Observable, Cache) {
+], function(declare, lang, when, array, Memory, JsonRest, Observable, Cache) {
 
 	// references for MonkeyPatching the store.Cache
 	var refPut, refDel, refAdd;
@@ -78,7 +78,7 @@ define([
 		 */
 		put: function(object, options) {
 			var self = this;
-			return Deferred.when(refPut.apply(this, arguments), function(id) {
+			return refPut.apply(this, arguments).then(function(id) {
 				self.onChange(object);
 				return id;
 			}, function(err) {
@@ -88,7 +88,7 @@ define([
 
 		add: function(object, options) {
 			var self = this;
-			return Deferred.when(refAdd.apply(this, arguments), function(newId) {
+			return refAdd.apply(this, arguments).then(function(newId) {
 				object.id = newId;
 				self.onNewItem(object);	// notifies tree
 				return newId;
@@ -99,7 +99,7 @@ define([
 
 		remove: function(id) {
 			var self = this, object = this.get(id);
-			return Deferred.when(refDel.apply(this, arguments), function() {
+			return refDel.apply(this, arguments).then(function() {
 				self.onDelete(object);	// notifies tree
 			}, function(err) {
 				console.log('error', err);
@@ -165,7 +165,7 @@ define([
 
 			// notify tree by calling onComplete
 			if (lang.isFunction(options)) {
-				Deferred.when(children, function(result) {
+				when(children, function(result) {
 					options(result);
 				});
 			}
@@ -200,7 +200,7 @@ define([
 					incremental: true   // otherwise store JsonRest does POST instead of PUT even if object has an id
 					// TODO: use overwrite: true instead of incremental?
 				});
-				dfd = Deferred.when(dfd, function(newId) {
+				dfd = dfd.then(function(newId) {
 					newObject.id = newId;
 					return newId;
 				});
@@ -218,7 +218,7 @@ define([
 				// Set object's parent attribute to new parent id
 				object[this.parentAttr] = newParentId;
 
-				dfd = Deferred.when(this.storeMaster.put(object), function() {
+				dfd = this.storeMaster.put(object).then(function() {
 
 					// only add to cache if folder was cached previously
 					if (self.childrenCached[newParentId]) {
@@ -227,7 +227,7 @@ define([
 
 					// Notify tree to update old parent (its children)
 					// Note: load children after put has completed, because put might modify the cache
-					return Deferred.when(self.getChildren(oldParentObject), function(children) {
+					return self.getChildren(oldParentObject).then(function(children) {
 						self.onChildrenChange(oldParentObject, children);
 					});
 				}, function() {
@@ -236,8 +236,8 @@ define([
 			}
 
 			// notify tree to update new parent (its children)
-			dfd = Deferred.when(dfd, function() {
-				return Deferred.when(self.getChildren(newParentObject), function(children) {
+			dfd = dfd.then(function() {
+				return self.getChildren(newParentObject).then(function(children) {
 					self.onChildrenChange(newParentObject, children);
 				});
 			});
@@ -319,7 +319,7 @@ define([
 		onNewItem: function(object) {
 			var parent = this.storeMemory.get(object.parId);
 			// since we know, that objects with this parItem are already cached (except the new one), we just query the memoryStore and add it
-			Deferred.when(this.getChildren(parent), lang.hitch(this, function(children) {
+			this.getChildren(parent).then(lang.hitch(this, function(children) {
 				this.onChildrenChange(parent, children);
 			}));
 		}

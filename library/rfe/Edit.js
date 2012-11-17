@@ -2,7 +2,7 @@ define([
 	'dojo/_base/lang',
 	'dojo/_base/array',
 	'dojo/_base/declare',
-	'dojo/_base/Deferred',
+	'dojo/Deferred',
 	'rfe/dialogs/dialogs'
 ], function(lang, array, declare, Deferred, dialogs) {
 

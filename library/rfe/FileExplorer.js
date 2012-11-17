@@ -2,7 +2,8 @@ define([
 	'dojo/_base/lang',
 	'dojo/_base/array',
 	'dojo/_base/declare',
-	'dojo/_base/Deferred',
+	'dojo/Deferred',
+	'dojo/when',
 	'dojo/cookie',
 	'dojo/keys',
 	'dojo/dom',
@@ -18,7 +19,7 @@ define([
 	'rfe/Store/FileStore',
 	'rfe/dialogs/dialogs',
 	'rfe/dnd/Manager'	// needs to be loaded for dnd
-], function(lang, array, declare, Deferred, cookie, keys, dom, domClass, locale, on, topic, query, Stateful, registry, Layout, Edit, FileStore, dialogs) {
+], function(lang, array, declare, Deferred, when, cookie, keys, dom, domClass, locale, on, topic, query, Stateful, registry, Layout, Edit, FileStore, dialogs) {
 
 	// TODO: use dijit._WidgetBase
 	// TODO: multiselect (in tree allow only of files but not of folders)
@@ -109,8 +110,9 @@ define([
 			grid.on("dgrid-datachange", function(evt) {
 				// catch using editor when renaming
 				var obj = evt.cell.row.data;
+
 				obj[store.labelAttr] = evt.value;
-				Deferred.when(store.put(obj), function() {
+				store.put(obj).then(function() {
 					grid.save();
 				}, function() {
 					grid.revert();
@@ -134,7 +136,7 @@ define([
 				dfd = new Deferred();
 
 			if (object.dir) {
-				dfd = Deferred.when(store.getChildren(object), function() {
+				dfd = when(store.getChildren(object), function() {
 					var sort = grid.get('sort');
 					grid.set('query', {parId: object.id}, {sort: sort});
 				});
@@ -178,7 +180,7 @@ define([
 				object = this.currentTreeObject;
 			}
 			if (object.parId) {
-				def = Deferred.when(this.store.get(object.parId), lang.hitch(this, function(object) {
+				def = when(this.store.get(object.parId), lang.hitch(this, function(object) {
 					return this.display(object);
 				}), function(err) {
 					console.debug('Error occurred when going directory up', err);
@@ -264,7 +266,7 @@ define([
 				id = hist.steps[++hist.curIdx];
 			}
 			if (id !== null) {
-				return Deferred.when(this.store.get(id), lang.hitch(this, function(object) {
+				return when(this.store.get(id), lang.hitch(this, function(object) {
 					return this.display(object);
 				}));
 			}
@@ -328,8 +330,8 @@ define([
 				id = object.id;
 			}
 
-			Deferred.when(store.get(id), lang.hitch(this, function(object) {
-				Deferred.when(store.getChildren(object), function() {	// load children first before setting store
+			when(store.get(id), lang.hitch(this, function(object) {
+				when(store.getChildren(object), function() {	// load children first before setting store
 					// Setting caching store for grid would not use cache, because cache.query() always uses the
 					// master store => use storeMemory.
 					grid.set('store', store.storeMemory, { parId: id });
