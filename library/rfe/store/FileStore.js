@@ -227,7 +227,7 @@ define([
 
 					// Notify tree to update old parent (its children)
 					// Note: load children after put has completed, because put might modify the cache
-					return self.getChildren(oldParentObject).then(function(children) {
+					return when(self.getChildren(oldParentObject), function(children) {
 						self.onChildrenChange(oldParentObject, children);
 					});
 				}, function() {
@@ -237,7 +237,7 @@ define([
 
 			// notify tree to update new parent (its children)
 			dfd = dfd.then(function() {
-				return self.getChildren(newParentObject).then(function(children) {
+				return when(self.getChildren(newParentObject), function(children) {
 					self.onChildrenChange(newParentObject, children);
 				});
 			});

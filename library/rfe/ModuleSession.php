@@ -104,7 +104,7 @@ class ModuleSession extends FileExplorer {
 		else if (array_key_exists($resource, $fs)) { // get item
 			$items = $fs[$resource];
 			$json = json_encode($items);
-			$json = preg_replace('/"([\d]+)"/', '$1', $json);
+			//$json = preg_replace('/"([\d]+)"/', '$1', $json);
 		}
 		return $json;
 	}
@@ -226,6 +226,72 @@ class ModuleSession extends FileExplorer {
 		return $_SESSION['rfe']['lastUsedItemId']++;
 	}
 
+	/**
+	 * Search files system array for keyword(s) in name.
+	 * @param $keyword
+	 * @param $start
+	 * @param $end
+	 * @return json
+	 */
+	public function search($keyword, $start, $end) {
+		// this would be slow on large arrays, but since the demo arrays are short it doesn't matter
+		$fs = unserialize($_SESSION['rfe'][$this->getRoot()]);
+		$arr = array();
+		$count = 0;
+		$keyword = str_replace('*', '', $keyword);
+		if ($keyword === '') {
+			foreach($fs as $file) {
+				if ($count >= $start && $count <= $end) {
+					$file['path'] = $this->createPath($fs, $file);
+					$arr[] = $file;
+				}
+				$count++;
+			}
+		}
+		else {
+			foreach($fs as $file) {
+				if (strpos($file['name'], $keyword) !== false) {
+					if ($count >= $start && $count <= $end) {
+						$file['path'] = $this->createPath($fs, $file);
+						$arr[] = $file;
+					}
+					$count++;
+				}
+			}
+		}
+		return json_encode($arr);
+	}
 
+	public function getNumSearchRecords($keyword) {
+		// this would be slow on large arrays, but since the array of the demo is short it doesn't matter
+
+		$fs = unserialize($_SESSION['rfe'][$this->getRoot()]);
+		$keyword = str_replace('*', '', $keyword);
+		if ($keyword === '') {
+			return count($fs);
+		}
+		$count = 0;
+		foreach($fs as $file) {
+			if (strpos($file['name'], $keyword) !== false) {
+				$count++;
+			}
+		}
+		return $count;
+	}
+
+	public function createPath($fs, $file) {
+		$path = '';
+
+		if (!isset($file['parId'])) {
+			return $file['id'];
+		}
+
+		$parId = $file['parId'];
+		while(isset($fs[$parId])) {
+			$path = $fs[$parId]['id'].'/'.$path;
+			$parId = isset($fs[$parId]['parId']) ? $fs[$parId]['parId'] : null;
+		}
+		return $path + $file['id'];
+	}
 }
 ?>

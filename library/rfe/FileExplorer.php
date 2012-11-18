@@ -56,6 +56,10 @@ abstract class FileExplorer {
 	public function getRoot() {
 		return $this->rootDir;
 	}
+
+	abstract function search($keyword, $start, $end);
+
+	abstract function getNumSearchRecords($keyword);
 }
 
 ?>

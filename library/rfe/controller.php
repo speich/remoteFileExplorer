@@ -1,23 +1,45 @@
 <?php
 session_start();
 
+require_once 'Error.php';
+
+$err = new Error();
+
 $resource = isset($_SERVER['PATH_INFO']) ? ltrim($_SERVER['PATH_INFO'], '/') : null;
 $method = $_SERVER['REQUEST_METHOD'];
 $status = null;
 $protocol = $_SERVER["SERVER_PROTOCOL"];
 $moduleType = 'session';
 $json = false;
+$header = false;
 
-if ($method == 'POST' || $method == 'PUT') {
-	$_DATA = file_get_contents('php://input');
-	$_DATA = json_decode($_DATA);
+/******************************************
+ *  Convert input parameters to an object	*
+ ******************************************/
+switch($method) {
+	case 'POST':
+		$arr = $_POST;
+		break;
+	case 'PUT':
+		$data = file_get_contents('php://input');
+		parse_str($data, $arr);
+		break;
+	case 'GET':
+		$arr = $_GET;
+		break;
+	case 'DELETE':
+		if ($_SERVER['QUERY_STRING'] !== '') {
+			// Delete has no body, but a query string is possible
+			parse_str($_SERVER['QUERY_STRING'], $arr);
+		}
+		else {
+			$arr = array();
+		}
+		break;
+	default:
+		$arr = array();
 }
-else if ($method == 'GET') {
-	$_DATA = (object) $_GET;	// note: + signs form sorted are converted to _
-}
-else {
-	$_DATA = null;
-}
+$data = count($arr) > 0 ? (object) $arr : null;
 
 // TODO: think about if it is necessary to sanitize input
 
@@ -45,13 +67,24 @@ switch($moduleType) {
 
 switch($method) {
 	case 'GET':
-		$json = $rfe->get($resource);
+		if ($resource == 'search/' && isset($_SERVER['HTTP_RANGE'])) {
+			$ranges = explode('-', substr($_SERVER['HTTP_RANGE'], 6));	// e.g. items=0-24
+			$keyword = $data->name;
+			$start = $ranges[0];
+			$end = $ranges[1];
+			$numRec = $rfe->getNumSearchRecords($keyword);
+			$json = $rfe->search($keyword, $start, $end);
+			$header = 'Content-Range: items '.$start.'-'.$end.'/'.$numRec;
+		}
+		else {
+			$json = $rfe->get($resource);
+		}
 		break;
 	case 'POST':
-		$json = $rfe->create($resource, $_DATA);
+		$json = $rfe->create($resource, $data);
 		break;
 	case 'PUT':
-		$json = $rfe->update($resource, $_DATA);
+		$json = $rfe->update($resource, $data);
 		break;
 	case 'DELETE':
 		$json = $rfe->delete($resource);
@@ -59,26 +92,26 @@ switch($method) {
 }
 
 
+header("Content-Type", "application/json");
 // PHP error
-// TODO: error class not implemented yet. use NAFIDAS dev
-/*if (!is_null($err->get())) {
+if (!is_null($err->get())) {
 	header($_SERVER["SERVER_PROTOCOL"].' 505 Internal Server Error');
-	header("Content-Type", "application/json");
 	echo $err->getAsJson();
 }
-	// ressource found and processed
+// resource found and processed
 else if ($json) {
- */
-if ($json) {
 	$method == 'POST' ? header($protocol.' 201 Created') : header($protocol.' 200 OK');
-	header("Content-Type", "application/json");
+	if ($header) {
+		header($header);
+	}
 	echo $json;
 }
-	// ressource not found
+// resource not found
 else {
 	header($protocol.' 404 Not Found');
-	echo '[{"msg": "Ressource not found."}]';
+	echo '[{"msg": "Resource not found."}]';
 }
+
 
 
 ?>

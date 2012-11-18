@@ -68,6 +68,11 @@ html, body {
 	width: 18px;
 }
 
+.rfeSearchBoxItemLabel {
+	color: #a6a6a6;
+	font-size: 0.8em;
+}
+
 .dijitMenuPopup .dijitMenuItemLabel {
 	min-width: 120px;
 }
