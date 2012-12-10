@@ -84,7 +84,7 @@ define([
 				mod: this.getDate()
 			});
 			object.name = object.dir ? 'new directory' : object.name = 'new text file.txt';
-			return Deferred.when(store.add(object), function(object) {
+			return store.add(object).then(function(object) {
 				return object;
 			})
 		},
@@ -98,13 +98,13 @@ define([
 			var widget = this.context.isOnGrid || this.context.isOnGridPane ? this.grid : this.tree,
 				store = this.store;
 
-			return Deferred.when(this.create(object), lang.hitch(this, function(object) {
+			return this.create(object).then(lang.hitch(this, function(object) {
 				if (this.context.isOnGrid || this.context.isOnGridPane) {
 					var column = widget.columns[store.labelAttr],
 						cell = widget.cell(object.id, column.field);
 					widget.edit(cell);
 				}
-			}))
+			}));
 		},
 
 		/**
