@@ -27,44 +27,53 @@ html, body {
 	height: 100%;
 	background-color: #ffffff;
 }
+
 #remoteFileExplorer .dijitMenuBar {
 	border-width: 0 0 1px 0;
 }
+
 #remoteFileExplorer .dijitSplitter {
 	border-width: 1px;
 	border-color: #B5BCC7;
 	border-style: solid;
 }
+
 #remoteFileExplorer .dijitSplitterH {
 	border-width: 1px 0;
 }
+
 #remoteFileExplorer .dijitSplitterV {
 	border-width: 0 1px;
 }
+
 .rfeTreePane, .rfeGridPane {
 	padding: 0;
 }
+
 .rfeLogPane {
 	height: 20%
 }
 
-.dgrid-row-table {border: none;}
+.dgrid-row-table { border: none; }
+
 #remoteFileExplorer .dgrid-cell {
 	cursor: default;
 	border: none;
 }
 
 .dijitDisabled .rfeToolbarIcon {
-	background-image:url("images/rfeToolbarIconsDisabled.png");
+	background-image: url("images/rfeToolbarIconsDisabled.png");
 }
+
 .rfeToolbarIconDirUp {
 	background-position: 0 50%;
 }
+
 .rfeToolbarIcon {
-	background-image:url("images/rfeToolbarIconsEnabled.png");
-	background-repeat:no-repeat;
+	background-image: url("images/rfeToolbarIconsEnabled.png");
+	background-repeat: no-repeat;
 	height: 18px;
-	text-align:center;
+	text-align: center;
 	width: 18px;
 }
 
@@ -78,47 +87,53 @@ html, body {
 }
 
 .tblFileProperties {
-    padding: 2px;
+	padding: 2px;
 }
+
 .tblFileProperties td:first-child {
-    color: #a6a6a6;
-    text-align: right;
-    padding-right: 8px;
+	color: #a6a6a6;
+	text-align: right;
+	padding-right: 8px;
 }
 
-.dialogContentIconImg, .dialogContentIconTxt {
-    display:  inline-block;
-
+.dialogContentIconImg, .dialogContentTxt {
+	display: inline-block;
 }
+
 .dialogContentIconImg {
-    margin: 0 12px 12px 0;
+	margin: 0 12px 0 0;
+	vertical-align: top;
 }
-
 
 /*** Begin rfeDialogAbout ***/
 #rfeDialogAbout {
 	width: 320px;
 	font-size: 11px;
 }
+
 #rfeDialogAbout .dijitDialogPaneContent {
 	background-color: #eeeeee;
 	padding: 0;
 }
 
-#rfeDialogAboutLogo  {
+#rfeDialogAboutLogo {
 	float: right;
 	padding: 4px 8px;
 }
+
 #rfeDialogAboutText {
 	clear: both;
 	background-color: #ffffff;
 	padding: 10px 8px;
 }
+
 #rfeDialogAboutText h2 {
 	font-size: 12px;
 	margin: 0;
 }
+
 #rfeDialogAboutText p:nth-child(2) {
 	margin: 0;
 }
+
 /*** End rfeDialogAbout ***/

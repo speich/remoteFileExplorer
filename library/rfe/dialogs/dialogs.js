@@ -57,8 +57,8 @@ define([
 						hasUnderlay: false,
 						title: 'Delete ' + this.ucfirst(str),
 						content: '<p>Do you really want to delete this ' + str + '?</p>' +
-							'<p><img src="' + require.toUrl('rfe/resources/images/icons-64/' + str + '.png') + '" alt="' + str + ' icon" class="dialogContentImg">' +
-							args.obj.name + '<br>Modified: ' + args.obj.mod + '</p>'
+							'<img src="' + require.toUrl('rfe/resources/images/icons-64/' + str + '.png') + '" alt="' + str + ' icon" class="dialogContentIconImg">' +
+							'<div class="dialogContentTxt">' + args.obj.name + '<br>Modified: ' + args.obj.mod + '</div>'
 					});
 					break;
 				case 'fileProperties':
