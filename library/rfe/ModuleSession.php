@@ -152,6 +152,8 @@ class ModuleSession extends FileExplorer {
 		$fs = unserialize($_SESSION['rfe'][$this->getRoot()]);
 
 		if (array_key_exists($resource, $fs)) {
+			var_dump($resource);
+			var_dump($fs);
 			$fs[$resource]['name'] = $data->name;
 			$fs[$resource]['mod'] = $data->mod;
 			$fs[$resource]['parId'] = $data->parId;

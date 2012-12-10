@@ -1,4 +1,5 @@
 <?php
+//var_dump($_POST);
 session_start();
 
 require_once 'Error.php';
@@ -7,17 +8,19 @@ $err = new Error();
 
 $resource = isset($_SERVER['PATH_INFO']) ? ltrim($_SERVER['PATH_INFO'], '/') : null;
 $method = $_SERVER['REQUEST_METHOD'];
-$status = null;
 $protocol = $_SERVER["SERVER_PROTOCOL"];
 $moduleType = 'session';
 $json = false;
 $header = false;
+$status = null;
 
 /******************************************
  *  Convert input parameters to an object	*
  ******************************************/
 switch($method) {
 	case 'POST':
+		//$arr = file_get_contents('php://input');
+		//$arr = json_decode($_DATA);
 		$arr = $_POST;
 		break;
 	case 'PUT':
@@ -41,7 +44,7 @@ switch($method) {
 }
 $data = count($arr) > 0 ? (object) $arr : null;
 
-// TODO: think about if it is necessary to sanitize input
+
 
 switch($moduleType) {
 	case 'session':
@@ -111,7 +114,3 @@ else {
 	header($protocol.' 404 Not Found');
 	echo '[{"msg": "Resource not found."}]';
 }
-
-
-
-?>
