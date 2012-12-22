@@ -19,10 +19,9 @@ define([
 	'rfe/layout/Menubar',
 	'rfe/layout/Panes',
 	'rfe/Console',
-	'rfe/ContextMenu',
-	'dijit/focus'
+	'rfe/ContextMenu'
 ], function(array, lang, declare, on, topic, cookie, domConstruct, query, Stateful, Tree, TreeSource, Grid, GridSource,
-				registry, CheckBox, Dialog, Toolbar, Menubar, Panes, Console, ContextMenu, focusUtil) {
+				registry, CheckBox, Dialog, Toolbar, Menubar, Panes, Console, ContextMenu) {
 
 	/**
 	 * @class
@@ -68,21 +67,23 @@ define([
 
 			this.panes.treePane.set('tabIndex', 20);
 			this.panes.gridPane.set('tabIndex', 30);
-
 			this.menubar.placeAt(this.panes.menuPane.domNode);
 			this.toolbar.placeAt(this.panes.menuPane.domNode);
 			this.panes.startup();
+
+			this.console = new Console(null, domConstruct.create('div', null, this.panes.logPane.domNode));
+
 			this.editContextMenu = new ContextMenu({
 				rfe: this,
 				targetNodeIds: [this.panes.treePane.id, this.panes.gridPane.id]
 			});
-			this.console = new Console();
-			this.console.placeAt(this.panes.logPane.domNode);
 			this.initTree();
 			this.initGrid();
 			this.initEvents();
 			this.initTopics();
 			this.initDialogs();
+
+
 		},
 
 		initEvents: function() {
