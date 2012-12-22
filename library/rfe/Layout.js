@@ -145,14 +145,15 @@ define([
 			new Dialog({
 				id: 'rfeDialogAbout',
 				title: "About Remote File Explorer (rfe)",
-				content: '<div id="rfeDialogAboutLogo"><img src="library/rfe/resources/images/logo-speich.net.png" alt="speich.net logo" title="Created by Simon Speich, www.speich.net"/></div>' +
-				'<div id="rfeDialogAboutText">' +
-				'<h2>Remote File Explorer (rfe)</h2>' +
-				'<p>version ' + this.version + ' - ' + this.versionDate + '</p>' +
-				'<p>Created by <a href="http://www.speich.net">Simon Speich</a>, www.speich.net using the ' +
-				'<a href="http://www.dojotoolkit.org">dojotoolkit</a> and <a href="http://www.php.net">PHP</a>.</p>' +
-				'<p>Can be used and altered freely as long as this dialog with logo and link is included.</p>' +
-				'</div>'
+				content: '<div id="rfeDialogAboutLogo"><img src="' + require.toUrl('rfe/resources/images/logo-speich.net.png') +
+					'" alt="speich.net logo" title="Created by Simon Speich, www.speich.net"/></div>' +
+					'<div id="rfeDialogAboutText">' +
+					'<h2>Remote File Explorer (rfe)</h2>' +
+					'<p>version ' + this.version + ' - ' + this.versionDate + '</p>' +
+					'<p>Created by <a href="http://www.speich.net">Simon Speich</a>, www.speich.net using the ' +
+					'<a href="http://www.dojotoolkit.org">dojotoolkit</a> and <a href="http://www.php.net">PHP</a>.</p>' +
+					'<p>Can be used and altered freely as long as this dialog with logo and link is included.</p>' +
+					'</div>'
 			});
 
 			var self = this;
