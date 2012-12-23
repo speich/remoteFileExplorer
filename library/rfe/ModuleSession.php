@@ -93,7 +93,7 @@ class ModuleSession extends FileExplorer {
 	/**
 	 * Reads requested resource from file system array.
 	 * @param string $resource REST resource
-	 * @return json|false
+	 * @return string|bool json or false
 	 */
 	public function get($resource) {
 		$json = false;
@@ -103,8 +103,7 @@ class ModuleSession extends FileExplorer {
 		}
 		else if (array_key_exists($resource, $fs)) { // get item
 			$items = $fs[$resource];
-			$json = json_encode($items);
-			//$json = preg_replace('/"([\d]+)"/', '$1', $json);
+			$json = json_encode($items, JSON_NUMERIC_CHECK);
 		}
 		return $json;
 	}
@@ -113,7 +112,7 @@ class ModuleSession extends FileExplorer {
 	 * Returns the children of a directory.
 	 * @param string $resource
 	 * @param array $fs array with files
-	 * @return json
+	 * @return string json
 	 */
 	public function getChildren($resource, $fs) {
 		$arr = array();
@@ -132,8 +131,7 @@ class ModuleSession extends FileExplorer {
 				$names[$key] = $row['name'];
 			}
 			array_multisort($dirs, SORT_ASC, $names, SORT_ASC, $arr);
-			$json = json_encode($arr);
-			$json = preg_replace('/"([\d]+)"/', '$1', $json);
+			$json = json_encode($arr, JSON_NUMERIC_CHECK);
 		}
 		else {
 			$json = '[]';
@@ -145,22 +143,19 @@ class ModuleSession extends FileExplorer {
 	 * Update item located at resource.
 	 * @param string $resource REST resource
 	 * @param object $data request data
-	 * @return json|false
+	 * @return string|bool json or false
 	 */
 	public function update($resource, $data) {
 		$json = false;
 		$fs = unserialize($_SESSION['rfe'][$this->getRoot()]);
 
 		if (array_key_exists($resource, $fs)) {
-			var_dump($resource);
-			var_dump($fs);
 			$fs[$resource]['name'] = $data->name;
 			$fs[$resource]['mod'] = $data->mod;
 			$fs[$resource]['parId'] = $data->parId;
 
 			$_SESSION['rfe'][$this->getRoot()] = serialize($fs);
-			$json = json_encode($fs[$resource]);
-			$json = preg_replace('/"([\d]+)"/', '$1', $json);
+			$json = json_encode($fs[$resource], JSON_NUMERIC_CHECK);
 		}
 		return $json;
 	}
@@ -169,7 +164,7 @@ class ModuleSession extends FileExplorer {
 	 * Create item located at resource.
 	 * @param string $resource REST resource
 	 * @param object $data request data
-	 * @return json|false resource location or false
+	 * @return string|bool json or false resource location or false
 	 */
 	public function create($resource, $data) {
 		$json = false;
@@ -190,8 +185,7 @@ class ModuleSession extends FileExplorer {
 			}
 			$fs[$id] = $item;
 			$_SESSION['rfe'][$this->getRoot()] = serialize($fs);
-			$json = json_encode($item);
-			$json = preg_replace('/"([\d]+)"/', '$1', $json);
+			$json = json_encode($item, JSON_NUMERIC_CHECK);
 		}
 		return $json;
 	}
@@ -199,9 +193,9 @@ class ModuleSession extends FileExplorer {
 	/**
 	 * Delete resource from filesystem.
 	 * @param string $resource REST resource
-	 * @return json|false
+	 * @return string|bool json or false
 	 */
-	public function delete($resource) {
+	public function del($resource) {
 		$json = false;
 		$fs = unserialize($_SESSION['rfe'][$this->getRoot()]);
 		if (array_key_exists($resource, $fs)) {
@@ -233,7 +227,7 @@ class ModuleSession extends FileExplorer {
 	 * @param $keyword
 	 * @param $start
 	 * @param $end
-	 * @return json
+	 * @return string json
 	 */
 	public function search($keyword, $start, $end) {
 		// this would be slow on large arrays, but since the demo arrays are short it doesn't matter
@@ -296,4 +290,3 @@ class ModuleSession extends FileExplorer {
 		return $path + $file['id'];
 	}
 }
-?>

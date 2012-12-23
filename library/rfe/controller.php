@@ -19,13 +19,13 @@ $status = null;
  ******************************************/
 switch($method) {
 	case 'POST':
-		//$arr = file_get_contents('php://input');
-		//$arr = json_decode($_DATA);
-		$arr = $_POST;
+		$arr = file_get_contents('php://input');
+		$arr = json_decode($arr);
+		//$arr = $_POST;
 		break;
 	case 'PUT':
 		$data = file_get_contents('php://input');
-		parse_str($data, $arr);
+		$arr = json_decode($data);
 		break;
 	case 'GET':
 		$arr = $_GET;
@@ -43,7 +43,6 @@ switch($method) {
 		$arr = array();
 }
 $data = count($arr) > 0 ? (object) $arr : null;
-
 
 
 switch($moduleType) {
@@ -90,7 +89,7 @@ switch($method) {
 		$json = $rfe->update($resource, $data);
 		break;
 	case 'DELETE':
-		$json = $rfe->delete($resource);
+		$json = $rfe->del($resource);
 		break;
 }
 
