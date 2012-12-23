@@ -81,8 +81,6 @@ define([
 			return refPut.apply(this, arguments).then(function(id) {
 				self.onChange(object);
 				return id;
-			}, function(err) {
-				console.log('error', err);
 			});
 		},
 
@@ -92,8 +90,6 @@ define([
 				object.id = newId;
 				self.onNewItem(object);	// notifies tree
 				return newId;
-			}, function(err) {
-				console.log('error', err);
 			});
 		},
 
@@ -101,8 +97,6 @@ define([
 			var self = this, object = this.get(id);
 			return refDel.apply(this, arguments).then(function() {
 				self.onDelete(object);	// notifies tree
-			}, function(err) {
-				console.log('error', err);
 			});
 		},
 
