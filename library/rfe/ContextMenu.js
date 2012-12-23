@@ -65,7 +65,9 @@ define([
 			}));
 			menu.addChild(new MenuItem({
 				label: 'File',
-				onClick: lang.hitch(this.rfe, this.rfe.createRename)
+				onClick: lang.hitch(this.rfe, function() {
+					this.createRename(null);	// do not call directly from onclick, otherwise event object would be passed
+				})
 			}));
 		},
 

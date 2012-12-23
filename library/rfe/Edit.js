@@ -86,7 +86,7 @@ define([
 			object.name = object.dir ? 'new directory' : object.name = 'new text file.txt';
 			return store.add(object).then(function(object) {
 				return object;
-			})
+			});
 		},
 
 		/**
