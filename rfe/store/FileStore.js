@@ -48,7 +48,7 @@ define([
 			var storeMaster, storeMemory, storeCache;
 
 			storeMaster = new JsonRest({
-				target: '/library/rfe/controller.php/'
+				target: '/rfe/controller.php/'
 			});
 			this.storeMaster = storeMaster;
 
