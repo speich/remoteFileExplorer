@@ -79,7 +79,8 @@ define([
 			});
 			this.initTree();
 			this.initGrid();
-			this.initEvents();
+			// TODO: fix initEvents() will also call FileExplorer::initEvents()
+			//this.initEvents();
 			this.initTopics();
 			this.initDialogs();
 
@@ -111,7 +112,7 @@ define([
 				model: this.store,
 				childrenAttrs: [this.store.childrenAttr],
 				openOnClick: false, //	If true, clicking a folder node's label will open it, rather than calling onClick()
-				openOnDblClick: false, // If true, double-clicking a folder node's label will open it, rather than calling onDblClick()
+				openOnDblClick: true, // If true, double-clicking a folder node's label will open it, rather than calling onDblClick()
 				showRoot: true,
 				tabIndex: 21,
 				persist: cookie(this._cnDialogSettingsFolderState) || true,

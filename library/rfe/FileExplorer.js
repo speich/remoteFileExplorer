@@ -85,15 +85,7 @@ define([
 				tree = this.tree,
 				store = this.store;
 
-			tree.on('click', function(object) {
-				self.displayChildrenInGrid(object);
-				self.setHistory(object.id);
-				self.currentTreeObject.set(object);
-			});
-			tree.on('dblclick', function(object, nodeWidget) {
-				if(nodeWidget.isExpandable){
-					this._onExpandoClick({ node: nodeWidget });
-				}
+			tree.on('click', function(object) {	// when calling tree.on(click, load) at once object is not passed
 				self.displayChildrenInGrid(object);
 				self.setHistory(object.id);
 				self.currentTreeObject.set(object);
