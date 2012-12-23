@@ -33,9 +33,7 @@ html, body {
 }
 
 #remoteFileExplorer .dijitSplitter {
-	border-width: 1px;
-	border-color: #B5BCC7;
-	border-style: solid;
+	border: 1px solid #B5BCC7;
 }
 
 #remoteFileExplorer .dijitSplitterH {
@@ -50,9 +48,16 @@ html, body {
 	padding: 0;
 }
 
-.rfeLogPane {
-	height: 20%
+.claro .rfeLogPane {
+	height: 20%;
+	padding: 4px;
 }
+
+.logErrMsg { color: red; }
+.logSuccessMsg {color: green; }
+.rfeConsole { font-size: 10px; }
+.rfeConsole ul { list-style: disc inside; }
+
 
 .dgrid-row-table { border: none; }
 
