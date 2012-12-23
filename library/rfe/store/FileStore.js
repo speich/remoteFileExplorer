@@ -126,9 +126,9 @@ define([
 
 		/**
 		 * Returns a folders (cached) children.
-		 * If children were previously load returns the cached result otherwise master store is
-		 * queried and cached.
-		 * @param object
+		 * If children were loaded previously, this returns the cached result otherwise the master store is queried first
+		 * and then the result is cached.
+		 * @param {object} object store object
 		 * @param options
 		 * @return {dojo/Deferred}
 		 */
@@ -143,28 +143,30 @@ define([
 				results = this.storeMemory.query(queryObj);
 				cached = true;
 			}
-			// children not cached yet, query master store and add them to cache
+			// children not cached yet, query master store and add result to cache
 			else {
 				results = self.storeMaster.query(id + '/');	// query has to be a string, otherwise will add querystring instead of REST resource
 				cached = false;
 			}
 
-			resultsDirOnly = results.filter(function(child) {
-				if (!cached) {
-					self.storeMemory.add(child);	// saves looping twice, but should logically be in own foreEach
-				}
-				return child[self.childrenAttr];	// only display directories in the tree
-			});
-			children = this.skipWithNoChildren ? resultsDirOnly : results;
-
-			// notify tree by calling onComplete
-			if (lang.isFunction(options)) {
-				when(children, function(result) {
-					options(result);
+			return when(results, lang.hitch(this, function(results) {
+				resultsDirOnly = results.filter(function(child) {
+					if (!cached) {
+						self.storeMemory.add(child);	// saves looping twice, but should logically be in own foreEach
+					}
+					return child[self.childrenAttr];	// only display directories in the tree
 				});
-			}
-			this.childrenCached[id] = children;
-			return children;
+				children = this.skipWithNoChildren ? resultsDirOnly : results;
+
+				// notify tree by calling onComplete
+				if (lang.isFunction(options)) {
+					when(children, function(result) {
+						options(result);
+					});
+				}
+				this.childrenCached[id] = children;
+				return children;
+			}));
 		},
 
 
