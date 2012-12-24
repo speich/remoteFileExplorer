@@ -4,8 +4,9 @@ define([
 	'dojo/aspect',
 	'dijit/registry',
 	'dijit/Toolbar',
-	'dijit/form/Button'
-], function(lang, declare, aspect, registry, Toolbar, Button) {
+	'dijit/form/Button',
+	'rfe/SearchBox'
+], function(lang, declare, aspect, registry, Toolbar, Button, SearchBox) {
 
 	/**
 	 * @class
@@ -88,6 +89,10 @@ define([
 				onClick: function() {
 					rfe.reload();
 				}
+			}));
+
+			this.addChild(new SearchBox({
+				target: rfe.store.storeMaster.target + 'search/'
 			}));
 		}
 

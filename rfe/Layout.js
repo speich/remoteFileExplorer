@@ -19,10 +19,9 @@ define([
 	'rfe/layout/Menubar',
 	'rfe/layout/Panes',
 	'rfe/Console',
-	'rfe/ContextMenu',
-	'dijit/focus'
+	'rfe/ContextMenu'
 ], function(array, lang, declare, on, topic, cookie, domConstruct, query, Stateful, Tree, TreeSource, Grid, GridSource,
-				registry, CheckBox, Dialog, Toolbar, Menubar, Panes, Console, ContextMenu, focusUtil) {
+				registry, CheckBox, Dialog, Toolbar, Menubar, Panes, Console, ContextMenu) {
 
 	/**
 	 * @class
@@ -68,21 +67,24 @@ define([
 
 			this.panes.treePane.set('tabIndex', 20);
 			this.panes.gridPane.set('tabIndex', 30);
-
 			this.menubar.placeAt(this.panes.menuPane.domNode);
 			this.toolbar.placeAt(this.panes.menuPane.domNode);
 			this.panes.startup();
+
+			this.console = new Console(null, domConstruct.create('div', null, this.panes.logPane.domNode));
+
 			this.editContextMenu = new ContextMenu({
 				rfe: this,
 				targetNodeIds: [this.panes.treePane.id, this.panes.gridPane.id]
 			});
-			this.console = new Console();
-			this.console.placeAt(this.panes.logPane.domNode);
 			this.initTree();
 			this.initGrid();
-			this.initEvents();
+			// TODO: fix initEvents() will also call FileExplorer::initEvents()
+			//this.initEvents();
 			this.initTopics();
 			this.initDialogs();
+
+
 		},
 
 		initEvents: function() {
@@ -110,7 +112,7 @@ define([
 				model: this.store,
 				childrenAttrs: [this.store.childrenAttr],
 				openOnClick: false, //	If true, clicking a folder node's label will open it, rather than calling onClick()
-				openOnDblClick: false, // If true, double-clicking a folder node's label will open it, rather than calling onDblClick()
+				openOnDblClick: true, // If true, double-clicking a folder node's label will open it, rather than calling onDblClick()
 				showRoot: true,
 				tabIndex: 21,
 				persist: cookie(this._cnDialogSettingsFolderState) || true,
@@ -144,14 +146,15 @@ define([
 			new Dialog({
 				id: 'rfeDialogAbout',
 				title: "About Remote File Explorer (rfe)",
-				content: '<div id="rfeDialogAboutLogo"><img src="library/rfe/resources/images/logo-speich.net.png" alt="speich.net logo" title="Created by Simon Speich, www.speich.net"/></div>' +
-				'<div id="rfeDialogAboutText">' +
-				'<h2>Remote File Explorer (rfe)</h2>' +
-				'<p>version ' + this.version + ' - ' + this.versionDate + '</p>' +
-				'<p>Created by <a href="http://www.speich.net">Simon Speich</a>, www.speich.net using the ' +
-				'<a href="http://www.dojotoolkit.org">dojotoolkit</a> and <a href="http://www.php.net">PHP</a>.</p>' +
-				'<p>Can be used and altered freely as long as this dialog with logo and link is included.</p>' +
-				'</div>'
+				content: '<div id="rfeDialogAboutLogo"><img src="' + require.toUrl('rfe/resources/images/logo-speich.net.png') +
+					'" alt="speich.net logo" title="Created by Simon Speich, www.speich.net"/></div>' +
+					'<div id="rfeDialogAboutText">' +
+					'<h2>Remote File Explorer (rfe)</h2>' +
+					'<p>version ' + this.version + ' - ' + this.versionDate + '</p>' +
+					'<p>Created by <a href="http://www.speich.net">Simon Speich</a>, www.speich.net using the ' +
+					'<a href="http://www.dojotoolkit.org">dojotoolkit</a> and <a href="http://www.php.net">PHP</a>.</p>' +
+					'<p>Can be used and altered freely as long as this dialog with logo and link is included.</p>' +
+					'</div>'
 			});
 
 			var self = this;

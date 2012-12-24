@@ -38,7 +38,7 @@ abstract class FileExplorer {
 	 * REST DELETE
 	 * @param string $resource REST resource
 	 */
-	abstract public function delete($resource);
+	abstract public function del($resource);
 	
 	/**
 	 * Set the root directory.
@@ -56,6 +56,10 @@ abstract class FileExplorer {
 	public function getRoot() {
 		return $this->rootDir;
 	}
+
+	abstract function search($keyword, $start, $end);
+
+	abstract function getNumSearchRecords($keyword);
 }
 
 ?>

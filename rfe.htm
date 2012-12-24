@@ -3,13 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <title>Remote File Explorer (rfe)</title>
-<!--<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.8.1/dijit/themes/claro/document.css"/>
-<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.8.1/dijit/themes/claro/claro.css"/>-->
-<link rel="stylesheet" type="text/css" href="/library/dojo/1.8.1/dijit/themes/claro/document.css"/>
-<link rel="stylesheet" type="text/css" href="/library/dojo/1.8.1/dijit/themes/claro/claro.css"/>
-<link rel="stylesheet" href="/library/dgrid/css/skins/claro.css">
-<!-- <link rel="stylesheet" href="/library/dgrid/css/extensions/Views.css"> -->
-<link rel="stylesheet" href="/library/rfe/resources/rfe.css">
+<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.8.1/dijit/themes/claro/document.css">
+<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.8.1/dijit/themes/claro/claro.css">
+<!--<link rel="stylesheet" type="text/css" href="/dojo/1.8.1/dijit/themes/claro/document.css">-->
+<!--<link rel="stylesheet" type="text/css" href="/dojo/1.8.1/dijit/themes/claro/claro.css">-->
+<link rel="stylesheet" href="/dgrid/css/skins/claro.css">
+<!-- <link rel="stylesheet" href="/dgrid/css/extensions/Views.css"> -->
+<link rel="stylesheet" href="/rfe/resources/reset.css">
+<link rel="stylesheet" href="/rfe/resources/rfe.css">
 </head>
 
 <body class="claro">
@@ -18,23 +19,23 @@
 var dojoConfig = {
 	async: true,
 	packages: [
-		{name: 'dgrid', location: '/library/dgrid'},
-		{name: 'xstyle', location: '/library/xstyle'},
-		{name: 'put-selector', location: '/library/put-selector'},
-		{name: 'rfe', location: '/library/rfe'},
-		{name: 'DialogConfirm', location: '/library/DialogConfirm'},
-		{name: 'original', location: '../'}
+		{name: 'dgrid', location: '/dgrid'},
+		{name: 'xstyle', location: '/xstyle'},
+		{name: 'put-selector', location: '/put-selector'},
+		{name: 'rfe', location: '/rfe'},
+		{name: 'DialogConfirm', location: '/DialogConfirm'},
+		{name: 'dijitOriginal', location: '../dijit'}
 	],
 	// redirect the following modules to my own modules
 	paths: {
-		'dijit/tree/_dndSelector': '/library/rfe/dnd/TreeSelector',
-		'dijit/tree/dndSource': '/library/rfe/dnd/TreeSource'
+		'dijit/tree/_dndSelector': '/rfe/dnd/TreeSelector',
+		'dijit/tree/dndSource': '/rfe/dnd/TreeSource'
 	}
 };
 
 </script>
-<script type="text/javascript" src="library/dojo/1.8.1/dojo/dojo.js"></script>
-<!--<script src="http://ajax.googleapis.com/ajax/libs/dojo/1.8.1/dojo/dojo.js" type="text/javascript"></script>-->
+<script type="text/javascript" src="dojo/1.8.1/dojo/dojo.js"></script>
+<!--<script src="http://ajax.googleapis.com/ajax/libs/dojo/1.8/dojo/dojo.js" type="text/javascript"></script>-->
 <script type="text/javascript">
 require(['dojo/ready', 'rfe/FileExplorer'], function(ready, FileExplorer) {
 	ready(function() {

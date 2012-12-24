@@ -8,20 +8,24 @@ define([
 	'dojo/dom-attr',
 	'dojo/query',
 	'dojo/dnd/Avatar'],
-function (lang, window, array, declare, construct, domClass, attr, query, Avatar) {
+function(lang, window, array, declare, construct, domClass, attr, query, Avatar) {
+
+	// preloading icons. Note: Can't be done in constructor, because it is only called when used
+	var images = {
+		folder: new Image(),
+		files: new Image(),
+		file: new Image()
+	};
+
+	images.folder.src = require.toUrl('rfe/resources/images/icons-64/folder.png');
+	images.files.src = require.toUrl('rfe/resources/images/icons-64/files.png');
+	images.file.src = require.toUrl('rfe/resources/images/icons-64/file.png');
+
 
 	return declare([Avatar], {
 
-		constructor: function () {
-			// preload icons
-			this.images = {
-				folder: new Image(),
-				files: new Image(),
-				file: new Image()
-			};
-			this.images.folder.src = '/library/rfe/resources/images/icons-64/folder.png';
-			this.images.files.src = '/library/rfe/resources/images/icons-64/files.png';
-			this.images.file.src = '/library/rfe/resources/images/icons-64/file.png';
+		constructor: function() {
+			this.images = images;
 
 			this.isA11y = domClass.contains(window.body(), "dijit_a11y");
 			var a = construct.create("table", {
@@ -37,7 +41,7 @@ function (lang, window, array, declare, construct, domClass, attr, query, Avatar
 			tr = construct.create("tr", null, b),
 			td = construct.create("td", null, tr),
 			span = construct.create("span", {
-				innerHTML: source.generateText ? this._generateText() : ""
+				innerHTML: source.generateText ? this._generateText(): ""
 			}, td);
 
 			// we have to set the opacity on IE only after the node is live
@@ -60,14 +64,14 @@ function (lang, window, array, declare, construct, domClass, attr, query, Avatar
 			this.node = a;
 		},
 
-		createIcon: function () {
+		createIcon: function() {
 			var img,
-				nodes = this.manager.nodes,
-				source = this.manager.source,
-				isDir = array.some(nodes, function (node) {
-					var obj = source.getObject(node);
-					return obj.dir;
-				}, this);
+			nodes = this.manager.nodes,
+			source = this.manager.source,
+			isDir = array.some(nodes, function(node) {
+				var obj = source.getObject(node);
+				return obj.dir;
+			}, this);
 
 			if (isDir) {
 				img = this.images.folder;
@@ -81,10 +85,10 @@ function (lang, window, array, declare, construct, domClass, attr, query, Avatar
 			return img;
 		},
 
-		_generateText: function () {
+		_generateText: function() {
 			// summary: generates a proper text to reflect copying or moving of items
 			var numItems = this.manager.nodes.length.toString(),
-				action = this.manager.copy ? 'Copy to' : 'Move to';
+			action = this.manager.copy ? 'Copy to': 'Move to';
 
 			return numItems + ', ' + action;
 		}

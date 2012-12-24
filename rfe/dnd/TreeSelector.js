@@ -14,7 +14,7 @@ define('test', [
 	'dojo/_base/connect',
 	'dojo/mouse',
 	'dojo/cookie',
-	'original/dijit/tree/_dndSelector'
+	'dijitOriginal/tree/_dndSelector'
 ], function(array, lang, event, connect, mouse, cookie, _dndSelector) {
 
 	// set references to be able to call overridden methods

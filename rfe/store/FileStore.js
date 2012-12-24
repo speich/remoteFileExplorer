@@ -6,13 +6,13 @@
 define([
 	'dojo/_base/declare',
 	'dojo/_base/lang',
-	'dojo/_base/Deferred',
+	'dojo/when',
 	'dojo/_base/array',
 	'dojo/store/Memory',
 	'dojo/store/JsonRest',
 	'dojo/store/Observable',
 	'dojo/store/Cache'
-], function(declare, lang, Deferred, array, Memory, JsonRest, Observable, Cache) {
+], function(declare, lang, when, array, Memory, JsonRest, Observable, Cache) {
 
 	// references for MonkeyPatching the store.Cache
 	var refPut, refDel, refAdd;
@@ -48,7 +48,7 @@ define([
 			var storeMaster, storeMemory, storeCache;
 
 			storeMaster = new JsonRest({
-				target: '/library/rfe/controller.php/'
+				target: '/rfe/controller.php/'
 			});
 			this.storeMaster = storeMaster;
 
@@ -78,31 +78,25 @@ define([
 		 */
 		put: function(object, options) {
 			var self = this;
-			return Deferred.when(refPut.apply(this, arguments), function(id) {
+			return refPut.apply(this, arguments).then(function(id) {
 				self.onChange(object);
 				return id;
-			}, function(err) {
-				console.log('error', err);
 			});
 		},
 
 		add: function(object, options) {
 			var self = this;
-			return Deferred.when(refAdd.apply(this, arguments), function(newId) {
+			return refAdd.apply(this, arguments).then(function(newId) {
 				object.id = newId;
 				self.onNewItem(object);	// notifies tree
 				return newId;
-			}, function(err) {
-				console.log('error', err);
 			});
 		},
 
 		remove: function(id) {
 			var self = this, object = this.get(id);
-			return Deferred.when(refDel.apply(this, arguments), function() {
+			return refDel.apply(this, arguments).then(function() {
 				self.onDelete(object);	// notifies tree
-			}, function(err) {
-				console.log('error', err);
 			});
 		},
 
@@ -132,9 +126,9 @@ define([
 
 		/**
 		 * Returns a folders (cached) children.
-		 * If children were previously load returns the cached result otherwise master store is
-		 * queried and cached.
-		 * @param object
+		 * If children were loaded previously, this returns the cached result otherwise the master store is queried first
+		 * and then the result is cached.
+		 * @param {object} object store object
 		 * @param options
 		 * @return {dojo/Deferred}
 		 */
@@ -149,28 +143,30 @@ define([
 				results = this.storeMemory.query(queryObj);
 				cached = true;
 			}
-			// children not cached yet, query master store and add them to cache
+			// children not cached yet, query master store and add result to cache
 			else {
 				results = self.storeMaster.query(id + '/');	// query has to be a string, otherwise will add querystring instead of REST resource
 				cached = false;
 			}
 
-			resultsDirOnly = results.filter(function(child) {
-				if (!cached) {
-					self.storeMemory.add(child);	// saves looping twice, but should logically be in own foreEach
-				}
-				return child[self.childrenAttr];	// only display directories in the tree
-			});
-			children = this.skipWithNoChildren ? resultsDirOnly : results;
-
-			// notify tree by calling onComplete
-			if (lang.isFunction(options)) {
-				Deferred.when(children, function(result) {
-					options(result);
+			return when(results, lang.hitch(this, function(results) {
+				resultsDirOnly = results.filter(function(child) {
+					if (!cached) {
+						self.storeMemory.add(child);	// saves looping twice, but should logically be in own foreEach
+					}
+					return child[self.childrenAttr];	// only display directories in the tree
 				});
-			}
-			this.childrenCached[id] = children;
-			return children;
+				children = this.skipWithNoChildren ? resultsDirOnly : results;
+
+				// notify tree by calling onComplete
+				if (lang.isFunction(options)) {
+					when(children, function(result) {
+						options(result);
+					});
+				}
+				this.childrenCached[id] = children;
+				return children;
+			}));
 		},
 
 
@@ -200,7 +196,7 @@ define([
 					incremental: true   // otherwise store JsonRest does POST instead of PUT even if object has an id
 					// TODO: use overwrite: true instead of incremental?
 				});
-				dfd = Deferred.when(dfd, function(newId) {
+				dfd = dfd.then(function(newId) {
 					newObject.id = newId;
 					return newId;
 				});
@@ -218,7 +214,7 @@ define([
 				// Set object's parent attribute to new parent id
 				object[this.parentAttr] = newParentId;
 
-				dfd = Deferred.when(this.storeMaster.put(object), function() {
+				dfd = this.storeMaster.put(object).then(function() {
 
 					// only add to cache if folder was cached previously
 					if (self.childrenCached[newParentId]) {
@@ -227,7 +223,7 @@ define([
 
 					// Notify tree to update old parent (its children)
 					// Note: load children after put has completed, because put might modify the cache
-					return Deferred.when(self.getChildren(oldParentObject), function(children) {
+					return when(self.getChildren(oldParentObject), function(children) {
 						self.onChildrenChange(oldParentObject, children);
 					});
 				}, function() {
@@ -236,8 +232,8 @@ define([
 			}
 
 			// notify tree to update new parent (its children)
-			dfd = Deferred.when(dfd, function() {
-				return Deferred.when(self.getChildren(newParentObject), function(children) {
+			dfd = dfd.then(function() {
+				return when(self.getChildren(newParentObject), function(children) {
 					self.onChildrenChange(newParentObject, children);
 				});
 			});
@@ -319,7 +315,7 @@ define([
 		onNewItem: function(object) {
 			var parent = this.storeMemory.get(object.parId);
 			// since we know, that objects with this parItem are already cached (except the new one), we just query the memoryStore and add it
-			Deferred.when(this.getChildren(parent), lang.hitch(this, function(children) {
+			this.getChildren(parent).then(lang.hitch(this, function(children) {
 				this.onChildrenChange(parent, children);
 			}));
 		}
