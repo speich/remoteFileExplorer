@@ -180,10 +180,10 @@ define([
 		 * @return {dojo.Deferred}
 		 */
 		pasteItem: function(object, oldParentObject, newParentObject, copy) {
-			var dfd, self = this, newObject,
-				oldParentId, newParentId;
+			var dfd, self = this, options,
+			newObject, oldParentId, newParentId;
 
-			oldParentId = object[this.parentAttr];
+			oldParentId = oldParentObject.id;
 			newParentId = newParentObject.id;
 
 			// copy object
@@ -203,8 +203,8 @@ define([
 			}
 			// move object
 			else {
-				// target folder might be cached (was visible at least once) then add to cache
-				// otherwise (its not visible) and we just put it to the server (master store):
+				// If target folder was cached previously, we have to update the dropped object in the cache, e.g. its parent attribute
+				// Otherwise we just put it to the server (master store), which updates the cache automatically.
 
 				// Put updates the cache and consequently getChildren() will return the cached items
 				// and not query the masterStore anymore. If the new parent's children have not been cached previously,
@@ -213,10 +213,14 @@ define([
 
 				// Set object's parent attribute to new parent id
 				object[this.parentAttr] = newParentId;
+				options = {
+					overwrite: true//,
+					//parent: newParentObject
+				};
 
-				dfd = this.storeMaster.put(object).then(function() {
-
-					// only add to cache if folder was cached previously
+				dfd = this.storeMaster.put(object, options).then(function() {	// note: put does not returnthe object, but only it's id
+					/*
+					// only update cache if folder was already cached previously
 					if (self.childrenCached[newParentId]) {
 						self.storeMemory.put(object);
 					}
@@ -225,13 +229,16 @@ define([
 					// Note: load children after put has completed, because put might modify the cache
 					return when(self.getChildren(oldParentObject), function(children) {
 						self.onChildrenChange(oldParentObject, children);
+
 					});
+					*/
 				}, function() {
+					// when request fails change id back
 					object[self.parentAttr] = oldParentId;
 				});
 			}
 
-			// notify tree to update new parent (its children)
+			// notify tree to update new parent (its children), will issue GET request with new parentId
 			dfd = dfd.then(function() {
 				return when(self.getChildren(newParentObject), function(children) {
 					self.onChildrenChange(newParentObject, children);
@@ -262,7 +269,6 @@ define([
 
 
 		// METHODS BELOW ARE NEEDED BY THE TREE MODEL
-
 
 		/**
 		 * Callback to do notifications about new, updated, or deleted items.
