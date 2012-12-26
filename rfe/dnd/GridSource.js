@@ -1,12 +1,12 @@
 define([
 	'dojo/_base/declare',
 	'dojo/_base/lang',
-	'dojo/_base/Deferred',
+	'dojo/when',
 	'dojo/on',
 	'dojo/mouse', // mouse.isLeft
 	'dojo/dnd/Source'
 ],
-function(declare, lang, Deferred, on, mouse, DnDSource) {
+function(declare, lang, when, on, mouse, DnDSource) {
 
 	/**
 	 * Class to handle drag and drop of the dgrid.
@@ -77,7 +77,7 @@ function(declare, lang, Deferred, on, mouse, DnDSource) {
 
 			targetRow = targetRow && grid.row(targetRow);
 
-			Deferred.when(targetRow && store.get(targetRow.id), function(targetObject) {
+			when(targetRow && store.get(targetRow.id), function(targetObject) {
 
 				// Note: if dropping after the last row, or into an empty grid,
 				// target will be undefined.
