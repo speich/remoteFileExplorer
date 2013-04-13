@@ -9,7 +9,7 @@ define([
 	'dojo/query',
 	'dojo/Stateful',
 	'dijit/Tree',
-	'dijit/tree/dndSource',
+	'rfe/dnd/TreeSource',	// set path to load dnd/TreeSource in dojoConfig
 	'rfe/Grid',
 	'rfe/dnd/GridSource',
 	'dijit/registry',

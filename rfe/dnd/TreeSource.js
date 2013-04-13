@@ -9,6 +9,7 @@ define([
 	'dojo/dnd/Manager'
 ], function(lang, array, declare, Deferred, on, domClass, dndSource, dndManager) {
 
+	console.log('loaded');
 		return declare([dndSource], {
 
 			getObject: function(node){
@@ -69,7 +70,7 @@ define([
 
 			/**
 			 * Topic event processor for /dnd/drop, called to finish the DnD operation.
-			 * Updates data store items according to where node was dragged from and dropped	to.
+			 * Updates data store items according to where node was dragged from and dropped to.
 			 * The tree will then respond to those data store updates and redraw itself.
 			 * @param {object} sourceSource dojo/dnd/Source dgrid or tree which is providing the items
 			 * @param {Array} nodes domNodes
@@ -100,6 +101,12 @@ define([
 				this.onDndCancel();
 			},
 
+			/**
+			 * Handle dropping on tree.
+			 * @param nodes
+			 * @param copy
+			 * @param newParentObject
+			 */
 			onDropInternal: function(nodes, copy, newParentObject) {
 				var fileStore = this.fileStore,
 					storeMemory = fileStore.storeMemory,

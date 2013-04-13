@@ -7,18 +7,18 @@
  * Solution: The idea is to defer de-/selection on mouseDown to mouseUp (@see setSelection())
  */
 
-define('test', [
+define([
 	'dojo/_base/array',
 	'dojo/_base/lang',
 	'dojo/_base/event',
 	'dojo/_base/connect',
-	'dojo/mouse',
-	'dojo/cookie',
 	'dijitOriginal/tree/_dndSelector'
-], function(array, lang, event, connect, mouse, cookie, _dndSelector) {
+], function(declare, array, lang, event, connect, _dndSelector) {
+
+	console.log('loaded TreeSelector');
 
 	// set references to be able to call overridden methods
-	var ref = _dndSelector.prototype,
+	var  ref = _dndSelector.prototype,
 		oldMouseUp = ref.onMouseUp,
 		oldMouseMove = ref.onMouseMove;
 

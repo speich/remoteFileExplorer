@@ -10,7 +10,6 @@ define([
 ], function(declare, lang, _WidgetBase, notify, dom, domConstruct, json, locale) {
 
 	return declare([_WidgetBase], {
-	//return declare(null, {
 
 		baseClass: 'rfeConsole',
 

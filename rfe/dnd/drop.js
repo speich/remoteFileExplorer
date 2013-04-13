@@ -24,8 +24,7 @@ define([
 
 			var grid = source.grid,
 				store = source.grid.store,
-				object,
-				i = 0, len = nodes.length;
+				object, i, len;
 
 			if (this.currentRowIndex === -1) {   // dropped onto grid, but not onto a grid row
 				oldParent = grid.getItem(0);		// -> we can use the parent of any row to get the parentItem
@@ -36,15 +35,26 @@ define([
 			oldParent = grid.store.storeMemory.get(oldParent.parId);
 
 
-			for (; i < len; i++) {
+			for (i = 0, len = nodes.length; i < len; i++) {
 				object = source.getItem(nodes[i].id).data.item,
 				oldParent = store.storeMemory.get(object.parId);
 				store.pasteItem(object, oldParent, oldParent, copy);
 			}
 		},
 
+		/**
+		 * Handle dropping when source is grid and target is tree.
+		 */
 		onGridToTree: function() {},
 
+		/**
+		 * Handle dropping when source and target is tree.
+		 * @param source
+		 * @param nodes
+		 * @param copy
+		 * @param target
+		 * @param newParent
+		 */
 		onTreeToTree: function(source, nodes, copy, target, newParent) {
 			console.log('onTreeToTree:', source, nodes, copy, target, newParent);
 			array.forEach(nodes, function(node) {
@@ -58,6 +68,13 @@ define([
 			});
 		},
 
+		/**
+		 * Handle dropping when source is tree and target is grid.
+		 * @param source
+		 * @param nodes
+		 * @param copy
+		 * @param newParentItem
+		 */
       onTreeToGrid: function(source, nodes, copy, newParentItem) {
 				var dfds = [];
 				var store = source.tree.model;
