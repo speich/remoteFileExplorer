@@ -7,12 +7,13 @@ define([
 	'dojo/_base/declare',
 	'dojo/_base/lang',
 	'dojo/when',
+	'dojo/aspect',
 	'dojo/_base/array',
 	'dojo/store/Memory',
 	'dojo/store/JsonRest',
 	'dojo/store/Observable',
 	'dojo/store/Cache'
-], function(declare, lang, when, array, Memory, JsonRest, Observable, Cache) {
+], function(declare, lang, when, aspect, array, Memory, JsonRest, Observable, Cache) {
 
 	// references for MonkeyPatching the store.Cache
 	var refPut, refDel, refAdd;
@@ -77,12 +78,19 @@ define([
 		 * @param {object} options
 		 */
 		put: function(object, options) {
-			var self = this;
+			var self = this, oldParentId;
+
+			oldParentId = object[this.parentAttr];
+			object[this.parentAttr] = options.parent[this.idProperty];
 			return refPut.apply(this, arguments).then(function(id) {
 				self.onChange(object);
 				return id;
+			}, function() {
+				// when request fails change id back
+				object[self.parentAttr] = oldParentId;
 			});
 		},
+
 
 		add: function(object, options) {
 			var self = this;
@@ -129,11 +137,12 @@ define([
 		 * If children were loaded previously, this returns the cached result otherwise the master store is queried first
 		 * and then the result is cached.
 		 * @param {object} object store object
-		 * @param options
+		 * @param onComplete
 		 * @return {dojo/Deferred}
 		 */
-		getChildren: function(object, options) {
-			var self = this, cached, queryObj = {},
+		getChildren: function(object, onComplete) {
+			var self = this, alreadyCached,
+				queryObj = {},
 				id = object[this.idProperty],
 				results, resultsDirOnly, children;
 
@@ -141,34 +150,39 @@ define([
 			if (this.childrenCached[id]) {
 				queryObj[this.parentAttr] = id;
 				results = this.storeMemory.query(queryObj);
-				cached = true;
+				alreadyCached = true;
 			}
 			// children not cached yet, query master store and add result to cache
 			else {
-				results = self.storeMaster.query(id + '/');	// query has to be a string, otherwise will add querystring instead of REST resource
-				cached = false;
+				results = self.storeMaster.query(id + '/');	// query has to be a string, otherwise jsonrest will add a querystring instead of REST resource
+				alreadyCached = false;
 			}
 
 			return when(results, lang.hitch(this, function(results) {
+				var options = {
+					overwrite: true
+				};
+				// only display directories in the tree ? / add children to cache
 				resultsDirOnly = results.filter(function(child) {
-					if (!cached) {
-						self.storeMemory.add(child);	// saves looping twice, but should logically be in own foreEach
+					if (!alreadyCached) {
+						// some items might already be cached from a previous drag n drop (though folder itself is not)
+						// Just overwrite (is this the right place to to this?)
+						self.storeMemory.put(child, options);	// saves looping twice, but should logically be in own foreEach
 					}
-					return child[self.childrenAttr];	// only display directories in the tree
+					return child[self.childrenAttr];
 				});
 				children = this.skipWithNoChildren ? resultsDirOnly : results;
 
 				// notify tree by calling onComplete
-				if (lang.isFunction(options)) {
+				if (lang.isFunction(onComplete)) {
 					when(children, function(result) {
-						options(result);
+						onComplete(result);
 					});
 				}
 				this.childrenCached[id] = children;
 				return children;
 			}));
 		},
-
 
 		/**
 		 * Move or copy an store object from one folder (parent object) to another.
@@ -183,7 +197,6 @@ define([
 			var dfd, self = this, options,
 			newObject, oldParentId, newParentId;
 
-			oldParentId = oldParentObject.id;
 			newParentId = newParentObject.id;
 
 			// copy object
@@ -205,36 +218,22 @@ define([
 			else {
 				// If target folder was cached previously, we have to update the dropped object in the cache, e.g. its parent attribute
 				// Otherwise we just put it to the server (master store), which updates the cache automatically.
-
-				// Put updates the cache and consequently getChildren() will return the cached items
-				// and not query the masterStore anymore. If the new parent's children have not been cached previously,
-				// only the moved object(s) will be returned from cache and the potential children will not be loaded
-				// from the masterStore -> check if cached previously and if not, remove putted objects from cache
-
 				// Set object's parent attribute to new parent id
-				object[this.parentAttr] = newParentId;
 				options = {
-					overwrite: true//,
-					//parent: newParentObject
+					overwrite: true,
+					parent: newParentObject
 				};
 
-				dfd = this.storeMaster.put(object, options).then(function() {	// note: put does not returnthe object, but only it's id
-					/*
-					// only update cache if folder was already cached previously
-					if (self.childrenCached[newParentId]) {
-						self.storeMemory.put(object);
-					}
+				dfd = this.put(object, options).then(function() {	// note: put does not return the object, but only it's id
+					// Opening (loading with getChildren) an uncached folder after having dropping objects onto it will
+					// add all content from that folder to the cache, but this will lead to an error of some objects already
+					// existing in cache (the dropped ones) -> remove from cache, they will be added back when loading folder.
 
 					// Notify tree to update old parent (its children)
 					// Note: load children after put has completed, because put might modify the cache
 					return when(self.getChildren(oldParentObject), function(children) {
 						self.onChildrenChange(oldParentObject, children);
-
 					});
-					*/
-				}, function() {
-					// when request fails change id back
-					object[self.parentAttr] = oldParentId;
 				});
 			}
 
