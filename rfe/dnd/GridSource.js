@@ -117,7 +117,7 @@ function(declare, lang, when, on, mouse, DnDSource) {
 				var object = targetSource.getObject(node);
 
 				// all nodes in grid share same parent, only get it once from first node. Since you can only drag an object
-				// that's visible (hence loaded an cached) we can use the memoryStore
+				// that's visible (hence loaded an cached) we can directly use the memoryStore
 				oldParentObject = oldParentObject || storeMemory.get(object[fileStore.parentAttr]);
 				fileStore.pasteItem(object, oldParentObject, newParentObject, copy);
 			});

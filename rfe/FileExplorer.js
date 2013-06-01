@@ -27,7 +27,7 @@ define([
 
 	/**
 	 * File explorer class creates an application that allows you to manage and browse files and directories
-	 * on a remote webserver server. It consists of tree and a grid. The tree loads file data over REST via php from remote server.
+	 * on a remote web server. It consists of tree and a grid. The tree loads file data over REST via php from remote server.
 	 * @class
 	 * @name rfe.FileExplorer
 	 * @extends {rfe.Layout}

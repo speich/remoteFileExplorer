@@ -70,6 +70,10 @@ define([
 		allowSelectAll: true,
 		maintainOddEven: false,
 		columns: {
+			id: {
+				sortable: false,
+				label: 'id'
+			},
 			name: editor({
 				sortable: false, // lets us apply own header click sort
 				editor: 'text',
