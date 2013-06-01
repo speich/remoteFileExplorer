@@ -2,18 +2,11 @@ define([
 	'dojo/_base/declare',
 	'dijit/form/ComboBox',
 	'rfe/_SearchBoxMenu',
-	'dojo/store/JsonRest'//,
-
-//	'dijit/_WidgetBase',
-//	'dijit/_TemplatedMixin',
-//	'dojo/text!rfe/templates/SearchButton.html'
-//], function(declare, ComboBox, _WidgetBase, _TemplatedMixin, template) {
+	'dojo/store/JsonRest'
 ], function(declare, ComboBox, _SearchBoxMenu, JsonRest) {
 
 	return declare([ComboBox], {
-
-		//templateString: template,
-
+		value: 'search',
 		searchAttr: 'name',
 		pageSize: 4,
 		searchDelay: 100,
@@ -36,6 +29,5 @@ define([
 		}
 
 	});
-
 });
 
