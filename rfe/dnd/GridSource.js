@@ -140,7 +140,12 @@ function(declare, lang, when, on, mouse, DnDSource) {
 				// dropping beyond rendered rows, so newParentObject is null. Since all displayed objects
 				// in grid share the same parent, just grab the parent of the first/last object in grid
 				row = grid.getFirstRow();
-				newParentObject = storeMemory.get(row.data[fileStore.parentAttr]);
+				if (row) {
+					newParentObject = storeMemory.get(row.data[fileStore.parentAttr]);
+				}
+				else {	// emtpy folder get parent from tree (TODO: find solution which uses dnd interface (possible?)
+					newParentObject = grid.rfe.currentTreeObject;
+				}
 			}
 
 			nodes.forEach(function(node) {

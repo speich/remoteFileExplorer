@@ -196,7 +196,7 @@ define([
 		},
 
 		/**
-		 * Returns the first row object.
+		 * Returns the first row object or false if none.
 		 * A row object has the properties:
 		 *      id: the data object's id
 		 *      data: the data object represented by the row
@@ -205,7 +205,7 @@ define([
 		 */
 		getFirstRow: function() {
 			var nodes = query('.dgrid-row', this.bodyNode);
-			return this.row(nodes[0]);
+			return nodes.length > 0 ? this.row(nodes[0]) : false;
 		}
 
 
