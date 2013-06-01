@@ -9,7 +9,6 @@ define([
 	'dojo/dnd/Manager'
 ], function(lang, array, declare, Deferred, on, domClass, dndSource, dndManager) {
 
-	console.log('loaded');
 		return declare([dndSource], {
 
 			getObject: function(node){

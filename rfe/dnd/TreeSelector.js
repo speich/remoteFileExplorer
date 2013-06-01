@@ -4,7 +4,7 @@
  * 2. Do not select a node when only dragging it
  * @see conversation on http://dojo-toolkit.33424.n3.nabble.com/Reason-behind-selecting-treeNode-onMouseDown-and-not-onMouseUp-td3021149.html#a3066447
  *
- * Solution: The idea is to defer de-/selection on mouseDown to mouseUp (@see setSelection())
+ * Solution: The idea is to defer de-/selection from mouseDown to mouseUp (@see setSelection())
  */
 
 define([
@@ -13,9 +13,7 @@ define([
 	'dojo/_base/event',
 	'dojo/_base/connect',
 	'dijitOriginal/tree/_dndSelector'
-], function(declare, array, lang, event, connect, _dndSelector) {
-
-	console.log('loaded TreeSelector');
+], function(array, lang, event, connect, _dndSelector) {
 
 	// set references to be able to call overridden methods
 	var  ref = _dndSelector.prototype,
