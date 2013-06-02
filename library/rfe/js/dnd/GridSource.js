@@ -55,12 +55,6 @@ function(declare, lang, when, on, mouse, DnDSource) {
 			return legal && evt.target !== this.grid.bodyNode;
 		},
 
-		_onDragMouse: function() {
-			// TODO: take care (in TreeSource?) of dropping on own descendant (by preventing from dropping in the first place?)
-			var oldTarget = this.targetAnchor,	// TreeNode corresponding to TreeNode mouse was previously over
-				newTarget = this.current;			// TreeNode corresponding to TreeNode mouse is currently over
-		},
-
 		/**
 		 * Topic event processor for /dnd/drop, called to finish the DnD operation.
 		 * @param {object} sourceSource dojo/dnd/Source dgrid or dijit/tree which is providing the items
@@ -143,7 +137,7 @@ function(declare, lang, when, on, mouse, DnDSource) {
 				if (row) {
 					newParentObject = storeMemory.get(row.data[fileStore.parentAttr]);
 				}
-				else {	// emtpy folder get parent from tree (TODO: find solution which uses dnd interface (possible?)
+				else {	// empty folder get parent from tree (TODO: find solution which uses dnd interface (possible?)
 					newParentObject = grid.rfe.currentTreeObject;
 				}
 			}

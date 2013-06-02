@@ -9,7 +9,7 @@ define([
 	return declare([_ComboBoxMenu], {
 
 		// TODO: find better solution to get store target url
-		url: 'library/rfe/controller.php',
+		url: '/library/rfe/php/controller.php',
 
 		/**
 		 * Creates an option to appear on the popup menu.

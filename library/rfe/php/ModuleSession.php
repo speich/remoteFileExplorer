@@ -33,6 +33,7 @@ class ModuleSession extends FileExplorer {
 		6 => array('id' => 6, 'parId' => 1, 'name' => 'photo01.jpg', 'size' => 129631, 'mod' => '27.03.2010'),
 		7 => array('id' => 7, 'parId' => 1, 'name' => 'photo02.jpg', 'size' => 29634, 'mod' => '27.03.2010'),
 		8 => array('id' => 8, 'parId' => 1, 'name' => 'photo03.jpg', 'size' => 79308, 'mod' => '27.07.2009'),
+		9 => array('id' => 9, 'parId' => 2, 'name' => 'subfolder 21', 'size' => 0, 'mod' => '27.03.2010', 'dir' => true),
 		26 => array('id' => 26, 'parId' => 1, 'name' => 'photo01.jpg', 'size' => 129631, 'mod' => '27.03.2010'),
 		27 => array('id' => 27, 'parId' => 1, 'name' => 'photo02.jpg', 'size' => 29634, 'mod' => '27.03.2010'),
 		28 => array('id' => 28, 'parId' => 1, 'name' => 'photo03.jpg', 'size' => 79308, 'mod' => '27.07.2009'),
@@ -80,9 +81,6 @@ class ModuleSession extends FileExplorer {
 	 * @param string $rootDir
 	 */
 	public function __construct($rootDir) {
-//		if (rand(0, 1) == 1) {
-			$this->fsDefault[9] = array('id' => 9, 'parId' => 2, 'name' => 'subfolder 21', 'size' => 0, 'mod' => '27.03.2010', 'dir' => true);
-//		}
 		parent::__construct($rootDir);
 		if (!isset($_SESSION['rfe'])) {
 			$_SESSION['rfe'][$rootDir] = serialize($this->fsDefault);
@@ -98,6 +96,7 @@ class ModuleSession extends FileExplorer {
 	public function get($resource) {
 		$json = false;
 		$fs = unserialize($_SESSION['rfe'][$this->getRoot()]);
+		//var_dump($fs);
 		if (substr($resource, -1) === '/') {   // query for children of $resource
 			$json = $this->getChildren(rtrim($resource, '/'), $fs);
 		}
@@ -287,6 +286,6 @@ class ModuleSession extends FileExplorer {
 			$path = $fs[$parId]['id'].'/'.$path;
 			$parId = isset($fs[$parId]['parId']) ? $fs[$parId]['parId'] : null;
 		}
-		return $path + $file['id'];
+		return $path.$file['id'];
 	}
 }

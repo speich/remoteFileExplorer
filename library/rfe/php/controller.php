@@ -54,10 +54,10 @@ switch($moduleType) {
 		$rfe = new ModuleSession($rootDir);
 		break;
 	case 'sqlite':
-		// use SQLite to store user's file system
+		// use ModuleSQLite to store user's file system
 		break;
 	case 'disk':
-		// use webserver's filesystem
+		// use web server's filesystem
 		//require_once('ModuleDisk.php');
 		//$rootDir = $_SERVER['DOCUMENT_ROOT'].'/images';
 		//$rfe = new DiskModule($rootDir);

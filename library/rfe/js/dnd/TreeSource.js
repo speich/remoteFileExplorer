@@ -19,54 +19,6 @@ define([
 				return item.data.item;
 			},
 
-			_onDragMouse_new: function(e) {
-				// called by dndSource.onMouseMove() if isDragging is true
-				// summary:
-				//		Helper method for processing onmousemove/onmouseover events while drag is in progress.
-				//		Keeps track of current drop target.
-
-				var m = dndManager.manager(),
-					oldTarget = this.targetAnchor,	// TreeNode corresponding to TreeNode mouse was previously over
-					newTarget = this.current,			// TreeNode corresponding to TreeNode mouse is currently over
-					droppable = false;
-
-				if (newTarget !== oldTarget) {
-			      if (oldTarget) {
-						this._removeItemClass(oldTarget.rowNode, 'Over');
-					}
-					if (newTarget){
-						this._addItemClass(newTarget.rowNode, 'Over');
-					}
-					// Check if it's ok to drop the dragged node on the target node.
-					if (m.source === this) {
-						if (newTarget.id in this.selection) {
-							// Guard against dropping onto yourself
-							droppable = false;
-						}
-						else {
-							droppable = !this._isParentChildDrop(m.source, newTarget.rowNode);
-						}
-					}
-					/*
-					else if (m.source.grid) {
-						// Note: To simplify things we (currently) do not differentiate between file or folder before
-						// dropping, even though files (but not folders) could be dropped independently of the hierarchy.
-						// But in case of dropping multiple items (files and folders at the same time) it wouldn't make
-						// sense to show the (-)avatar anymore. Windows Explorer does not prevent parentChildDrops but
-						// instead displays a warning message for each dropped file/folder afterwards.
-						var grid = m.source.grid;
-						var node, item = grid.getObject(0);	// we can use any row to get the parent
-						node = this.tree.getNodesByItem(item);
-						node = node[0].rowNode;
-						droppable = !this._isParentChildDrop(m.target, node);
-						console.log('tree.canDrop', droppable, m.target)
-					}
-					*/
-					m.canDrop(droppable);
-					this.targetAnchor = newTarget;
-				}
-			},
-
 			/**
 			 * Topic event processor for /dnd/drop, called to finish the DnD operation.
 			 * Updates data store items according to where node was dragged from and dropped to.
