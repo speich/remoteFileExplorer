@@ -81,7 +81,9 @@ define([
 			var self = this, oldParentId;
 
 			oldParentId = object[this.parentAttr];
-			object[this.parentAttr] = options.parent[this.idProperty];
+			if (options && options.parent) {
+				object[this.parentAttr] = options.parent[this.idProperty];
+			}
 			return refPut.apply(this, arguments).then(function(id) {
 				self.onChange(object);
 				return id;
@@ -137,7 +139,7 @@ define([
 		 * If children were loaded previously, this returns the cached result otherwise the master store is queried first
 		 * and then the result is cached.
 		 * @param {object} object store object
-		 * @param onComplete
+		 * @param [onComplete]
 		 * @return {dojo/Deferred}
 		 */
 		getChildren: function(object, onComplete) {
@@ -320,7 +322,7 @@ define([
 		onNewItem: function(object) {
 			var parent = this.storeMemory.get(object.parId);
 			// since we know, that objects with this parItem are already cached (except the new one), we just query the memoryStore and add it
-			this.getChildren(parent).then(lang.hitch(this, function(children) {
+			when(this.getChildren(parent), lang.hitch(this, function(children) {
 				this.onChildrenChange(parent, children);
 			}));
 		}

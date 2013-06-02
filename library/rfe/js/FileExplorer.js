@@ -99,7 +99,7 @@ define([
 					self.setHistory(obj.id);
 				}
 			});
-			grid.on("dgrid-datachange", function(evt) {
+			grid.on('dgrid-datachange', function(evt) {
 				// catch using editor when renaming
 				var obj = evt.cell.row.data;
 
