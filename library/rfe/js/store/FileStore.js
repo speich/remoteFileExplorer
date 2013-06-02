@@ -196,17 +196,14 @@ define([
 		 * @return {dojo.Deferred}
 		 */
 		pasteItem: function(object, oldParentObject, newParentObject, copy) {
-			var dfd, self = this, options,
-			newObject, oldParentId, newParentId;
-
-			newParentId = newParentObject.id;
+			var dfd, self = this, options, newObject;
 
 			// copy object
 			if (copy) {
 				// create new object based on child and use same id -> when server sees POST with id this means copy (implicitly)
 				// TODO: if object is a folder then recursively copy all its children
 				newObject = lang.clone(object);
-				newObject[this.parentAttr] = newParentId;
+				newObject[this.parentAttr] = newParentObject.id;
 				dfd = this.add(newObject, {
 					incremental: true   // otherwise store JsonRest does POST instead of PUT even if object has an id
 					// TODO: use overwrite: true instead of incremental?
