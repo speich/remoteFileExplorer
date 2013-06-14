@@ -5,8 +5,9 @@ define([
 	'dijit/registry',
 	'dijit/Toolbar',
 	'dijit/form/Button',
-	'rfe/SearchBox'
-], function(lang, declare, aspect, registry, Toolbar, Button, SearchBox) {
+	'rfe/SearchBox',
+	'dijit/registry'
+], function(lang, declare, aspect, registry, Toolbar, Button, SearchBox, registry) {
 
 	/**
 	 * @class
@@ -18,7 +19,7 @@ define([
 
 		rfe: null,
 
-		/** #constructor */
+		/** @constructor */
 		constructor: function(props) {
 			lang.mixin(this, props || {});
 		},
@@ -94,7 +95,20 @@ define([
 			this.addChild(new SearchBox({
 				target: rfe.store.storeMaster.target + 'search/'
 			}));
-		}
+		},
 
+		_onContainerKeydown: function(evt) {
+			var widget = registry.getEnclosingWidget(evt.target);
+			if (!widget.textbox) {
+				this.inherited('_onContainerKeydown', arguments);
+			}
+		},
+
+		_onContainerKeypress: function(evt) {
+			var widget = registry.getEnclosingWidget(evt.target);
+			if (!widget.textbox) {
+				this.inherited('_onContainerKeydown', arguments);
+			}
+		}
 	});
 });

@@ -48,8 +48,8 @@ define([
 	 *
 	 */
 	return declare([Layout, Edit], /** @lends rfe.FileExplorer.prototype */ {
-		version: '1.0',
-		versionDate: '2012',
+		version: '0.9',
+		versionDate: '2013',
 		currentTreeObject: null,
 		context: null,
 		history: null,
@@ -189,6 +189,7 @@ define([
 		 * Reload current folder.
 		 */
 		reload: function() {
+			/*
 			var dndController = this.tree.dndController.declaredClass;
 
 			this.store.storeMemory.setData([]);
@@ -202,6 +203,8 @@ define([
 			this.tree.dndController = dndController; //'rfe.dnd.TreeSource',
 			this.tree.postMixInProperties();
 			this.tree.postCreate();
+			this.initState();
+			*/
 		},
 
 		/**

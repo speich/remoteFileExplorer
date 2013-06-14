@@ -1,15 +1,23 @@
 define([
+	'dojo/_base/lang',
 	'dojo/_base/array',
 	'dojo/_base/declare',
 	'dojo/dom-construct',
 	'dojo/dom-attr',
+	'dojo/on',
 	'dijit/form/_ComboBoxMenu'
-], function(array, declare, domConstruct, domAttr, _ComboBoxMenu) {
+], function(lang, array, declare, domConstruct, domAttr, on, _ComboBoxMenu) {
 
 	return declare([_ComboBoxMenu], {
-
 		// TODO: find better solution to get store target url
 		url: '/library/rfe/php/controller.php',
+
+		postCreate: function() {
+			this.inherited(arguments);
+			this.on('focus', lang.hitch(this, function() {
+				this.select();
+			}));
+		},
 
 		/**
 		 * Creates an option to appear on the popup menu.
@@ -27,6 +35,7 @@ define([
 
 			return menuItem;
 		}
+
 
 	});
 });
