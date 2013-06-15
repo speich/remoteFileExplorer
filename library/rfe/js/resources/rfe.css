@@ -43,6 +43,7 @@ html, body {
 #remoteFileExplorer .dijitSplitterV {
 	border-width: 0 1px;
 }
+#rfeTbSeparatorSearch { margin-right: 10px; }
 
 .rfeTreePane, .rfeGridPane {
 	padding: 0;

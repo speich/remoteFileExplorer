@@ -4,10 +4,11 @@ define([
 	'dojo/aspect',
 	'dijit/registry',
 	'dijit/Toolbar',
+	'dijit/ToolbarSeparator',
 	'dijit/form/Button',
 	'rfe/SearchBox',
 	'dijit/registry'
-], function(lang, declare, aspect, registry, Toolbar, Button, SearchBox, registry) {
+], function(lang, declare, aspect, registry, Toolbar, ToolbarSeparator, Button, SearchBox, registry) {
 
 	/**
 	 * @class
@@ -91,6 +92,7 @@ define([
 					rfe.reload();
 				}
 			}));
+			this.addChild(new ToolbarSeparator({ id: 'rfeTbSeparatorSearch'}));
 
 			this.addChild(new SearchBox({
 				target: rfe.store.storeMaster.target + 'search/'
