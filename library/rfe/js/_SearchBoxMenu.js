@@ -10,7 +10,7 @@ define([
 
 	return declare([_ComboBoxMenu], {
 		// TODO: find better solution to get store target url
-		url: '/library/rfe/php/controller.php',
+		target: '/library/rfe/php/controller.php',
 
 		postCreate: function() {
 			this.inherited(arguments);
@@ -30,7 +30,7 @@ define([
 
 			// TODO: add more info, e.g. path
 			menuItem.innerHTML = obj.name + '<br>' +
-				'/' + this.url + '/' + obj.path + '<br>' +
+				'/' + this.target + '/' + obj.path + '<br>' +
 				'<span class="rfeSearchBoxItemLabel">Date modified:</span> ' + obj.mod + ', <span class="rfeSearchBoxItemLabel">Size:</span> ' + obj.size;
 
 			return menuItem;

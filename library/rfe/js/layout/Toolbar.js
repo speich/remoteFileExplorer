@@ -1,14 +1,14 @@
 define([
 	'dojo/_base/lang',
 	'dojo/_base/declare',
+	'dojo/when',
 	'dojo/aspect',
 	'dijit/registry',
 	'dijit/Toolbar',
 	'dijit/ToolbarSeparator',
 	'dijit/form/Button',
-	'rfe/SearchBox',
-	'dijit/registry'
-], function(lang, declare, aspect, registry, Toolbar, ToolbarSeparator, Button, SearchBox, registry) {
+	'rfe/SearchBox'
+], function(lang, declare, when, aspect, registry, Toolbar, ToolbarSeparator, Button, SearchBox) {
 
 	/**
 	 * @class
@@ -95,7 +95,17 @@ define([
 			this.addChild(new ToolbarSeparator({ id: 'rfeTbSeparatorSearch'}));
 
 			this.addChild(new SearchBox({
-				target: rfe.store.storeMaster.target + 'search/'
+				target: rfe.store.storeMaster.target + 'search/',
+				onChange: function() {	// note: change event passes value and not evt
+					if (this.item.dir) {
+						rfe.display(this.item);
+					}
+					else {
+						when(rfe.store.get(this.item.parId), function(object) {
+							rfe.display(object);
+						});
+					}
+				}
 			}));
 		},
 

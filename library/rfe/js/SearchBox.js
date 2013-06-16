@@ -28,6 +28,8 @@ define([
 			this.baseClass = this.get('baseClass') + ' rfeSearchBox';
 		}
 
+
+
 	});
 });
 
