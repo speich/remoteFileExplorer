@@ -5,6 +5,7 @@ define([
 	'dojo/_base/array',
 	'dojo/on',
 	'dojo/aspect',
+	'dojo/topic',
 	'dojo/query',
 	'dgrid/OnDemandGrid',
 	'dgrid/Selection',
@@ -13,12 +14,11 @@ define([
 	'dgrid/extensions/DnD',
 	'dgrid/extensions/ColumnResizer',
 	'dgrid/extensions/ColumnHider',
-//	"dgrid/extensions/Views",
+	'put-selector/put',
 	'dgrid/extensions/DijitRegistry',
 	'xstyle/has-class',
-	'xstyle/css',
-	'put-selector/put'
-], function(lang, Deferred, declare, array, on, aspect, query, Grid, Selection, editor, Keyboard, DnD, ColumnResizer, ColumnHider/*, Views*/) {
+	'xstyle/css'
+], function(lang, Deferred, declare, array, on, aspect, topic, query, Grid, Selection, editor, Keyboard, DnD, ColumnResizer, ColumnHider, put) {
 
 	/**
 	 * Create HTML string to display file type icon in grid
@@ -103,6 +103,19 @@ define([
 				label: 'last modified'
 			}
 		},
+		renderers: {
+			list: Grid.prototype.renderRow,
+			details: function() {
+
+				return;
+			},
+			icons: function(obj, options) {
+				var div = put('div');
+				div.innerHTML = '<div class="dialogContentIconImg"><img src="library/rfe/js/resources/images/icons-64/' +
+				(obj.dir ? 'folder.png' : 'file.png') + '" width="64" heigh="64">' + obj.name + '</div>';
+				return div;
+			}
+		},
 
 		postCreate: function() {
 			this.inherited('postCreate', arguments);
@@ -120,6 +133,10 @@ define([
 			this.bodyNode.tabIndex = this.tabIndex;
 
 			this.initEvents();
+
+			topic.subscribe('grid/views/state', lang.hitch(this, function(view) {
+				this.setRenderer(view);
+			}));
 		},
 
 		initEvents: function() {
@@ -151,7 +168,7 @@ define([
 			headerNode = this.headerNode;
 
 			// if it columns are sortable, resort on clicks
-			on(headerNode.firstChild, "click,keydown", function(event) {
+			on(headerNode.firstChild, 'click, keydown', function(event) {
 
 				// respond to click or space keypress
 				if (event.type === "click" || event.keyCode === 32) {
@@ -206,6 +223,14 @@ define([
 		getFirstRow: function() {
 			var nodes = query('.dgrid-row', this.bodyNode);
 			return nodes.length > 0 ? this.row(nodes[0]) : false;
+		},
+
+		setRenderer: function(view) {
+			this.renderRow = this.renderers[view];
+			//put(grid.domNode, "!table!gallery!details." + view);
+			// only show headers if we're in "list" view
+			this.set('showHeader', view == "list");
+			this.refresh();
 		}
 
 

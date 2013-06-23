@@ -27,7 +27,8 @@ define([
 			this.inherited('postCreate', arguments);
 
 			var panes = this.rfe.panes,
-				menuItemDetails, menuItemIcons, menuFile, menuView, menuHelp, menuTools, menuItemV, subMenuFile;
+				submenuView = {},
+				menuFile, menuView, menuHelp, menuTools, menuItemV, subMenuFile;
 
 			this.menuItems = {};
 
@@ -60,14 +61,12 @@ define([
 				disabled: true
 			});
 			menuFile.addChild(this.menuItems.rename);
-
 			this.menuItems.del = new MenuItem({
 				label: 'Delete',
 				onClick: lang.hitch(this.rfe, this.rfe.del),
 				disabled: true
 			});
 			menuFile.addChild(this.menuItems.del);
-
 			menuFile.addChild(new MenuSeparator());
 			this.menuItems.properties = new MenuItem({
 				label: 'Properties',
@@ -79,29 +78,36 @@ define([
 
 			// ******* menu layout ********
 			menuView = new DropDownMenu();
-			menuItemDetails = new CheckedMenuItem({
-				label: 'As Details',
-				checked: false,
-				onClick: lang.hitch(this, function() {
-					topic.publish('grid/views/state', 'details');
-				})
-			});
-			topic.subscribe('grid/views/state', function(state) {
-				menuItemDetails.set('checked', state === 'details');
-			});
-			menuView.addChild(menuItemDetails);
-			menuItemIcons = new CheckedMenuItem({
-				label: 'As Icons',
+			submenuView.icons = new CheckedMenuItem({
+				label: 'Icons',
 				checked: false,
 				onClick: lang.hitch(this, function() {
 					topic.publish('grid/views/state', 'icons');
 				})
 			});
-			topic.subscribe('grid/views/state', function(state) {
-				menuItemIcons.set('checked', state === 'icons');
+			menuView.addChild(submenuView.icons);
+			submenuView.list = new CheckedMenuItem({
+				label: 'List',
+				checked: false,
+				onClick: lang.hitch(this, function() {
+					topic.publish('grid/views/state', 'list');
+				})
 			});
-			menuView.addChild(menuItemIcons);
+			menuView.addChild(submenuView.list);
+			submenuView.details = new CheckedMenuItem({
+				label: 'Details',
+				checked: false,
+				onClick: lang.hitch(this, function() {
+					topic.publish('grid/views/state', 'details');
+				})
+			});
+			menuView.addChild(submenuView.details);
 			menuView.addChild(new MenuSeparator());
+			topic.subscribe('grid/views/state', lang.hitch(this, function(view) {
+				submenuView[view].set('checked', true);
+				this.rfe.grid.refresh();
+			}));
+
 			menuItemV = new CheckedMenuItem({
 				label: 'Layout vertical',
 				checked: panes.get('view') !== 'horizontal',

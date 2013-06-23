@@ -23,7 +23,6 @@ define([
 
 	// TODO: use dijit._WidgetBase
 	// TODO: multiselect (in tree allow only of files but not of folders)
-	// TODO: override dgrid.renderRow() to create different views for grid content (e.g. view = list, details, thumbnails, etc.)
 
 	/**
 	 * File explorer class creates an application that allows you to manage and browse files and directories

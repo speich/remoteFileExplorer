@@ -96,10 +96,10 @@ define([
 		},
 
 		initTopics: function() {
-			topic.publish('grid/views/state', 'details');
-			topic.subscribe('grid/views/state', lang.hitch(this, function(state) {
+			topic.publish('grid/views/state', 'icons');
+/*			topic.subscribe('grid/views/state', lang.hitch(this, function(state) {
 				this.grid.set('view', state);
-			}));
+			}));*/
 		},
 
 		/**
