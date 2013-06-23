@@ -96,16 +96,7 @@ define([
 
 			this.addChild(new SearchBox({
 				target: rfe.store.storeMaster.target + 'search/',
-				onChange: function() {	// note: change event passes value and not evt
-					if (this.item.dir) {
-						rfe.display(this.item);
-					}
-					else {
-						when(rfe.store.get(this.item.parId), function(object) {
-							rfe.display(object);
-						});
-					}
-				}
+				rfe: rfe
 			}));
 		},
 
