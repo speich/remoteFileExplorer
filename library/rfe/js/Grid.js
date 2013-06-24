@@ -105,14 +105,10 @@ define([
 		},
 		renderers: {
 			list: Grid.prototype.renderRow,
-			details: function() {
-
-				return;
-			},
 			icons: function(obj, options) {
 				var div = put('div');
-				div.innerHTML = '<div class="dialogContentIconImg"><img src="library/rfe/js/resources/images/icons-64/' +
-				(obj.dir ? 'folder.png' : 'file.png') + '" width="64" heigh="64">' + obj.name + '</div>';
+				div.innerHTML = '<div class="gridIcon"><img src="library/rfe/js/resources/images/icons-64/' +
+				(obj.dir ? 'folder.png' : 'file.png') + '" width="64" heigh="64"><br>' + obj.name + '</div>';
 				return div;
 			}
 		},
@@ -226,8 +222,18 @@ define([
 		},
 
 		setRenderer: function(view) {
+			var i, cssClassRemove = '',
+				cssClass = 'gridView' + view.charAt(0).toUpperCase() + view.slice(1);
+
+			// update class on grid domNode for correct row css
+			for (i in this.renderers) {
+				if (this.renderers.hasOwnProperty(i)) {
+					cssClassRemove += '!gridView' + i.charAt(0).toUpperCase() + i.slice(1);
+				}
+			}
 			this.renderRow = this.renderers[view];
-			//put(grid.domNode, "!table!gallery!details." + view);
+			put(this.domNode, "!gridViewList!gridViewIcons!gridViewDetails." + cssClass);
+
 			// only show headers if we're in "list" view
 			this.set('showHeader', view == "list");
 			this.refresh();

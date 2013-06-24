@@ -94,16 +94,12 @@ define([
 				})
 			});
 			menuView.addChild(submenuView.list);
-			submenuView.details = new CheckedMenuItem({
-				label: 'Details',
-				checked: false,
-				onClick: lang.hitch(this, function() {
-					topic.publish('grid/views/state', 'details');
-				})
-			});
-			menuView.addChild(submenuView.details);
 			menuView.addChild(new MenuSeparator());
 			topic.subscribe('grid/views/state', lang.hitch(this, function(view) {
+				var i;
+				for (i in submenuView) {
+					submenuView[i].set('checked', false);
+				}
 				submenuView[view].set('checked', true);
 				this.rfe.grid.refresh();
 			}));

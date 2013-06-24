@@ -83,8 +83,6 @@ define([
 			//this.initEvents();
 			this.initTopics();
 			this.initDialogs();
-
-
 		},
 
 		initEvents: function() {

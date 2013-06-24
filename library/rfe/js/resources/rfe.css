@@ -111,6 +111,12 @@ html, body {
 	vertical-align: top;
 }
 
+.gridViewIcons .dgrid-row {
+	display: inline-block;
+	margin: 5px;
+	text-align: center;
+}
+
 /*** Begin rfeDialogAbout ***/
 #rfeDialogAbout {
 	width: 320px;
