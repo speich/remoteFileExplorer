@@ -84,9 +84,7 @@ define([
 				mod: this.getDate()
 			});
 			object.name = object.dir ? 'new directory' : object.name = 'new text file.txt';
-			return store.add(object).then(function(object) {
-				return object;
-			});
+			return store.add(object);
 		},
 
 		/**
@@ -99,10 +97,12 @@ define([
 				store = this.store;
 
 			return this.create(object).then(lang.hitch(this, function(object) {
+				var element, column;
+
 				if (this.context.isOnGrid || this.context.isOnGridPane) {
-					var column = widget.columns[store.labelAttr],
-						cell = widget.cell(object.id, column.field);
-					widget.edit(cell);
+					column = widget.columns[store.labelAttr];
+					element = widget.get('editableElement', object.id, column.field);
+					widget.edit(element);
 				}
 			}));
 		},
@@ -116,12 +116,13 @@ define([
 			var widget = this.context.isOnGrid || this.context.isOnGridPane ? this.grid : this.tree,
 				store = this.store,
 				column = widget.columns[store.labelAttr],
+				element,
 				id, selection = widget.selection;
 
 			for (id in selection) {
 				if (selection.hasOwnProperty(id) && selection[id] === true) {
-					var cell = widget.cell(id, column.field);
-					widget.edit(cell);
+					element = widget.get('editableElement', id, column.field);
+					widget.edit(element);
 				}
 			}
 		}

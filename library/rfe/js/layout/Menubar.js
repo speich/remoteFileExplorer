@@ -28,7 +28,7 @@ define([
 
 			var panes = this.rfe.panes,
 				submenuView = {},
-				menuFile, menuView, menuHelp, menuTools, menuItemV, subMenuFile;
+				menuFile, menuView, menuHelp, menuTools, menuItemLayout, subMenuFile;
 
 			this.menuItems = {};
 
@@ -54,18 +54,17 @@ define([
 					});
 				})
 			}));
-
 			this.menuItems.rename = new MenuItem({
 				label: 'Rename',
 				onClick: lang.hitch(this.rfe, this.rfe.rename),
 				disabled: true
 			});
-			menuFile.addChild(this.menuItems.rename);
 			this.menuItems.del = new MenuItem({
 				label: 'Delete',
 				onClick: lang.hitch(this.rfe, this.rfe.del),
 				disabled: true
 			});
+			menuFile.addChild(this.menuItems.rename);
 			menuFile.addChild(this.menuItems.del);
 			menuFile.addChild(new MenuSeparator());
 			this.menuItems.properties = new MenuItem({
@@ -85,7 +84,6 @@ define([
 					topic.publish('grid/views/state', 'icons');
 				})
 			});
-			menuView.addChild(submenuView.icons);
 			submenuView.list = new CheckedMenuItem({
 				label: 'List',
 				checked: false,
@@ -93,25 +91,27 @@ define([
 					topic.publish('grid/views/state', 'list');
 				})
 			});
+			menuView.addChild(submenuView.icons);
 			menuView.addChild(submenuView.list);
 			menuView.addChild(new MenuSeparator());
 			topic.subscribe('grid/views/state', lang.hitch(this, function(view) {
 				var i;
 				for (i in submenuView) {
-					submenuView[i].set('checked', false);
+					if (submenuView.hasOwnProperty(i)) {
+						submenuView[i].set('checked', false);
+					}
 				}
 				submenuView[view].set('checked', true);
-				this.rfe.grid.refresh();
 			}));
 
-			menuItemV = new CheckedMenuItem({
+			menuItemLayout = new CheckedMenuItem({
 				label: 'Layout vertical',
 				checked: panes.get('view') !== 'horizontal',
 				onClick: function() {
-					panes.set('view', menuItemV.get('checked') === true ? 'vertical' : 'horizontal');
+					panes.set('view', menuItemLayout.get('checked') === true ? 'vertical' : 'horizontal');
 				}
 			});
-			menuView.addChild(menuItemV);
+			menuView.addChild(menuItemLayout);
 			menuView.addChild(new CheckedMenuItem({
 				id: 'rfeMenuItemFolders',
 				label: 'Navigation pane',

@@ -20,6 +20,7 @@ var dojoConfig = {
 	async: true,
 	packages: [
 		{name: 'dgrid', location: '/library/dgrid'},
+		{name: 'dgridOriginal', location: '/library/dgrid'},
 		{name: 'xstyle', location: '/library/xstyle'},
 		{name: 'put-selector', location: '/library/put-selector'},
 		{name: 'rfe', location: '/library/rfe/js'},
@@ -29,7 +30,8 @@ var dojoConfig = {
 	// redirect the following modules to my own modules
 	paths: {
    	'dijit/tree/_dndSelector': '/library/rfe/js/dnd/TreeSelector',
-      'dijit/tree/dndSource': '/library/rfe/js/js/dnd/TreeSource'
+      'dijit/tree/dndSource': '/library/rfe/js/js/dnd/TreeSource'//,
+		//'dgrid/Grid': '/library/rfe/js/grid/Grid'
 	}
 };
 </script>

@@ -70,6 +70,10 @@ html, body {
 .dijitDisabled .rfeToolbarIcon {
 	background-image: url("images/rfeToolbarIconsDisabled.png");
 }
+.dgrid-cell .dijitFolderClosed, .dgrid-cell .dijitLeaf {
+	display: inline-block;
+	vertical-align: top;
+}
 
 .rfeToolbarIconDirUp {
 	background-position: 0 50%;
@@ -115,6 +119,7 @@ html, body {
 	display: inline-block;
 	margin: 5px;
 	text-align: center;
+	vertical-align: top;
 }
 
 /*** Begin rfeDialogAbout ***/

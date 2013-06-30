@@ -133,7 +133,7 @@ function(declare, lang, when, on, mouse, DnDSource) {
 			else if (!newParentObject) {
 				// dropping beyond rendered rows, so newParentObject is null. Since all displayed objects
 				// in grid share the same parent, just grab the parent of the first/last object in grid
-				row = grid.getFirstRow();
+				row = grid.get('firstRow');
 				if (row) {
 					newParentObject = storeMemory.get(row.data[fileStore.parentAttr]);
 				}

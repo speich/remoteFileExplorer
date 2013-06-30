@@ -14,26 +14,8 @@ define([
 	'dgrid/extensions/DnD',
 	'dgrid/extensions/ColumnResizer',
 	'dgrid/extensions/ColumnHider',
-	'put-selector/put',
-	'dgrid/extensions/DijitRegistry',
-	'xstyle/has-class',
-	'xstyle/css'
-], function(lang, Deferred, declare, array, on, aspect, topic, query, Grid, Selection, editor, Keyboard, DnD, ColumnResizer, ColumnHider, put) {
-
-	/**
-	 * Create HTML string to display file type icon in grid
-	 * @param {Object} object
-	 * @param {Object} data
-	 * @param {Object} td
-	 */
-	function formatImg(object, data, td) {
-		var str, strClass = object.dir ? 'dijitFolderClosed' : 'dijitLeaf';
-		str = '<span>';
-		str += '<img class="dijitTreeIcon ' + strClass;
-		str += '" alt="" src="' + require.toUrl("dojo/resources/blank.gif") + '"/>' + object.name;
-		str += '</span>';
-		td.innerHTML = str;
-	}
+	'rfe/grid/View'
+], function(lang, Deferred, declare, array, on, aspect, topic, query, Grid, Selection, editor, Keyboard, DnD, ColumnResizer, ColumnHider, View) {
 
 	/**
 	 * Format integer to display file size in kilobyte.
@@ -64,7 +46,7 @@ define([
 	 * @property {string} allowSelectAll
 	 * @property {object} columns
 	 */
-	return declare([Grid, Selection, editor, Keyboard, ColumnResizer, ColumnHider, DnD/*, Views*/], /** @lends rfe.Grid.prototype */ {
+	return declare([Grid, Selection, editor, Keyboard, ColumnResizer, ColumnHider, DnD, View], /** @lends rfe.Grid.prototype */ {
 
 		selectionMode: 'extended',
 		allowSelectAll: true,
@@ -76,13 +58,10 @@ define([
 			},
 			name: editor({
 				sortable: false, // lets us apply own header click sort
-				editor: 'text',
+				editor: 'textarea',
 				editOn: 'dummyEvent',
 				autoSave: false,
-				label: "name",
-				renderCell: function(object, data, td) {
-					formatImg(object, data, td);
-				}
+				label: "name"
 			}),
 			size: {
 				sortable: false, // lets us apply own header click sort
@@ -101,15 +80,6 @@ define([
 			mod: {
 				sortable: false, // lets us apply own header click sort
 				label: 'last modified'
-			}
-		},
-		renderers: {
-			list: Grid.prototype.renderRow,
-			icons: function(obj, options) {
-				var div = put('div');
-				div.innerHTML = '<div class="gridIcon"><img src="library/rfe/js/resources/images/icons-64/' +
-				(obj.dir ? 'folder.png' : 'file.png') + '" width="64" heigh="64"><br>' + obj.name + '</div>';
-				return div;
 			}
 		},
 
@@ -131,8 +101,9 @@ define([
 			this.initEvents();
 
 			topic.subscribe('grid/views/state', lang.hitch(this, function(view) {
-				this.setRenderer(view);
+				this.set('renderer', view);
 			}));
+
 		},
 
 		initEvents: function() {
@@ -216,29 +187,10 @@ define([
 		 *      element: the row's DOM element
 		 * @return {object}
 		 */
-		getFirstRow: function() {
+		_getFirstRow: function() {
 			var nodes = query('.dgrid-row', this.bodyNode);
 			return nodes.length > 0 ? this.row(nodes[0]) : false;
-		},
-
-		setRenderer: function(view) {
-			var i, cssClassRemove = '',
-				cssClass = 'gridView' + view.charAt(0).toUpperCase() + view.slice(1);
-
-			// update class on grid domNode for correct row css
-			for (i in this.renderers) {
-				if (this.renderers.hasOwnProperty(i)) {
-					cssClassRemove += '!gridView' + i.charAt(0).toUpperCase() + i.slice(1);
-				}
-			}
-			this.renderRow = this.renderers[view];
-			put(this.domNode, "!gridViewList!gridViewIcons!gridViewDetails." + cssClass);
-
-			// only show headers if we're in "list" view
-			this.set('showHeader', view == "list");
-			this.refresh();
 		}
-
 
 	});
 });
