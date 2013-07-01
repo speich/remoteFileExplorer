@@ -57,9 +57,9 @@ define([
 				label: 'id'
 			},
 			name: editor({
-				sortable: false, // lets us apply own header click sort
 				editor: 'textarea',
 				editOn: 'dummyEvent',
+				sortable: false, // lets us apply own header click sort
 				autoSave: false,
 				label: "name"
 			}),
@@ -110,9 +110,11 @@ define([
 			var rfe = this.rfe;
 
 			on(this.contentNode, 'keydown', function(evt) {
-				var fnc, keyCode = evt.keyCode;
-				if (evt.target.type === 'text') {
-					// text boxes should be ignored when deleting etc.
+				var fnc, keyCode = evt.keyCode,
+					nodeType = evt.target.nodeName.toLowerCase();
+
+				if (nodeType === 'input' || nodeType === 'textarea') {
+					// prevent calling delete
 					return;
 				}
 				fnc = {

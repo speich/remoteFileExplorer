@@ -1,22 +1,26 @@
 define(['dojo/_base/declare', 'dgrid/Grid', 'put-selector/put'], function(declare, Grid, put) {
 	return declare(null, {
 
-		view: 'list',
+		view: 'icons',
 
 		rowRenderers: {
 			list: Grid.prototype.renderRow,
 			icons: function(obj) {
-				var div = put('div');
-				div.innerHTML = '<div class="gridIcon"><img src="library/rfe/js/resources/images/icons-64/' +
-				(obj.dir ? 'folder.png' : 'file.png') + '" width="64" height="64"><br><span>' + obj.name + '</span></div>';
-				return div;
+				var div, parent = put('div');
+
+				div = put(parent, 'div.gridIcon', {
+					innerHTML: '<img src="library/rfe/js/resources/images/icons-64/' +
+						(obj.dir ? 'folder.png' : 'file.png') + '" width="64" height="64"><br><span>' + obj.name + '</span>',
+					columnId: 'name'
+				});
+				return parent;
 			}
 		},
 		cellRenderers: {
 			list: {
-				name: function(obj, data, td) {
-					td.innerHTML = '<span class="' + (obj.dir ? 'dijitFolderClosed' : 'dijitLeaf') + '"></span><span>' + obj.name + '</span>';
-				//	td.innerHTML = '<span>' + obj.name + '</span>';
+				name: function(obj, data, containerEl) {
+					containerEl.innerHTML = '<span class="' + (obj.dir ? 'dijitFolderClosed' : 'dijitLeaf') + '"></span><span>' + obj.name + '</span>';
+				//	containerEl.innerHTML = '<span>' + obj.name + '</span>';
 				}
 			},
 			icons: {
@@ -52,19 +56,19 @@ define(['dojo/_base/declare', 'dgrid/Grid', 'put-selector/put'], function(declar
 		},
 
 		/**
-		 *
-		 * @param id object id
-		 * @param columnId column id
+		 * Override to make cell work with other views than lists (table)
+		 * @param target event, node, object id
+		 * @param [columnId] column id
 		 * @returns {Object}
 		 */
-		cell: function(id, columnId) {
+		cell: function(target, columnId) {
 			var cell = this.inherited('cell', arguments);
 
 			// note: cell is also called when clicking on the grid, but not on a row, e.g. cell is an empty object
-			if (cell.row && this.view === 'icons') {
-				cell.element = this.row(id).element;
+			if (this.view === 'icons') {
+				cell.element = cell.element || this.row(target).element;
+				//cell.column = cell.column ||
 			}
-
 			return cell;
 		},
 

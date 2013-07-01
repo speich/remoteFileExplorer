@@ -79,18 +79,8 @@ define([
 			});
 			this.initTree();
 			this.initGrid();
-			// TODO: fix initEvents() will also call FileExplorer::initEvents()
-			//this.initEvents();
 			this.initTopics();
 			this.initDialogs();
-		},
-
-		initEvents: function() {
-/*			focusUtil.focus(this.tree.domNode);
-			focusUtil.on("widget-blur", function() {
-				console.log(arguments)
-			});*/
-
 		},
 
 		initTopics: function() {
@@ -134,6 +124,9 @@ define([
 					fileStore: this.store
 				}
 			}, div);
+			this.grid.on('dgrid-editor-show, dgrid-editor-hide', function() {
+					console.log(arguments)
+				})
 		},
 
 		initDialogs: function() {
