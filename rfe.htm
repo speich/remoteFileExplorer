@@ -3,12 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <title>Remote File Explorer (rfe)</title>
-<!--<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.9.0/dijit/themes/claro/document.css">
-<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.9.0/dijit/themes/claro/claro.css">-->
-<link rel="stylesheet" type="text/css" href="/library/dojo/1.9.0/dijit/themes/claro/document.css">
-<link rel="stylesheet" type="text/css" href="/library/dojo/1.9.0/dijit/themes/claro/claro.css">
+<link rel="stylesheet" type="text/css" href="/library/dojo/1.9.1/dijit/themes/claro/document.css">
+<link rel="stylesheet" type="text/css" href="/library/dojo/1.9.1/dijit/themes/claro/claro.css">
 <link rel="stylesheet" href="/library/dgrid/css/skins/claro.css">
-<!-- <link rel="stylesheet" href="/dgrid/css/extensions/Views.css"> -->
 <link rel="stylesheet" href="/library/rfe/js/resources/reset.css">
 <link rel="stylesheet" href="/library/rfe/js/resources/rfe.css">
 </head>
@@ -30,13 +27,11 @@ var dojoConfig = {
 	// redirect the following modules to my own modules
 	paths: {
    	'dijit/tree/_dndSelector': '/library/rfe/js/dnd/TreeSelector',
-      'dijit/tree/dndSource': '/library/rfe/js/js/dnd/TreeSource'//,
-		//'dgrid/Grid': '/library/rfe/js/grid/Grid'
+      'dijit/tree/dndSource': '/library/rfe/js/js/dnd/TreeSource'
 	}
 };
 </script>
-<script type="text/javascript" src="/library/dojo/1.9.0/dojo/dojo.js"></script>
-<!--<script src="http://ajax.googleapis.com/ajax/libs/dojo/1.9.0/dojo/dojo.js" type="text/javascript"></script>-->
+<script type="text/javascript" src="/library/dojo/1.9.1/dojo/dojo.js"></script>
 <script type="text/javascript">
 require(['dojo/ready', 'rfe/FileExplorer'], function(ready, FileExplorer) {
 	ready(function() {
