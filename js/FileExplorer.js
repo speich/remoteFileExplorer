@@ -16,7 +16,7 @@ define([
 	'dijit/registry',
 	'rfe/Layout',
 	'rfe/Edit',
-	'rfe/Store/FileStore',
+	'rfe/store/FileStore',
 	'rfe/dialogs/dialogs',
 	'rfe/dnd/Manager'	// needs to be loaded for dnd
 ], function(lang, array, declare, Deferred, when, cookie, keys, dom, domClass, locale, on, topic, query, Stateful, registry, Layout, Edit, FileStore, dialogs) {
