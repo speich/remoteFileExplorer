@@ -8,4 +8,3 @@ Requires the following dependencies to be installed or mapped into the folder /l
 * [dgrid](https://github.com/SitePen/dgrid)
 * [xstyle](https://github.com/kriszyp/xstyle)
 * [put-selector](https://github.com/kriszyp/put-selector)
-* [DialogConfirm](https://github.com/speich/DialogConfirm)
