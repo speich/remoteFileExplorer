@@ -17,11 +17,10 @@ $status = null;
 /******************************************
  *  Convert input parameters to an object	*
  ******************************************/
-switch($method) {
+switch ($method) {
 	case 'POST':
 		$arr = file_get_contents('php://input');
 		$arr = json_decode($arr);
-		//$arr = $_POST;
 		break;
 	case 'PUT':
 		$data = file_get_contents('php://input');
@@ -51,7 +50,7 @@ switch($moduleType) {
 		// root dir is used for the session's name 
 		require_once('ModuleSession.php');
 		$rootDir ='virtFileSystem';
-		$rfe = new ModuleSession($rootDir);
+		$fs = new ModuleSession($rootDir);
 		break;
 	case 'sqlite':
 		// use ModuleSQLite to store user's file system
@@ -74,22 +73,22 @@ switch($method) {
 			$keyword = $data->name;
 			$start = $ranges[0];
 			$end = $ranges[1];
-			$numRec = $rfe->getNumSearchRecords($keyword);
-			$json = $rfe->search($keyword, $start, $end);
+			$numRec = $fs->getNumSearchRecords($keyword);
+			$json = $fs->search($keyword, $start, $end);
 			$header = 'Content-Range: items '.$start.'-'.$end.'/'.$numRec;
 		}
 		else {
-			$json = $rfe->get($resource);
+			$json = $fs->get($resource);
 		}
 		break;
 	case 'POST':
-		$json = $rfe->create($resource, $data);
+		$json = $fs->create($resource, $data);
 		break;
 	case 'PUT':
-		$json = $rfe->update($resource, $data);
+		$json = $fs->update($resource, $data);
 		break;
 	case 'DELETE':
-		$json = $rfe->del($resource);
+		$json = $fs->del($resource);
 		break;
 }
 
