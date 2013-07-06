@@ -17,16 +17,17 @@ var dojoConfig = {
 	async: true,
 	packages: [
 		{name: 'dgrid', location: '/dgrid'},
-		{name: 'dgridOriginal', location: '/dgrid'},
 		{name: 'xstyle', location: '/xstyle'},
 		{name: 'put-selector', location: '/put-selector'},
 		{name: 'rfe', location: '/js'},
-		{name: 'dijitOriginal', location: '/dojo/1.9.0/dijit'}
+		{name: 'rfe-php', location: '/php'}
 	],
-	// redirect the following modules to my own modules
-	paths: {
-   	'dijit/tree/_dndSelector': '/js/dnd/TreeSelector',
-      'dijit/tree/dndSource': '/js/dnd/TreeSource'
+	map: {
+		// redirect the following modules to my own modules
+	  	'dijit/tree': {
+			'dijit/tree/_dndSelector': 'rfe/dnd/TreeSelector',
+      	'dijit/tree/dndSource': 'rfe/dnd/TreeSource'
+		}
 	}
 };
 </script>

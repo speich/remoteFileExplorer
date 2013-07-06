@@ -12,7 +12,7 @@ define([
 	'dojo/_base/lang',
 	'dojo/_base/event',
 	'dojo/_base/connect',
-	'dijitOriginal/tree/_dndSelector'
+	'dijit/tree/_dndSelector'
 ], function(array, lang, event, connect, _dndSelector) {
 
 	// set references to be able to call overridden methods

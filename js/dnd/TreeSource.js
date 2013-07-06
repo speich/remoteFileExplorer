@@ -5,7 +5,7 @@ define([
 	'dojo/_base/Deferred',
 	'dojo/on',
 	'dojo/dom-class',
-	'dijitOriginal/tree/dndSource',
+	'dijit/tree/dndSource',
 	'dojo/dnd/Manager'
 ], function(lang, array, declare, Deferred, on, domClass, dndSource, dndManager) {
 
