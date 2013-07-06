@@ -7,8 +7,7 @@ define(['dojo/_base/declare', 'dgrid/Grid', 'put-selector/put'], function(declar
 			list: Grid.prototype.renderRow,
 			icons: function(obj) {
 				var div, parent = put('div', {
-					innerHTML: '<img src="library/rfe/js/resources/images/icons-64/' +
-						(obj.dir ? 'folder.png' : 'file.png') + '" width="64" height="64"><br>'
+					innerHTML: '<img src="' + require.toUrl('rfe/resources/images/icons-64/'+ (obj.dir ? 'folder.png' : 'file.png')) + '" width="64" height="64"><br>'
 				});
 				div = put(parent, 'div', {columnId: 'name'});
 				this.cellRenderers.icons.name(obj, obj.name, div);

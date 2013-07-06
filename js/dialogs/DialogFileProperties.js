@@ -1,7 +1,7 @@
 define([
 	'dojo/_base/declare',
 	'dojo/dom-construct',
-	'DialogConfirm/DialogConfirm'
+	'rfe/DialogConfirm'
 ], function(declare, construct, Dialog) {
 
 	/**

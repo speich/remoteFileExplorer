@@ -1,7 +1,7 @@
 define([
 	'dijit/registry',
 	'rfe/dialogs/DialogFileProperties',
-	'DialogConfirm/DialogConfirm'
+	'rfe/DialogConfirm'
 ], function(registry, DialogFileProperties, DialogConfirm) {
 
 	return {
