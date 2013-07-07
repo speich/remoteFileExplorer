@@ -9,6 +9,8 @@ define([
 	'dojo/date/locale'
 ], function(declare, lang, _WidgetBase, notify, dom, domConstruct, json, locale) {
 
+	var autoId = 0;
+
 	return declare([_WidgetBase], {
 
 		baseClass: 'rfeConsole',
@@ -25,18 +27,23 @@ define([
 			this.inherited('buildRendering', arguments);
 
 			// create the DOM for this widget
-			this.domNode.innerHTML = '<label>log:</label>';
+			var menu, id = 'rfeButtReset_' + autoId++;
+			menu = domConstruct.create('menu', {
+				'class': 'dijitToolbar',
+				type: 'toolbar'
+			}, this.domNode);
 
 			domConstruct.create('button', {
+				id: id,
 				'class': 'buttIcon',
-				title: 'reset log',	// TODO: use i18n
+				title: 'clear log',	// TODO: use i18n
 				onclick: lang.hitch(this, function(evt) {
 					evt.preventDefault();
 					this.clear();
 					return false;
 				}),
 				innerHTML: '<img src="' + require.toUrl('rfe/resources/images/icon_reset.png') + '" alt="reset icon" title="reset">'
-			}, this.domNode);
+			}, menu);
 
 			domConstruct.create('div', {
 				innerHTML: '<div></div>'
