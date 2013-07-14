@@ -20,7 +20,7 @@ define([
 		dndController: function(arg, params) {
 			return new TreeSource(arg, lang.mixin(params || {}, {
 				accept: ['dgrid-row'],
-				fileStore: this.store,
+				fileStore: arg.rfe.store,
 				singular: true
 			}));
 		},
@@ -28,7 +28,8 @@ define([
 		postCreate: function() {
 			this.inherited('postCreate', arguments);
 			this.onLoadDeferred.then(lang.hitch(this, function() {
-				// start watching for changes on paths only after initial tree load and before setting state, otherwise
+				// start watching for changes on paths only after initial tree load and before setting state,
+				// otherwise only root will always be set
 				this.watch('paths', lang.hitch(this, function(attr, oldVal, newVal) {
 					this.savePaths(newVal);
 				}));

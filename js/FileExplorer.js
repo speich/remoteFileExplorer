@@ -308,30 +308,30 @@ define([
 				object, arr, id, paths;
 
 			paths = this.tree.loadPaths();
-			tree.set('paths', paths);
-			if (paths.length > 0) {
-				// we only use last object in array to set the folders in the grid (normally there would be one selection only anyway)
-				arr = paths.pop();
-				id = arr[arr.length - 1];
-			}
-			else {
-				// no cookie available use root
-				object = tree.rootNode.item;
-				id = object.id;
-			}
+			tree.set('paths', paths).then(function(){
+				if (paths.length > 0) {
+					// we only use last object in array to set the folders in the grid (normally there would be one selection only anyway)
+					arr = paths.pop();
+					id = arr[arr.length - 1];
+				}
+				else {
+					// no cookie available use root
+					object = tree.rootNode.item;
+					id = object.id;
+				}
 
-			when(store.get(id), lang.hitch(this, function(object) {
-				when(store.getChildren(object), function() {	// load children first before setting store
-					// Setting caching store for grid would not use cache, because cache.query() always uses the
-					// master store => use storeMemory.
-					grid.set('store', store.storeMemory, { parId: id });
-				});
-				this.currentTreeObject.set(object);
-			}));
+				when(store.get(id), lang.hitch(this, function(object) {
+					when(store.getChildren(object), function() {	// load children first before setting store
+						// Setting caching store for grid would not use cache, because cache.query() always uses the
+						// master store => use storeMemory.
+						grid.set('store', store.storeMemory, { parId: id });
+					});
+					this.currentTreeObject.set(object);
+				}));
 
-			this.context.isOnTree = true;
-			this.setHistory(id);   // do not set history in display() since history uses display too in goHistory()
-
+				this.context.isOnTree = true;
+				this.setHistory(id);   // do not set history in display() since history uses display too in goHistory()
+			})
 		},
 
 		showFileDetails: function() {

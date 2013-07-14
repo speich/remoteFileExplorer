@@ -111,9 +111,6 @@ define([
 					fileStore: this.store
 				}
 			}, div);
-			this.grid.on('dgrid-editor-show, dgrid-editor-hide', function() {
-					console.log(arguments)
-				})
 		},
 
 		initDialogs: function() {
