@@ -40,11 +40,12 @@ define([
 			menuFile.addChild(new PopupMenuItem({
 				label: 'New',
 				popup: subMenuFile,
-				iconClass: 'dijitEditorIcon dijitEditorIconNewPage'
+				iconClass: 'rfeIcon rfeMenuIconNew'
 			}));
 			subMenuFile.addChild(new MenuItem({
 				label: 'File',
-				onClick: lang.hitch(this.rfe, this.rfe.createRename)
+				onClick: lang.hitch(this.rfe, this.rfe.createRename),
+				iconClass: 'rfeIcon rfeMenuIconFile'
 			}));
 			subMenuFile.addChild(new MenuItem({
 				label: 'Directory',
@@ -52,7 +53,8 @@ define([
 					this.createRename({
 						dir: true
 					});
-				})
+				}),
+				iconClass: 'rfeIcon rfeMenuIconDir'
 			}));
 			this.menuItems.rename = new MenuItem({
 				label: 'Rename',
@@ -77,19 +79,21 @@ define([
 
 			// ******* menu layout ********
 			menuView = new DropDownMenu();
-			submenuView.icons = new CheckedMenuItem({
+			submenuView.icons = new MenuItem({
 				label: 'Icons',
 				checked: false,
 				onClick: lang.hitch(this, function() {
 					topic.publish('grid/views/state', 'icons');
-				})
+				}),
+				iconClass: 'rfeIcon rfeMenuIconThumbs'
 			});
-			submenuView.list = new CheckedMenuItem({
+			submenuView.list = new MenuItem({
 				label: 'List',
 				checked: false,
 				onClick: lang.hitch(this, function() {
 					topic.publish('grid/views/state', 'list');
-				})
+				}),
+				iconClass: 'rfeIcon rfeMenuIconList'
 			});
 			menuView.addChild(submenuView.icons);
 			menuView.addChild(submenuView.list);
@@ -98,10 +102,10 @@ define([
 				var i;
 				for (i in submenuView) {
 					if (submenuView.hasOwnProperty(i)) {
-						submenuView[i].set('checked', false);
+						//submenuView[i].set('checked', false);
 					}
 				}
-				submenuView[view].set('checked', true);
+				//submenuView[view].set('checked', true);
 			}));
 
 			menuItemLayout = new CheckedMenuItem({

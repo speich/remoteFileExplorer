@@ -36,7 +36,7 @@ define([
 			bt1 = new Button({
 				label: 'up',
 				showLabel: true,
-				iconClass: 'rfeToolbarIcon rfeToolbarIconDirUp',
+				iconClass: 'rfeIcon rfeToolbarIconDirUp',
 				disabled: true,
 				onClick: function() {
 					var def = rfe.goDirUp();
@@ -55,7 +55,7 @@ define([
 			bt2 = new Button({
 				label: 'history back',
 				showLabel: false,
-				iconClass: 'dijitEditorIcon dijitEditorIconUndo',
+				iconClass: 'rfeIcon rfeToolbarIconHistoryBack',
 				disabled: true,
 				onClick: function() {
 					rfe.goHistory('back');
@@ -72,7 +72,7 @@ define([
 			bt3 = new Button({
 				label: 'history forward',
 				showLabel: false,
-				iconClass: 'dijitEditorIcon dijitEditorIconRedo',
+				iconClass: 'rfeIcon rfeToolbarIconHistoryForward',
 				disabled: true,
 				onClick: function() {
 					rfe.goHistory('forward');
@@ -86,7 +86,7 @@ define([
 			this.addChild(new Button({
 				label: 'reload',
 				showLabel: true,
-				iconClass: 'dijitEditorIcon dijitEditorIconRedo',
+				iconClass: 'rfeIcon rfeToolbarIconReload',
 				disabled: false,
 				onClick: function() {
 					rfe.reload();

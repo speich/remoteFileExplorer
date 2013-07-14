@@ -1,4 +1,4 @@
-html, body {
+	html, body {
 	width: 100%;
 	height: 100%;
 	font-size: 1.2em;
@@ -71,25 +71,47 @@ html, body {
 	cursor: default;
 	border: none;
 }
-
-.dijitDisabled .rfeToolbarIcon {
-	background-image: url("images/rfeToolbarIconsDisabled.png");
-}
 .dgrid-cell .dijitFolderClosed, .dgrid-cell .dijitLeaf {
 	display: inline-block;
 	vertical-align: top;
 }
-
+.rfeIcon {
+	background: url("images/rfeToolbarIconsEnabled.png") no-repeat;
+	height: 16px;
+	text-align: center;
+	width: 16px;
+}
+.dijitDisabled .rfeIcon {
+	background-image: url("images/rfeToolbarIconsDisabled.png");
+}
 .rfeToolbarIconDirUp {
-	background-position: 0 50%;
+	background-position: 0;
+}
+.rfeToolbarIconHistoryBack {
+	background-position: -32px;
 }
 
-.rfeToolbarIcon {
-	background-image: url("images/rfeToolbarIconsEnabled.png");
-	background-repeat: no-repeat;
-	height: 18px;
-	text-align: center;
-	width: 18px;
+.rfeToolbarIconHistoryForward {
+	background-position: -48px;
+}
+.rfeToolbarIconReload {
+	background-position: -16px;
+}
+
+.rfeMenuIconNew {
+	background-position: -112px;
+}
+.rfeMenuIconDir {
+	background-position: -64px;
+}
+.rfeMenuIconFile {
+	background-position: -96px;
+}
+.rfeMenuIconList {
+	background-position: -128px;
+}
+.rfeMenuIconThumbs {
+	background-position: -144px;
 }
 
 .rfeSearchBoxItemLabel {
