@@ -110,5 +110,6 @@ define([
 			}));
 			this._updateSelectionProperties();
 		}
+
 	});
 });

@@ -305,17 +305,13 @@ define([
 		 */
 		initState: function() {
 			var tree = this.tree, grid = this.grid, store = this.store,
-				object, oreo, arr, id, paths = [];
+				object, arr, id, paths;
 
-			oreo = tree.dndController.cookieName ? cookie(tree.dndController.cookieName) : false;	// not available in 1.7.2
-
-			if (tree.persist && oreo) {
-				// extract information to display folder content in grid
-				paths = array.map(oreo.split(","), function(path) {
-					return path.split("/");
-				});
+			paths = this.tree.loadPaths();
+			tree.set('paths', paths);
+			if (paths.length > 0) {
 				// we only use last object in array to set the folders in the grid (normally there would be one selection only anyway)
-				arr = paths[paths.length - 1];
+				arr = paths.pop();
 				id = arr[arr.length - 1];
 			}
 			else {

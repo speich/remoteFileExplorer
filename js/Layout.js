@@ -8,8 +8,7 @@ define([
 	'dojo/dom-construct',
 	'dojo/query',
 	'dojo/Stateful',
-	'dijit/Tree',
-	'rfe/dnd/TreeSource',	// set path to load dnd/TreeSource in dojoConfig
+	'rfe/Tree',
 	'rfe/Grid',
 	'rfe/dnd/GridSource',
 	'dijit/registry',
@@ -20,7 +19,7 @@ define([
 	'rfe/layout/Panes',
 	'rfe/Console',
 	'rfe/ContextMenu'
-], function(array, lang, declare, on, topic, cookie, domConstruct, query, Stateful, Tree, TreeSource, Grid, GridSource,
+], function(array, lang, declare, on, topic, cookie, domConstruct, query, Stateful, Tree, Grid, GridSource,
 				registry, CheckBox, Dialog, Toolbar, Menubar, Panes, Console, ContextMenu) {
 
 	/**
@@ -91,25 +90,13 @@ define([
 		 * Initializes the tree and tree dnd.
 		 */
 		initTree: function() {
-			var self = this;
 			this.tree = new Tree({
 				rfe: this,
 				model: this.store,
 				childrenAttrs: [this.store.childrenAttr],
-				openOnClick: false, //	If true, clicking a folder node's label will open it, rather than calling onClick()
-				openOnDblClick: true, // If true, double-clicking a folder node's label will open it, rather than calling onDblClick()
-				showRoot: true,
-				tabIndex: 21,
-				persist: cookie(this._cnDialogSettingsFolderState) || true,
-				dndController: function(arg, params) {
-					return new TreeSource(arg, lang.mixin(params || {}, {
-						accept: ['dgrid-row'],
-						fileStore: self.store,
-						singular: true
-					}));
-				}
+				persist: cookie(this._cnDialogSettingsFolderState) || true
 			});
-			this.tree.placeAt(this.panes.treePane)
+			this.tree.placeAt(this.panes.treePane);
 		},
 
 		initGrid: function() {
