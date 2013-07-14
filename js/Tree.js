@@ -12,7 +12,7 @@ define([
 	 * @extends {dijit.Tree} Tree
 	 */
 	return declare([Tree], {
-		cookieName: 'dijit/tree/SelectedNodes',
+		cookieNameSelNodes: 'dijit/tree/SelectedNodes',
 		openOnClick: false, //	If true, clicking a folder node's label will open it, rather than calling onClick()
 		openOnDblClick: true, // If true, double-clicking a folder node's label will open it, rather than calling onDblClick()
 		showRoot: true,
@@ -41,7 +41,7 @@ define([
 		 * @return {Array} paths
 		 */
 		loadPaths: function() {
-			var oreo = cookie(this.cookieName),
+			var oreo = cookie(this.cookieNameSelNodes),
 				paths = [];
 
 			if (this.persist && oreo) {
@@ -71,7 +71,7 @@ define([
 			selects.push(arr.join("/"));
 
 			if (this.persist && selects.length > 0) {
-				cookie(this.cookieName, selects.join(","), {expires: 365});
+				cookie(this.cookieNameSelNodes, selects.join(","), {expires: 365});
 			}
 		}
 
