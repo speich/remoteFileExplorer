@@ -308,7 +308,7 @@ define([
 				object, arr, id, paths;
 
 			paths = this.tree.loadPaths();
-			tree.set('paths', paths).then(function(){
+			tree.set('paths', paths).then(lang.hitch(this, function(){
 				if (paths.length > 0) {
 					// we only use last object in array to set the folders in the grid (normally there would be one selection only anyway)
 					arr = paths.pop();
@@ -331,7 +331,7 @@ define([
 
 				this.context.isOnTree = true;
 				this.setHistory(id);   // do not set history in display() since history uses display too in goHistory()
-			})
+			}));
 		},
 
 		showFileDetails: function() {
