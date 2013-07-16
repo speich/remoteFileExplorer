@@ -32,7 +32,7 @@ class ModuleSession extends FileExplorer {
 
 		6 => array('id' => 6, 'parId' => 1, 'name' => 'photo01.jpg', 'size' => 129631, 'mod' => '27.03.2010'),
 		7 => array('id' => 7, 'parId' => 1, 'name' => 'photo02.jpg', 'size' => 29634, 'mod' => '27.03.2010'),
-		8 => array('id' => 8, 'parId' => 1, 'name' => 'photo13.jpg', 'size' => 79308, 'mod' => '27.07.2009'),
+		'1/8' => array('id' => '1/8', 'parId' => 1, 'name' => 'photo13.jpg', 'size' => 79308, 'mod' => '16.07.2013'),
 		9 => array('id' => 9, 'parId' => 2, 'name' => 'subfolder 21', 'size' => 0, 'mod' => '27.03.2010', 'dir' => true),
 		26 => array('id' => 26, 'parId' => 1, 'name' => 'photo01.jpg', 'size' => 129631, 'mod' => '27.03.2010'),
 		27 => array('id' => 27, 'parId' => 1, 'name' => 'photo02.jpg', 'size' => 29634, 'mod' => '27.03.2010'),
