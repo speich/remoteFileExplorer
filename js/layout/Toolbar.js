@@ -95,7 +95,7 @@ define([
 			this.addChild(new ToolbarSeparator({ id: 'rfeTbSeparatorSearch'}));
 
 			this.addChild(new SearchBox({
-				target: rfe.store.storeMaster.target + 'search/',
+				target: require.toUrl('rfe-php/controller.php/search'),
 				rfe: rfe
 			}));
 		},

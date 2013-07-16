@@ -33,7 +33,6 @@ define([
 		},
 
 		postCreate: function() {
-
 			this.inherited('postCreate', arguments);
 
 			var rfe = this.rfe;
@@ -53,7 +52,6 @@ define([
 					});
 				}
 			});
-
 			this.on('input', function(evt) {
 				if (evt.keyCode === 13) {
 					evt.preventDefault();
@@ -61,7 +59,6 @@ define([
 				}
 			});
 		}
-
 	});
 });
 

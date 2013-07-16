@@ -20,13 +20,13 @@ var dojoConfig = {
 		{name: 'xstyle', location: '/xstyle'},
 		{name: 'put-selector', location: '/put-selector'},
 		{name: 'rfe', location: '/js'},
-		{name: 'rfe-php', location: '/php'}
+		{name: 'rfe-php', location: '../..'}
 	],
 	map: {
 		// redirect the following modules to my own modules
 	  	'dijit/tree': {
 			'dijit/tree/_dndSelector': 'rfe/dnd/TreeSelector',
-      	'dijit/tree/dndSource': 'rfe/dnd/TreeSource'
+      	    'dijit/tree/dndSource': 'rfe/dnd/TreeSource'
 		}
 	}
 };

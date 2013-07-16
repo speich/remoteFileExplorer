@@ -32,7 +32,7 @@ class ModuleSession extends FileExplorer {
 
 		6 => array('id' => 6, 'parId' => 1, 'name' => 'photo01.jpg', 'size' => 129631, 'mod' => '27.03.2010'),
 		7 => array('id' => 7, 'parId' => 1, 'name' => 'photo02.jpg', 'size' => 29634, 'mod' => '27.03.2010'),
-		8 => array('id' => 8, 'parId' => 1, 'name' => 'photo03.jpg', 'size' => 79308, 'mod' => '27.07.2009'),
+		8 => array('id' => 8, 'parId' => 1, 'name' => 'photo13.jpg', 'size' => 79308, 'mod' => '27.07.2009'),
 		9 => array('id' => 9, 'parId' => 2, 'name' => 'subfolder 21', 'size' => 0, 'mod' => '27.03.2010', 'dir' => true),
 		26 => array('id' => 26, 'parId' => 1, 'name' => 'photo01.jpg', 'size' => 129631, 'mod' => '27.03.2010'),
 		27 => array('id' => 27, 'parId' => 1, 'name' => 'photo02.jpg', 'size' => 29634, 'mod' => '27.03.2010'),
@@ -96,13 +96,12 @@ class ModuleSession extends FileExplorer {
 	public function get($resource) {
 		$json = false;
 		$fs = unserialize($_SESSION['rfe'][$this->getRoot()]);
-		//var_dump($fs);
 		if (substr($resource, -1) === '/') {   // query for children of $resource
 			$json = $this->getChildren(rtrim($resource, '/'), $fs);
 		}
 		else if (array_key_exists($resource, $fs)) { // get item
-			$items = $fs[$resource];
-			$json = json_encode($items, JSON_NUMERIC_CHECK);
+			$item = $fs[$resource];
+			$json = json_encode($item, JSON_NUMERIC_CHECK);
 		}
 		return $json;
 	}
@@ -233,7 +232,6 @@ class ModuleSession extends FileExplorer {
 		$fs = unserialize($_SESSION['rfe'][$this->getRoot()]);
 		$arr = array();
 		$count = 0;
-		$keyword = str_replace('*', '', $keyword);
 		if ($keyword === '') {
 			foreach($fs as $file) {
 				if ($count >= $start && $count <= $end) {

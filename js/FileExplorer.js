@@ -19,7 +19,8 @@ define([
 	'rfe/store/FileStore',
 	'rfe/dialogs/dialogs',
 	'rfe/dnd/Manager'	// needs to be loaded for dnd
-], function(lang, array, declare, Deferred, when, cookie, keys, dom, domClass, locale, on, topic, query, Stateful, registry, Layout, Edit, FileStore, dialogs) {
+], function(lang, array, declare, Deferred, when, cookie, keys, dom, domClass, locale, on, topic, query, Stateful,
+				registry, Layout, Edit, FileStore, dialogs) {
 
 	// TODO: use dijit._WidgetBase
 	// TODO: multiselect (in tree allow only of files but not of folders)

@@ -64,7 +64,7 @@ class Error {
 
 	/**
 	 * Returns all errors as a json array.
-	 * @return json
+	 * @return string json
 	 */
 	public function getAsJson() {
 		$errs = $this->get();

@@ -13,7 +13,8 @@ define([
 	'dojo/store/JsonRest',
 	'dojo/store/Observable',
 	'dojo/store/Cache'
-], function(declare, lang, when, aspect, array, Memory, JsonRest, Observable, Cache) {
+], function(declare, lang, when, aspect, array, Memory, JsonRest, Observable, Cache)
+{
 
 	// references for MonkeyPatching the store.Cache
 	var refPut, refDel, refAdd;
@@ -49,7 +50,7 @@ define([
 			var storeMaster, storeMemory, storeCache;
 
 			storeMaster = new JsonRest({
-				target: require.toUrl('rfe-php/controller.php/')
+				target: require.toUrl('rfe-php/controller.php/fs/')
 			});
 			this.storeMaster = storeMaster;
 
