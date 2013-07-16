@@ -4,6 +4,8 @@
 	font-size: 1.2em;
 }
 
+p { margin: 0 0 10px 0;}
+
 .claro .dgrid {
 	border: none;
 	height: 100%;
@@ -182,10 +184,6 @@
 
 #rfeDialogAboutText h2 {
 	font-size: 12px;
-	margin: 0;
-}
-
-#rfeDialogAboutText p:nth-child(2) {
 	margin: 0;
 }
 
