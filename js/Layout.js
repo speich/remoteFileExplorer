@@ -123,8 +123,9 @@ define([
 					'<div id="rfeDialogAboutText">' +
 					'<h2>Remote File Explorer (rfe)</h2>' +
 					'<p>version ' + this.version + ' - ' + this.versionDate + '</p>' +
-					'<p>Created by <a href="http://www.speich.net">Simon Speich</a>, www.speich.net using the ' +
-					'<a href="http://www.dojotoolkit.org">dojotoolkit</a> and <a href="http://www.php.net">PHP</a>.</p>' +
+					'<p>Created by <a href="http://www.speich.net" target="_blank">Simon Speich</a>, www.speich.net using the ' +
+					'<a href="http://www.dojotoolkit.org" target="_blank">dojotoolkit</a> and <a href="http://www.php.net" target="_blank">PHP</a>.' +
+					'The code is available on <a href="https://github.com/speich/remoteFileExplorer" target="_blank">github</a></p>' +
 					'<p>Can be used and altered freely as long as this dialog with logo and link is included.</p>' +
 					'</div>'
 			});
