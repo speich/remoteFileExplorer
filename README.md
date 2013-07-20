@@ -4,6 +4,17 @@ All communication with the web server is done through REST.
 
 Working [demo of the remoteFileExplorer](http://www.speich.net/projects/programming/remoteFileExplorer.php)
 
+## Features
+* REST-based file operations on remote server (create, rename and delete)
+* lazy loading combined with client-side caching of files and folders
+* move (multiple) files and folder with drag and drop (copy not implemented yet)
+* keyboard support
+* list and icons view of files
+* vertical or horizontal layout with or without navigation pane (tree view)
+* searching for files and folders
+* sorting of files and folders
+* net panel logging all requests and server errors
+
 ## Dependencies
 Requires the following dependencies to be installed or mapped into the folder /library:
 * [The Dojo Toolkit](http://dojotoolkit.org) SDK version 1.8.1 or higher
