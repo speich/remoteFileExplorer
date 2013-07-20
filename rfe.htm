@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="js/resources/rfe.css">
 </head>
 
-<body class="claro">
+<body class="claro rfe">
 <div id="remoteFileExplorer"></div>
 <script type="text/javascript">
 var dojoConfig = {
@@ -20,18 +20,18 @@ var dojoConfig = {
 		{name: 'xstyle', location: '/xstyle'},
 		{name: 'put-selector', location: '/put-selector'},
 		{name: 'rfe', location: '/js'},
-		{name: 'rfe-php', location: '../..'}
+		{name: 'rfe-php', location: '../../..'}
 	],
 	map: {
 		// redirect the following modules to my own modules
 	  	'dijit/tree': {
 			'dijit/tree/_dndSelector': 'rfe/dnd/TreeSelector',
-      	    'dijit/tree/dndSource': 'rfe/dnd/TreeSource'
+      	'dijit/tree/dndSource': 'rfe/dnd/TreeSource'
 		}
 	}
 };
 </script>
-<script type="text/javascript" src="dojo/dojo/dojo.js"></script>
+<script type="text/javascript" src="dojo/1.9.1/dojo/dojo.js"></script>
 <script type="text/javascript">
 require(['dojo/ready', 'rfe/FileExplorer'], function(ready, FileExplorer) {
 	ready(function() {
