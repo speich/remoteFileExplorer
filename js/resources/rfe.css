@@ -125,8 +125,8 @@ p { margin: 0 0 10px 0;}
 	min-width: 120px;
 }
 
-.tblFileProperties {
-	padding: 2px;
+.tblFileProperties td {
+	padding: 4px;
 }
 
 .tblFileProperties td:first-child {
@@ -159,6 +159,9 @@ p { margin: 0 0 10px 0;}
 	padding: 0;
 	height: 18px;
 }
+
+.dijitDialog { min-width: 200px;}
+.rfe .dijitDialogPaneContent { padding: 10px 5px 5px 5px; }
 
 /*** Begin rfeDialogAbout ***/
 #rfeDialogAbout {
