@@ -103,7 +103,6 @@ define([
 			topic.subscribe('grid/views/state', lang.hitch(this, function(view) {
 				this.set('renderer', view);
 			}));
-
 		},
 
 		initEvents: function() {
@@ -193,6 +192,7 @@ define([
 			var nodes = query('.dgrid-row', this.bodyNode);
 			return nodes.length > 0 ? this.row(nodes[0]) : false;
 		}
+
 
 	});
 });
