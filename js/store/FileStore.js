@@ -1,7 +1,7 @@
 /**
- * @module rfe/store/FileStore
  * Note: This stores caching algorithm has one flaw: If item doesn't have children it is not cached, since the cache checks for
  * the items children in the cache.
+ * @module rfe/store/FileStore
  */
 define([
 	'dojo/_base/declare',
@@ -12,18 +12,17 @@ define([
 	'dojo/store/Memory',
 	'dojo/store/JsonRest',
 	'dojo/store/Observable',
-	'dojo/store/Cache'
-], function(declare, lang, when, aspect, array, Memory, JsonRest, Observable, Cache)
-{
+	'dojo/store/Cache',
+	'dijit/tree/ObjectStoreModel'
+], function(declare, lang, when, aspect, array, Memory, JsonRest, Observable, Cache, ObjectStoreModel) {
 
 	// references for MonkeyPatching the store.Cache
 	var refPut, refDel, refAdd;
 
 	/**
 	 * Class which creates a store to work with remote files over REST and local caching.
-	 * @class
-	 * @name rfe.store.FileStore
-	 * @property {JsonRest} storeMaster
+	 * @alias module:rfe/store/FileStore
+	 * @property {dojo/store/JsonRest} storeMaster
 	 * @property {Memory} storeMemory
 	 * @property {string} childrenAttr
 	 * @property {string} parentAttr
@@ -32,14 +31,14 @@ define([
 	 * @property {boolean} skipWithNoChildren getChildren returns only folders
 	 * @extends {Cache}
 	 */
-	return declare(null, /** @lends rfe.store.FileStore.prototype */ {
+	return declare([ObjectStoreModel], {
 		storeMaster: null,
 		storeMemory: null,
 		childrenAttr: 'dir',
 		parentAttr: 'parId',
 		labelAttr: 'name',
-		rootId: 'root',
-		rootLabel: 'web root',
+		rootId: '/demo',
+		rootLabel: 'demo',
 		skipWithNoChildren: true,
 
 		/**
@@ -50,7 +49,7 @@ define([
 			var storeMaster, storeMemory, storeCache;
 
 			storeMaster = new JsonRest({
-				target: require.toUrl('rfe-php/controller.php/fs/')
+				target: require.toUrl('rfe-php/controller.php')
 			});
 			this.storeMaster = storeMaster;
 
@@ -70,7 +69,7 @@ define([
 			storeCache.add = this.add;
 			lang.mixin(this, storeCache);
 
-			this.childrenCached = {};	// Deferred map from id to boolean is cached
+			this.childrenCache = {};	// Deferred map from id to boolean is cached
 		},
 
 		/**
@@ -150,7 +149,7 @@ define([
 				results, resultsDirOnly, children;
 
 			// check if children are already cached
-			if (this.childrenCached[id]) {
+			if (this.childrenCache[id]) {
 				queryObj[this.parentAttr] = id;
 				results = this.storeMemory.query(queryObj);
 				alreadyCached = true;
@@ -182,7 +181,7 @@ define([
 						onComplete(result);
 					});
 				}
-				this.childrenCached[id] = children;
+				this.childrenCache[id] = children;
 				return children;
 			}));
 		},
@@ -202,7 +201,7 @@ define([
 			// copy object
 			if (copy) {
 				// create new object based on child and use same id -> when server sees POST with id this means copy (implicitly)
-				// TODO: if object is a folder then recursively copy all its children
+				// TODO: if object is a folder then copy all its children
 				newObject = lang.clone(object);
 				newObject[this.parentAttr] = newParentObject.id;
 				dfd = this.add(newObject, {

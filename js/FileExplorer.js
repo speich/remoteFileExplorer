@@ -22,20 +22,23 @@ define([
 ], function(lang, array, declare, Deferred, when, cookie, keys, dom, domClass, locale, on, topic, query, Stateful,
 				registry, Layout, Edit, FileStore, dialogs) {
 
+	/**
+	 * A module that creates an application that allows you to manage and browse files and directories on a remote web server.
+	 * It consists of tree and a grid. The tree loads file data over REST via php from remote server.
+	 * @module FileExplorer rfe/FileExplorer
+	 */
+
 	// TODO: use dijit._WidgetBase
 	// TODO: multiselect (in tree allow only of files but not of folders)
 
-	/**
-	 * File explorer class creates an application that allows you to manage and browse files and directories
-	 * on a remote web server. It consists of tree and a grid. The tree loads file data over REST via php from remote server.
-	 * @class
-	 * @name rfe.FileExplorer
-	 * @extends {rfe.Layout}
-	 * @extends {rfe.Edit}
+	/*
+	 *	@constructor
+	 *	@extends {rfe/Layout}
+	 * @mixes {rfe/Edit}
 	 * @property {string} version
 	 * @property {string} versionDate
-	 * @property {dojo.Stateful} currentTreeObject keeps track of currently selected store object in tree. Equals always parent of grid items
-	 * @property {dojo.Stateful} context keeps track of widget the context menu was created on (right clicked on)
+	 * @property {dojo/Stateful} currentTreeObject keeps track of currently selected store object in tree. Equals always parent of grid items
+	 * @property {dojo/Stateful} context keeps track of widget the context menu was created on (right clicked on)
 	 * @config {boolean} isOnGrid
 	 * @config {boolean} isOnTree
 	 * @config {boolean} isOnGridPane
@@ -44,10 +47,10 @@ define([
 	 * @config {array} steps saves the steps
 	 * @config {int} curIdx index of current step we're on
 	 * @config {int} numSteps number of steps you can go forward/back
-	 * @property {rfe.store.FileStore}
+	 * @property {rfe/store/FileStore} store
 	 *
 	 */
-	return declare([Layout, Edit], /** @lends rfe.FileExplorer.prototype */ {
+	return declare([Layout, Edit], {
 		version: '0.9',
 		versionDate: '2013',
 		currentTreeObject: null,

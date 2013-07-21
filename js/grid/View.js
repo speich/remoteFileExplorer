@@ -1,13 +1,31 @@
-define(['dojo/_base/declare', 'dgrid/Grid', 'put-selector/put'], function(declare, Grid, put) {
+define([
+	'dojo/_base/declare',
+	'dojo/_base/lang',
+	'dojo/request/xhr',
+	'dojo/aspect',
+	'dgrid/Grid',
+	'put-selector/put'
+], function(declare, lang, xhr, aspect, Grid, put) {
+
 	return declare(null, {
 
 		view: 'icons',
-
+		services: {
+			thumbnail: require.toUrl('rfe-php/php/fs/thumbnail.php/')
+		},
 		rowRenderers: {
 			list: Grid.prototype.renderRow,
 			icons: function(obj) {
-				var div, parent = put('div', {
-					innerHTML: '<img src="' + require.toUrl('rfe/resources/images/icons-64/'+ (obj.dir ? 'folder.png' : 'file.png')) + '" width="64" height="64"><br>'
+				var src, div, parent;
+
+				if (obj.mime && /image\//.test(obj.mime)) {
+					src = this.services.thumbnail + obj.id + '?w=64&h=64'
+				}
+				else {
+					src = require.toUrl('rfe/resources/images/icons-64/'+ (obj.dir ? 'folder.png' : 'file.png'));
+				}
+				parent = put('div', {
+					innerHTML: '<img src="' + src + '" width="64" height="64"><br>'
 				});
 				div = put(parent, 'div', {columnId: 'name'});
 				this.cellRenderers.icons.name(obj, obj.name, div);
@@ -65,7 +83,8 @@ define(['dojo/_base/declare', 'dgrid/Grid', 'put-selector/put'], function(declar
 			// note: cell is also called when clicking on the grid, but not on a row, e.g. cell is an empty object
 			if (this.view === 'icons' && this.row(target)) {
 				cell.element = cell.element || this.row(target).element.getElementsByClassName('field-name')[0];
-			}			return cell;
+			}
+			return cell;
 		},
 
 		_getEditableElement: function(id, columnId) {
@@ -82,5 +101,6 @@ define(['dojo/_base/declare', 'dgrid/Grid', 'put-selector/put'], function(declar
 
 			return cell;
 		}
+
 	})
 });

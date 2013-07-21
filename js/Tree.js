@@ -17,6 +17,8 @@ define([
 		openOnDblClick: true, // If true, double-clicking a folder node's label will open it, rather than calling onDblClick()
 		showRoot: true,
 		tabIndex: 21,
+		pathSeparator: ';',	// should be character that does not occur in id
+		multiplePathSeparator: ',',
 		dndController: function(arg, params) {
 			return new TreeSource(arg, lang.mixin(params || {}, {
 				accept: ['dgrid-row'],
@@ -42,21 +44,21 @@ define([
 		 */
 		loadPaths: function() {
 			var oreo = cookie(this.cookieNameSelNodes),
-				paths = [];
+				paths = [],
+				self = this;
 
 			if (this.persist && oreo) {
-				paths = array.map(oreo.split(','), function(path) {
-					return path.split("/");
+				paths = array.map(oreo.split(self.multiplePathSeparator), function(path) {
+					return path.split(self.pathSeparator);
 				});
-
 			}
 			return paths;
 		},
 
 		/**
  		 * Save selected nodes in a cookie.
-		 * Converts the path array to a string separated with slahes. If there are multiple nodes selected, they
-		 * are separated by a comma.
+		 * Converts the path array to a string separated with slashes. If there are multiple nodes selected, they
+		 * are separated by this.multiplePathSeparator.
 		 * @param {array} paths
  		 */
 		savePaths: function(paths) {
@@ -68,10 +70,10 @@ define([
 					return part[model.idProperty];
 				}, this);
 			});
-			selects.push(arr.join("/"));
+			selects.push(arr.join(this.pathSeparator));
 
 			if (this.persist && selects.length > 0) {
-				cookie(this.cookieNameSelNodes, selects.join(","), {expires: 365});
+				cookie(this.cookieNameSelNodes, selects.join(this.multiplePathSeparator), {expires: 365});
 			}
 		}
 

@@ -12,7 +12,8 @@ class Header {
 		'json' => 'application/json',
 		'pdf' => 'application/pdf',
 		'html' => 'text/html',
-		'svg'	 => 'image/svg+xml'
+		'svg'	 => 'image/svg+xml',
+		'jpg' => 'image/jpeg'
 	);
 
 	/**

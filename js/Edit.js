@@ -8,10 +8,9 @@ define([
 
 	/**
 	 * Provides functionality to edit files and folders.
-	 * @class
-	 * @name rfe.Edit
+	 * @module Edit rfe/Edit
 	 */
-	return declare(null, /** @lends rfe.Edit.prototype */ {
+	return declare(null, {
 
 		/**
 		 * Delete selected file or folder object(s).

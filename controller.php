@@ -8,6 +8,7 @@ require_once 'Http.php';
 $err = new Error();
 $ctrl = new Controller(new Header(), $err);
 $data = $ctrl->getDataAsObject();
+$resource = $ctrl->getResource();
 $controller = $ctrl->getController();
 $resources = $ctrl->getResources();
 $ctrl->contentType = 'json';
@@ -19,10 +20,9 @@ $moduleType = 'session';
 switch($moduleType) {
 	case 'session':
 		// use session to store the user's filesystem
-		// root dir is used for the session's name 
 		require_once('ModuleSession.php');
-		$rootDir ='virtFileSystem';
-		$fs = new ModuleSession($rootDir);
+		$data = require_once 'php/fs/demo/demodata.php';
+		$fs = new ModuleSession('php/fs/demo', $data);
 		break;
 	case 'sqlite':
 		// TODO: use ModuleSQLite to store user's file system
@@ -35,7 +35,7 @@ switch($moduleType) {
 //sleep(1); // for testing async
 //time_nanosleep(0, 500000000);	// = 0.5 seconds
 
-if (is_array($resources)) {
+if ($resource) {
 	switch ($ctrl->getMethod()) {
 		case 'GET':
 			if ($controller == 'search') {
@@ -46,17 +46,17 @@ if (is_array($resources)) {
 				$response = $fs->search($keyword, $ranges['start'], $ranges['end']);
 			}
 			else {
-				$response = $fs->get(implode('/', $resources));
+				$response = $fs->get($resource);
 			}
 			break;
 		case 'POST':
-			$response = $fs->create($resources, $data);
+			$response = $fs->create($resource, $data);
 			break;
 		case 'PUT':
-			$response = $fs->update($resources, $data);
+			$response = $fs->update($resource, $data);
 			break;
 		case 'DELETE':
-			$response = $fs->del($resources);
+			$response = $fs->del($resource);
 			break;
 	}
 }

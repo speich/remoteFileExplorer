@@ -14,6 +14,7 @@ Working [demo of the remoteFileExplorer](http://www.speich.net/projects/programm
 * searching for files and folders
 * sorting of files and folders
 * net panel logging all requests and server errors
+* remember opened folder and selection state
 
 ## Dependencies
 Requires the following dependencies to be installed or mapped into the folder /library:
