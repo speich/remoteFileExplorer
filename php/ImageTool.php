@@ -306,6 +306,4 @@ class ImageTool {
 		$gray = $this->getGrayscaleValue($OriginalPixel['red'], $OriginalPixel['green'], $OriginalPixel['blue']);
 		return array('red'=>$gray, 'green'=>$gray, 'blue'=>$gray);
 	}
-
-
 }

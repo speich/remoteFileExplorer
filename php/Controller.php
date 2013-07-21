@@ -64,11 +64,12 @@ class Controller {
 	public function getDataAsObject() {
 		switch ($this->method) {
 			case 'POST':
-				$arr = $_POST;
+				$data = count($_POST) > 0 ? $_POST : file_get_contents('php://input');	// in my local php installation $_POST is always empty, haven't figured out why yet
+				$arr = json_decode($data);
 				break;
 			case 'PUT':
 				$data = file_get_contents('php://input');
-				parse_str($data, $arr);
+				$arr = json_decode($data);
 				break;
 			case 'GET':
 				$arr = $_GET;

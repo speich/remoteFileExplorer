@@ -21,8 +21,8 @@ switch($moduleType) {
 	case 'session':
 		// use session to store the user's filesystem
 		require_once('ModuleSession.php');
-		$data = require_once 'php/fs/demo/demodata.php';
-		$fs = new ModuleSession('php/fs/demo', $data);
+		$fsData = require_once 'php/fs/demo/demodata.php';
+		$fs = new ModuleSession('php/fs/demo', $fsData);
 		break;
 	case 'sqlite':
 		// TODO: use ModuleSQLite to store user's file system
@@ -35,7 +35,7 @@ switch($moduleType) {
 //sleep(1); // for testing async
 //time_nanosleep(0, 500000000);	// = 0.5 seconds
 
-if ($resource) {
+if ($resource || $data) {
 	switch ($ctrl->getMethod()) {
 		case 'GET':
 			if ($controller == 'search') {

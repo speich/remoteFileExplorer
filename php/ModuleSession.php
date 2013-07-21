@@ -34,7 +34,7 @@ class ModuleSession extends FileExplorer {
 			$this->fsDefault = $data;
 			$_SESSION['rfe'][$rootDir] = serialize($data);
 			$_SESSION['rfe']['lastUsedItemId'] = count($data);	// this is a very simple way which is not very robust // TODO: better way to create an id
-		//}
+//		}
 	}
 	
 	/**
@@ -95,7 +95,6 @@ class ModuleSession extends FileExplorer {
 	public function update($resource, $data) {
 		$json = false;
 		$fs = unserialize($_SESSION['rfe'][$this->getRoot()]);
-
 		if (array_key_exists($resource, $fs)) {
 			$fs[$resource]['name'] = $data->name;
 			$fs[$resource]['mod'] = $data->mod;
@@ -119,7 +118,7 @@ class ModuleSession extends FileExplorer {
 			// number of items in filesystem is limited
 			// TODO: raise error instead of $json = false
 			$fs = unserialize($_SESSION['rfe'][$this->getRoot()]);
-			$id = $this->getId(); // $ref/id do not start with a slash
+			$id = '/'.$this->getId();
 			$item = array(
 				'id' => $id,
 				'parId' => $data->parId,
