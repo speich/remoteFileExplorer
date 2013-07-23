@@ -10,23 +10,17 @@ define([
 	return declare(null, {
 
 		view: 'icons',
+		iconWidth: 80	,
 		services: {
-			thumbnail: require.toUrl('rfe-php/php/fs/thumbnail.php/')
+			thumbnail: require.toUrl('rfe-php/php/fs/thumbnail.php')
 		},
 		rowRenderers: {
 			list: Grid.prototype.renderRow,
 			icons: function(obj) {
-				var src, div, parent;
+				var div, img, parent;
 
-				if (obj.mime && /image\//.test(obj.mime)) {
-					src = this.services.thumbnail + obj.id + '?w=64&h=64'
-				}
-				else {
-					src = require.toUrl('rfe/resources/images/icons-64/'+ (obj.dir ? 'folder.png' : 'file.png'));
-				}
-				parent = put('div', {
-					innerHTML: '<img src="' + src + '" width="64" height="64"><br>'
-				});
+				img = this.get('iconType', obj);
+				parent = put('div', img);
 				div = put(parent, 'div', {columnId: 'name'});
 				this.cellRenderers.icons.name(obj, obj.name, div);
 				return parent;
@@ -44,6 +38,40 @@ define([
 					containerEl.innerHTML = '<span class="dgrid-column-name field-name">' + obj.name + '</span>';
 				}
 			}
+		},
+
+		/**
+		 * Return the icon according to provided mime type of object.
+		 * @param {Object} obj
+		 * @returns {HTMLImageElement}
+		 */
+		_getIconType: function(obj) {
+			var mime, img = put('img', {
+				width: 64,
+				height: 64
+			});
+
+			mime = obj.mime ? obj.mime.split('/')[0] : null;
+			switch (mime) {
+				case 'image':
+					img.className = 'iconImage';
+					img.src = this.services.thumbnail + obj.id + '?w=' + this.iconWidth;
+					img.width = this.iconWidth;
+					img.removeAttribute('height');
+					break;
+				case 'video':
+					img.src = require.toUrl('rfe') + '/resources/images/icons-64/file-video.png';
+					break;
+				case 'audio':
+					img.src = require.toUrl('rfe') + '/resources/images/icons-64/file-audio.png';
+					break;
+				case 'text':
+					img.src = require.toUrl('rfe') + '/resources/images/icons-64/file-text.png';
+					break;
+				default:
+					img.src = require.toUrl('rfe') + '/resources/images/icons-64/'+ (obj.dir ? 'folder.png' : 'file.png');
+			}
+			return img;
 		},
 
 		_setRenderer: function(view) {

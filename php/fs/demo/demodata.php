@@ -4,7 +4,7 @@ return array(
 	'/demo' => array('id' => 'demo', 'name' => 'demo', 'size' => 0, 'mod' => '21.03.2010', 'dir' => true),
 
 	'/demo/photos' => array('id' => '/demo/photos', 'parId' => '/demo', 'name' => 'photos', 'size' => 0, 'mod' => '21.03.2010', 'dir' => true),
-	'/2' => array('id' => '/2', 'parId' => '/demo', 'name' => 'folder 2', 'size' => 0, 'mod' => '23.03.2010', 'dir' => true),
+	'/2' => array('id' => '/2', 'parId' => '/demo', 'name' => 'media', 'size' => 0, 'mod' => '23.03.2010', 'dir' => true),
 	'/24' => array('id' => '/24', 'parId' => '/demo', 'name' => 'empty folder', 'size' => 0, 'mod' => '23.03.2010', 'dir' => true),
 	'/3' => array('id' => '/3', 'parId' => '/demo', 'name' => 'texts', 'size' => 0, 'mod' => '20.04.2010', 'dir' => true),
 	'/4' => array('id' => '/4', 'parId' => '/demo', 'name' => 'photo03.jpg', 'size' => 79308, 'mod' => '27.07.2009'),
@@ -38,6 +38,8 @@ return array(
 	'/8' => array('id' => '/8', 'parId' => '/2', 'name' => 'subfolder 21', 'size' => 0, 'mod' => '27.03.2010', 'dir' => true),
 	'/12' => array('id' => '/12', 'parId' => '/2', 'name' => 'subfolder 22', 'size' => 0, 'mod' => '27.03.2010', 'dir' => true),
 	'/25' => array('id' => '/25', 'parId' => '/2', 'name' => 'test dnd 1', 'size' => 1631, 'mod' => '06.11.1973'),
+	'/26' => array('id' => '/26', 'parId' => '/2', 'name' => 'jungle.mp3', 'size' => 312631, 'mod' => '06.11.1973', 'mime' => 'audio/mpeg'),
+	'/27' => array('id' => '/27', 'parId' => '/2', 'name' => 'at home.ogg', 'size' => 312631, 'mod' => '06.11.1973', 'mime' => 'video/ogg'),
 	'/44' => array('id' => '/44', 'parId' => '/2', 'name' => 'test dnd 2', 'size' => 9638, 'mod' => '27.01.2010'),
 
 	'/13' => array('id' => '/13', 'parId' => '/3', 'name' => 'file3.pdf', 'size' => 8923, 'mod' => '27.03.2001'),

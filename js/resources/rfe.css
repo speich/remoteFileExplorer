@@ -1,7 +1,7 @@
 	html, body {
 	width: 100%;
 	height: 100%;
-	font-size: 1.2em;
+	font-size: 12px;
 }
 
 p { margin: 0 0 10px 0;}
@@ -13,7 +13,7 @@ p { margin: 0 0 10px 0;}
 
 .dgrid th {
 	font-weight: normal;
-	font-size: 0.8em;
+	font-size: 9px;
 }
 
 .dijitTree {
@@ -28,6 +28,7 @@ p { margin: 0 0 10px 0;}
 	width: 100%;
 	height: 100%;
 	background-color: #ffffff;
+	font-size: 11px;
 }
 
 #remoteFileExplorer .dijitMenuBar {
@@ -148,7 +149,14 @@ p { margin: 0 0 10px 0;}
 	display: inline-block;
 	margin: 5px;
 	text-align: center;
-	vertical-align: top;
+	vertical-align: bottom;
+	max-width: 90px;
+}
+.gridViewIcons img {
+	margin-bottom: 3px;
+}
+.iconImage {
+	box-shadow: 2px 2px 4px #cccccc;
 }
 
 .buttIcon {

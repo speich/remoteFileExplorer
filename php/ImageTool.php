@@ -56,8 +56,8 @@ class ImageTool {
 	 * @param array $filterValues
 	 */
 	public function unsharpMask(&$gdImg, $filterValues = null)    {
-		$amount = !is_null($filterValues) ? $filterValues['amount'] : 60;
-		$radius = !is_null($filterValues) ? $filterValues['radius'] : 0.8;
+		$amount = !is_null($filterValues) ? $filterValues['amount'] : 30;
+		$radius = !is_null($filterValues) ? $filterValues['radius'] : 0.9;
 		$threshold = !is_null($filterValues) ? $filterValues['threshold'] : 0;
 
 		// Attempt to calibrate the parameters to Photoshop:

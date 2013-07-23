@@ -139,7 +139,6 @@ define([
 				'</div>'
 			});
 
-
 			// TODO: move dialog creation to constructor/init so we can use cookie also to set store on first display
 			var label = domConstruct.create('label', {
 				innerHTML: 'Remember folders state'

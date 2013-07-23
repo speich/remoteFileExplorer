@@ -16,7 +16,7 @@ date_default_timezone_set('Europe/Zurich');
 $path = '/';
 
 // make include paths available to pages independent on subdir they reside in. On windows this has to be absolute paths
-$absPath = $_SERVER['DOCUMENT_ROOT'].$path;
+$absPath = rtrim($_SERVER['DOCUMENT_ROOT'], '/').$path;
 $incPath = $absPath.'php';
 // PATH_SEPARATOR; add more here
 set_include_path($incPath);

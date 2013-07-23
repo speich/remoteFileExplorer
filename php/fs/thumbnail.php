@@ -8,8 +8,8 @@ require_once 'Header.php';
 require_once 'Http.php';
 
 // TODO: have a registry for all the different paths in a central location
-$fsRoot = 'demo/';
-$imgPath = 'cache/256/';
+$fsRoot = rtrim($_SERVER['DOCUMENT_ROOT'], '/').'/php/fs/';
+$cachePath = rtrim($_SERVER['DOCUMENT_ROOT'], '/').'/php/fs/cache/';
 
 $err = new Error();
 $ctrl = new Controller(new Header(), $err);
@@ -47,15 +47,15 @@ if ($resource) {
 	}
 	$db->commit();
 
-	if (!file_exists($imgPath.$id)) {
+	if (!file_exists($cachePath.$id.".jpg")) {
 		$filters = array(
 			'unsharpMask' => array()
 		);
-		$imgWidth = 256;
-		$jpgQuality = 70;
-		$imgSrc = $resource;
-		$imgTrg = $imgPath.$id;
-		$imgTool->createThumb($imgSrc, $imgTrg, $imgWidth, $jpgQuality);
+		$imgWidth = property_exists($data, 'w') ? $data->w : 256;
+		$jpgQuality = 80;
+		$imgSrc = $fsRoot.ltrim($resource, '/');
+		$imgTrg = $cachePath.$id.".jpg";
+		$imgTool->createThumb($imgSrc, $imgTrg, $imgWidth, $jpgQuality, $filters);
 	}
 }
 else {
@@ -63,13 +63,13 @@ else {
 	$ctrl->notFound = true;
 }
 
-if ($err) {
+if ($err->get()) {
 	$ctrl->printHeader();
 	$ctrl->printBody();
 }
 else {
 	ob_start();
 	header('Content-Type: image/jpeg');	// thumbnails are always jpg
-	readfile($imgPath.$id);
+	readfile($cachePath.$id.".jpg");
 	ob_end_flush();
 }
