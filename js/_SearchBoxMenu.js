@@ -10,7 +10,7 @@ define([
 
 	return declare([_ComboBoxMenu], {
 		// TODO: find better solution to get store target url
-		target: require.toUrl('rfe-php/controller.php/'),
+		target: require.toUrl('rfe-php') + '/filesystem.php/',
 
 		postCreate: function() {
 			this.inherited(arguments);

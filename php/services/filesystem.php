@@ -1,5 +1,5 @@
 <?php
-require_once 'inc_global.php';
+require_once '../inc_global.php';
 require_once 'Error.php';
 require_once 'Controller.php';
 require_once 'Header.php';
@@ -21,8 +21,8 @@ switch($moduleType) {
 	case 'session':
 		// use session to store the user's filesystem
 		require_once('ModuleSession.php');
-		$fsData = require_once 'php/fs/demo/demodata.php';
-		$fs = new ModuleSession('php/fs/demo', $fsData);
+		$fsData = require_once $rfeConfig['paths']['demo'].'demodata.php';
+		$fs = new ModuleSession($rfeConfig['paths']['demo'], $fsData);
 		break;
 	case 'sqlite':
 		// TODO: use ModuleSQLite to store user's file system

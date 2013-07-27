@@ -1,18 +1,19 @@
 define([
 	'dojo/_base/lang',
 	'dojo/_base/declare',
+	'dojo/_base/array',
 	'dojo/when',
 	'dojo/aspect',
 	'dijit/registry',
 	'dijit/Toolbar',
 	'dijit/ToolbarSeparator',
 	'dijit/form/Button',
+	'dijit/form/Select',
 	'rfe/SearchBox'
-], function(lang, declare, when, aspect, registry, Toolbar, ToolbarSeparator, Button, SearchBox) {
+], function(lang, declare, array, when, aspect, registry, Toolbar, ToolbarSeparator, Button, Select, SearchBox) {
 
 	/**
-	 * @class
-	 * @name rfe.layout.Toolbar
+	 * @class rfe.layout.Toolbar
 	 * @extends dijit.Toolbar
 	 * @property {rfe} rfe reference to remoteFileExplorer
 	 */
@@ -20,7 +21,6 @@ define([
 
 		rfe: null,
 
-		/** @constructor */
 		constructor: function(props) {
 			lang.mixin(this, props || {});
 		},
@@ -95,9 +95,22 @@ define([
 			this.addChild(new ToolbarSeparator({ id: 'rfeTbSeparatorSearch'}));
 
 			this.addChild(new SearchBox({
-				target: require.toUrl('rfe-php/controller.php/search'),
+				target: require.toUrl('rfe-php') + '/filesystem.php/search',
 				rfe: rfe
 			}));
+/*
+			var item = rfe.store.get
+			var options = array.filter(rfe.grid.columns, function() {
+
+			});
+			this.addChild(new Select({});
+
+				options: [
+					{ label: 'foo', value: 'foo', selected: true },
+					{ label: 'bar', value: 'bar' }
+				],
+			}))
+			*/
 		},
 
 		_onContainerKeydown: function(evt) {

@@ -78,12 +78,7 @@ define([
 			});
 			this.initTree();
 			this.initGrid();
-			this.initTopics();
 			this.initDialogs();
-		},
-
-		initTopics: function() {
-			topic.publish('grid/views/state', this.grid.view);
 		},
 
 		/**
@@ -118,7 +113,7 @@ define([
 			new Dialog({
 				id: 'rfeDialogAbout',
 				title: "About Remote File Explorer (rfe)",
-				content: '<div id="rfeDialogAboutLogo"><img src="' + require.toUrl('rfe/resources/images/logo-speich.net.png') +
+				content: '<div id="rfeDialogAboutLogo"><img src="' + require.toUrl('rfe') + '/resources/images/logo-speich.net.png' +
 					'" alt="speich.net logo" title="Created by Simon Speich, www.speich.net"/></div>' +
 					'<div id="rfeDialogAboutText">' +
 					'<h2>Remote File Explorer (rfe)</h2>' +

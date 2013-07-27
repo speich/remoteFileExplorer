@@ -42,7 +42,7 @@ define([
 					this.clear();
 					return false;
 				}),
-				innerHTML: '<img src="' + require.toUrl('rfe/resources/images/icon_reset.png') + '" alt="reset icon" title="reset">'
+				innerHTML: '<img src="' + require.toUrl('rfe') + '/resources/images/icon_reset.png' + '" alt="reset icon" title="reset">'
 			}, menu);
 
 			domConstruct.create('div', {

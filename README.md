@@ -15,10 +15,19 @@ Working [demo of the remoteFileExplorer](http://www.speich.net/projects/programm
 * sorting of files and folders
 * net panel logging all requests and server errors
 * remember opened folder and selection state
+* server side automatic generation of thumbnails with caching
 
-## Dependencies
-Requires the following dependencies to be installed or mapped into the folder /library:
-* [The Dojo Toolkit](http://dojotoolkit.org) SDK version 1.8.1 or higher
-* [dgrid](https://github.com/SitePen/dgrid)
-* [xstyle](https://github.com/kriszyp/xstyle)
-* [put-selector](https://github.com/kriszyp/put-selector)
+## JavaScript Dependencies
+Requires the following dependencies to be installed or mapped:
+* [The Dojo Toolkit](http://dojotoolkit.org) SDK version 1.8.1 or higher, mapped to /dojo
+* [dgrid](https://github.com/SitePen/dgrid), mapped to /dgrid
+* [xstyle](https://github.com/kriszyp/xstyle), mapped to /xstyle
+* [put-selector](https://github.com/kriszyp/put-selector), mapped to /put-selector
+
+## PHP Dependencies
+Requires the following additional extensions to be loaded:
+* php_gd2.dll
+* php_mbstring.dll
+* php_exif
+* php_pdo_sqlite.dll
+

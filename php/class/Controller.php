@@ -3,7 +3,7 @@
 /**
  * This class is used as a REST controller.
  * REST resources are transformed into a controller (first path segment) and an array of resources, e.g.:
- * controller.php/administration/user/1 would be stored as
+ * filesystem.php/administration/user/1 would be stored as
  * $this->controller = 'administration' and $this->resources = array('user', 1);
  */
 

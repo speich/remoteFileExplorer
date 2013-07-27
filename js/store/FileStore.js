@@ -49,7 +49,7 @@ define([
 			var storeMaster, storeMemory, storeCache;
 
 			storeMaster = new JsonRest({
-				target: require.toUrl('rfe-php/controller.php')
+				target: require.toUrl('rfe-php') + '/services/filesystem.php'
 			});
 			this.storeMaster = storeMaster;
 
@@ -132,7 +132,6 @@ define([
 			results = array.some(data, callback);
 			return results;
 		},
-
 
 		/**
 		 * Returns a folders (cached) children.

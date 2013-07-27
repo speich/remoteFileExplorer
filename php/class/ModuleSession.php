@@ -30,11 +30,11 @@ class ModuleSession extends FileExplorer {
 	 */
 	public function __construct($rootDir, $data) {
 		parent::__construct($rootDir);
-		if (!isset($_SESSION['rfe'])) {
+	//	if (!isset($_SESSION['rfe'])) {
 			$this->fsDefault = $data;
 			$_SESSION['rfe'][$rootDir] = serialize($data);
 			$_SESSION['rfe']['lastUsedItemId'] = count($data);	// this is a very simple way which is not very robust // TODO: better way to create an id
-		}
+	//	}
 	}
 	
 	/**

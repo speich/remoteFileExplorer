@@ -17,9 +17,9 @@ function(lang, window, array, declare, construct, domClass, attr, query, Avatar)
 		file: new Image()
 	};
 
-	images.folder.src = require.toUrl('rfe/resources/images/icons-64/folder.png');
-	images.files.src = require.toUrl('rfe/resources/images/icons-64/files.png');
-	images.file.src = require.toUrl('rfe/resources/images/icons-64/file.png');
+	images.folder.src = require.toUrl('rfe') + '/resources/images/icons-64/folder.png';
+	images.files.src = require.toUrl('rfe') + '/resources/images/icons-64/files.png';
+	images.file.src = require.toUrl('rfe') + '/resources/images/icons-64/file.png';
 
 
 	return declare([Avatar], {
