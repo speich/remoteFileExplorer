@@ -2,17 +2,19 @@ define([
 	'dojo/_base/declare',
 	'dojo/_base/lang',
 	'dojo/request/xhr',
+	'dojo/on',
 	'dojo/aspect',
 	'dgrid/Grid',
 	'put-selector/put'
-], function(declare, lang, xhr, aspect, Grid, put) {
+], function(declare, lang, xhr, on, aspect, Grid, put) {
 
 	return declare(null, {
 
+		/** default view */
 		view: 'icons',
-		iconWidth: 80	,
+		iconWidth: 80,
 		services: {
-			thumbnail: require.toUrl('rfe-php/php/fs/thumbnail.php')
+			thumbnail: require.toUrl('rfe-php') + '/services/image.php'
 		},
 		rowRenderers: {
 			list: Grid.prototype.renderRow,
@@ -38,6 +40,26 @@ define([
 					containerEl.innerHTML = '<span class="dgrid-column-name field-name">' + obj.name + '</span>';
 				}
 			}
+		},
+
+		headerRenderers: {
+			list: function() {
+				this.renderHeaderList();
+			},
+			icons: function() {
+				this.renderHeaderIcons();
+			}
+		},
+
+		/**
+		 * Rerender headings and rows
+		 * @param {String} view
+		 */
+		_setView: function(view) {
+			this._destroyColumns();
+			this.set('renderer', view);
+			this._updateColumns();
+			this.refresh();
 		},
 
 		/**
@@ -84,6 +106,7 @@ define([
 					cssClassRemove += '!gridView' + prop.charAt(0).toUpperCase() + prop.slice(1);
 				}
 			}
+			this.renderHeader = this.headerRenderers[view];
 			this.renderRow = this.rowRenderers[view];
 
 			// set correct cell renderer for current view
@@ -95,8 +118,72 @@ define([
 
 			this.view = view;
 			put(this.domNode, "!gridViewList!gridViewIcons!gridViewDetails." + cssClass);
-			this.set('showHeader', view == "list");
-			this.refresh();
+		},
+
+		renderHeaderIcons: function() {
+			var headerNode = this.headerNode,
+				i = headerNode.childNodes.length;
+
+			headerNode.setAttribute("role", "row");
+
+			// clear out existing header in case we're resetting (changing view)
+			while(i--){
+				put(headerNode.childNodes[i], "!");
+			}
+		},
+
+		renderHeaderList: function() {
+			// Note: overriding to be able to manipulate sorting, when clicking on header
+			var grid = this, headerNode;
+
+			//target = grid._sortNode;	// access before sort is called, because Grid._setSort will delete the sort node
+			this.inherited('renderHeader', arguments);
+
+			headerNode = this.headerNode;
+
+			// if it columns are sortable, resort on clicks
+			on(headerNode.firstChild, 'click, keydown', function(event) {
+
+				// respond to click or space keypress
+				if (event.type === "click" || event.keyCode === 32) {
+					var target = event.target, field, descending, arrSort, sortObj;
+
+					// remove previous added sorting by childrenAttr, e.g. group by folder
+					arrSort = grid._sort;
+					if (arrSort && arrSort.length === 2) {
+						arrSort.shift();
+					}
+
+					do {
+						if (target.field) {	// true = found the right node
+							// stash node subject to DOM manipulations to be referenced then removed by sort()
+							grid._sortNode = target;
+
+							field = target.field || target.columnId;
+							sortObj = arrSort[0];	// might be undefined
+
+							// if the click is on same column as the active sort, reverse direction of corresponding sort object
+							descending = sortObj && sortObj.attribute === field && !sortObj.descending;
+							sortObj = {
+								attribute: field,
+								descending: descending
+							};
+
+							arrSort = [sortObj];
+
+							// sort by childrenAttr first
+							if (sortObj.attribute !== grid.store.childrenAttr) {
+								arrSort.unshift({
+									attribute: grid.store.childrenAttr,
+									descending: descending
+								});
+							}
+
+							return grid.set("sort", arrSort);
+						}
+					} while ((target = target.parentNode) && target !== headerNode);
+				}
+			});
 		},
 
 		/**
