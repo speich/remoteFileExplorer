@@ -136,6 +136,49 @@ define([
 		_getFirstRow: function() {
 			var nodes = query('.dgrid-row', this.bodyNode);
 			return nodes.length > 0 ? this.row(nodes[0]) : false;
+		},
+
+		/**
+		 * Return
+		 * @param field
+		 * @private
+		 */
+		_getHeader: function(field) {
+
+		},
+
+		/**
+		 * Set sorting
+		 * @param {String} field name of column to sort
+		 * @param arrSort
+		 */
+		_setMultisort: function(field, arrSort) {
+			var grid = this, sortObj, descending;
+
+			// remove previous added sorting by childrenAttr, e.g. group by folder
+			if (arrSort && arrSort.length === 2) {
+				arrSort.shift();
+			}
+			sortObj = arrSort[0];	// might be undefined
+
+			// if  click is on same as the active sort, reverse direction of corresponding sort object
+			descending = sortObj && sortObj.attribute === field && !sortObj.descending;
+			sortObj = {
+				attribute: field,
+				descending: descending
+			};
+
+			arrSort = [sortObj];
+
+			// sort by childrenAttr first
+			if (sortObj.attribute !== grid.store.childrenAttr) {
+				arrSort.unshift({
+					attribute: grid.store.childrenAttr,
+					descending: descending
+				});
+			}
+
+			this.set('sort', arrSort);
 		}
 
 

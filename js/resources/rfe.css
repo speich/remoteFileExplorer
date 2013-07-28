@@ -122,10 +122,23 @@ p {
 .rfeToolbarIconHistoryForward {
 	background-position: -48px;
 }
+.rfeToolbarSort {
+	float: right;
+}
+.rfeToolbarSort .dijitSelect .dijitStretch {
+	min-width: 100px;
+}
 
 .rfeToolbarIconReload {
 	background-position: -16px;
 }
+.rfeToolbarIconSortDesc {
+	background-position: -160px;
+}
+.rfeToolbarIconSortAsc {
+	background-position: -176px;
+}
+
 
 .rfeMenuIconNew {
 	background-position: -112px;

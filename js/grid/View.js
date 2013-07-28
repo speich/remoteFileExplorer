@@ -56,8 +56,13 @@ define([
 		 * @param {String} view
 		 */
 		_setView: function(view) {
+
+
+			this.hiderToggleNode.style.display = view !== 'list' ? "none" : "";
+
 			this._destroyColumns();
 			this.set('renderer', view);
+			this.view = view;
 			this._updateColumns();
 			this.refresh();
 		},
@@ -96,6 +101,10 @@ define([
 			return img;
 		},
 
+		/**
+		 * Set renderers for headers, rows and cells depending on view
+		 * @param {String} view
+		 */
 		_setRenderer: function(view) {
 			var prop, cssClassRemove = '',
 				cssClass = 'gridView' + view.charAt(0).toUpperCase() + view.slice(1);
@@ -116,10 +125,12 @@ define([
 				}
 			}
 
-			this.view = view;
 			put(this.domNode, "!gridViewList!gridViewIcons!gridViewDetails." + cssClass);
 		},
 
+		/**
+		 * Render headers when in icon mode.
+		 */
 		renderHeaderIcons: function() {
 			var headerNode = this.headerNode,
 				i = headerNode.childNodes.length;
@@ -132,6 +143,9 @@ define([
 			}
 		},
 
+		/**
+		 * Render column headers when in list mode.
+		 */
 		renderHeaderList: function() {
 			// Note: overriding to be able to manipulate sorting, when clicking on header
 			var grid = this, headerNode;
@@ -141,55 +155,33 @@ define([
 
 			headerNode = this.headerNode;
 
-			// if it columns are sortable, resort on clicks
+			// if it columns are sortable, add events to headers
 			on(headerNode.firstChild, 'click, keydown', function(event) {
 
 				// respond to click or space keypress
 				if (event.type === "click" || event.keyCode === 32) {
-					var target = event.target, field, descending, arrSort, sortObj;
-
-					// remove previous added sorting by childrenAttr, e.g. group by folder
-					arrSort = grid._sort;
-					if (arrSort && arrSort.length === 2) {
-						arrSort.shift();
-					}
+					var target = event.target, field, arrSort;
 
 					do {
 						if (target.field) {	// true = found the right node
 							// stash node subject to DOM manipulations to be referenced then removed by sort()
 							grid._sortNode = target;
-
 							field = target.field || target.columnId;
-							sortObj = arrSort[0];	// might be undefined
-
-							// if the click is on same column as the active sort, reverse direction of corresponding sort object
-							descending = sortObj && sortObj.attribute === field && !sortObj.descending;
-							sortObj = {
-								attribute: field,
-								descending: descending
-							};
-
-							arrSort = [sortObj];
-
-							// sort by childrenAttr first
-							if (sortObj.attribute !== grid.store.childrenAttr) {
-								arrSort.unshift({
-									attribute: grid.store.childrenAttr,
-									descending: descending
-								});
-							}
-
-							return grid.set("sort", arrSort);
+							arrSort = grid._sort;
+							return grid.set("multisort", field, arrSort);
 						}
-					} while ((target = target.parentNode) && target !== headerNode);
+					}
+					while ((target = target.parentNode) && target !== headerNode);
 				}
 			});
 		},
 
+		//_setColumn
+
 		/**
 		 * Override to make cell work with other views than lists (table)
-		 * @param target event, node, object id
-		 * @param [columnId] column id
+		 * @param {Event} target event, node, object id
+		 * @param {Integer} [columnId] column id
 		 * @returns {Object}
 		 */
 		cell: function(target, columnId) {

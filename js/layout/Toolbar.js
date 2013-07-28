@@ -2,15 +2,19 @@ define([
 	'dojo/_base/lang',
 	'dojo/_base/declare',
 	'dojo/_base/array',
+	'dojo/on',
 	'dojo/when',
 	'dojo/aspect',
+	'dojo/dom-construct',
+	'dojo/dom-class',
+	'dojo/query',
 	'dijit/registry',
 	'dijit/Toolbar',
 	'dijit/ToolbarSeparator',
 	'dijit/form/Button',
 	'dijit/form/Select',
 	'rfe/SearchBox'
-], function(lang, declare, array, when, aspect, registry, Toolbar, ToolbarSeparator, Button, Select, SearchBox) {
+], function(lang, declare, array, on, when, aspect, domConstruct, domClass, query, registry, Toolbar, ToolbarSeparator, Button, Select, SearchBox) {
 
 	/**
 	 * @class rfe.layout.Toolbar
@@ -31,7 +35,7 @@ define([
 		postCreate: function() {
 			this.inherited('postCreate', arguments);	// in case we've overriden something
 
-			var rfe = this.rfe, bt1, bt2, bt3;
+			var rfe = this.rfe, bt1, bt2, bt3, bt4, div, selSort;
 
 			bt1 = new Button({
 				label: 'up',
@@ -98,19 +102,44 @@ define([
 				target: require.toUrl('rfe-php') + '/filesystem.php/search',
 				rfe: rfe
 			}));
-/*
-			var item = rfe.store.get
-			var options = array.filter(rfe.grid.columns, function() {
 
-			});
-			this.addChild(new Select({});
-
+			// TODO: do not hardcode sortable (file) properties
+			div = domConstruct.create('div', {
+				'class': 'rfeToolbarSort'
+			}, this.domNode);
+			domConstruct.create('label', {
+				innerHTML: 'sort by'
+			}, div);
+			selSort = new Select({
 				options: [
-					{ label: 'foo', value: 'foo', selected: true },
-					{ label: 'bar', value: 'bar' }
-				],
-			}))
-			*/
+					// value shoud be name of store object property to be sorted
+					{ label: 'file name', value: 'name', selected: true },
+					{ label: 'size', value: 'size' },
+					{ label: 'modification date', value: 'mod' },
+					{ label: 'type', value: 'mime' }
+				]
+			}).placeAt(div);
+			bt4 = new Button({
+				label: 'sort',
+				showLabel: false,
+				iconClass: 'rfeIcon rfeToolbarIconSortAsc',
+				onClick: function () {
+					if (rfe.grid.view === 'icons') {
+						rfe.grid.set('multisort', selSort.get('value'), rfe.grid._sort);
+					}
+					else {
+						// simulate clicking on grid column
+						var field = selSort.get('value'),
+							node = query('th.field-' + field)[0];
+						on.emit(node, 'click', {
+							cancelable: true,
+							bubbles: true
+						});
+					}
+					domClass.remove(bt4, 'rfeToolbarIconSortAsc');
+					domClass.add(bt4, 'rfeToolbarIconSortDesc');
+				}
+			}).placeAt(div);
 		},
 
 		_onContainerKeydown: function(evt) {
