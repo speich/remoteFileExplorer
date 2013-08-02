@@ -139,15 +139,6 @@ define([
 		},
 
 		/**
-		 * Return
-		 * @param field
-		 * @private
-		 */
-		_getHeader: function(field) {
-
-		},
-
-		/**
 		 * Set sorting
 		 * @param {String} field name of column to sort
 		 * @param arrSort

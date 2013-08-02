@@ -25,10 +25,6 @@ p {
 	padding: 0;
 }
 
-.dijitDisabled .rfeIcon {
-	background-image: url("images/rfeToolbarIconsDisabled.png");
-}
-
 .dijitMenuPopup .dijitMenuItemLabel {
 	min-width: 120px;
 }
@@ -105,10 +101,14 @@ p {
 }
 
 .rfeIcon {
-	background: url("images/rfeToolbarIconsEnabled.png") no-repeat;
+	background: url("images/rfeToolbarIconsEnabled.png") no-repeat 0 0;
 	height: 16px;
 	text-align: center;
 	width: 16px;
+}
+
+.dijitDisabled .rfeIcon {
+	background-image: url("images/rfeToolbarIconsDisabled.png");
 }
 
 .rfeToolbarIconDirUp {
@@ -138,24 +138,18 @@ p {
 .rfeToolbarIconSortAsc {
 	background-position: -176px;
 }
-
-
 .rfeMenuIconNew {
 	background-position: -112px;
 }
-
 .rfeMenuIconDir {
 	background-position: -64px;
 }
-
 .rfeMenuIconFile {
 	background-position: -96px;
 }
-
 .rfeMenuIconList {
 	background-position: -128px;
 }
-
 .rfeMenuIconThumbs {
 	background-position: -144px;
 }

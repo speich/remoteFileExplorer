@@ -12,10 +12,17 @@ define([
 
 		/** default view */
 		view: 'icons',
+
+		/** width of icons */
 		iconWidth: 80,
+
 		services: {
 			thumbnail: require.toUrl('rfe-php') + '/services/image.php'
 		},
+
+		/**
+		 * Object providing the different render functions for the rows.
+		 */
 		rowRenderers: {
 			list: Grid.prototype.renderRow,
 			icons: function(obj) {
@@ -28,8 +35,12 @@ define([
 				return parent;
 			}
 		},
-		// cell is only part with editable text
+
+		/**
+		 * Object providing the different render functions for the cells.
+		 */
 		cellRenderers: {
+			// note: a cell is only the part of a row with editable text and contains no elements
 			list: {
 				name: function(obj, data, containerEl) {
 					containerEl.innerHTML = '<span class="' + (obj.dir ? 'dijitFolderClosed' : 'dijitLeaf') + '"></span><span>' + obj.name + '</span>';
@@ -42,6 +53,9 @@ define([
 			}
 		},
 
+		/**
+		 * Object providing the different render functions for the headers.
+		 */
 		headerRenderers: {
 			list: function() {
 				this.renderHeaderList();
@@ -56,10 +70,7 @@ define([
 		 * @param {String} view
 		 */
 		_setView: function(view) {
-
-
 			this.hiderToggleNode.style.display = view !== 'list' ? "none" : "";
-
 			this._destroyColumns();
 			this.set('renderer', view);
 			this.view = view;
@@ -175,8 +186,6 @@ define([
 				}
 			});
 		},
-
-		//_setColumn
 
 		/**
 		 * Override to make cell work with other views than lists (table)

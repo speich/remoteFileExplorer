@@ -6,15 +6,15 @@ define([
 	'dojo/when',
 	'dojo/aspect',
 	'dojo/dom-construct',
-	'dojo/dom-class',
 	'dojo/query',
 	'dijit/registry',
 	'dijit/Toolbar',
 	'dijit/ToolbarSeparator',
 	'dijit/form/Button',
 	'dijit/form/Select',
+	'rfe/util/stringUtil',
 	'rfe/SearchBox'
-], function(lang, declare, array, on, when, aspect, domConstruct, domClass, query, registry, Toolbar, ToolbarSeparator, Button, Select, SearchBox) {
+], function(lang, declare, array, on, when, aspect, domConstruct, query, registry, Toolbar, ToolbarSeparator, Button, Select, stringUtil, SearchBox) {
 
 	/**
 	 * @class rfe.layout.Toolbar
@@ -124,22 +124,32 @@ define([
 				showLabel: false,
 				iconClass: 'rfeIcon rfeToolbarIconSortAsc',
 				onClick: function () {
+					var node, field = selSort.get('value');
 					if (rfe.grid.view === 'icons') {
-						rfe.grid.set('multisort', selSort.get('value'), rfe.grid._sort);
+						rfe.grid.set('multisort', field, rfe.grid._sort);
 					}
 					else {
 						// simulate clicking on grid column
-						var field = selSort.get('value'),
-							node = query('th.field-' + field)[0];
+						node = query('th.field-' + field)[0];
 						on.emit(node, 'click', {
 							cancelable: true,
 							bubbles: true
 						});
 					}
-					domClass.remove(bt4, 'rfeToolbarIconSortAsc');
-					domClass.add(bt4, 'rfeToolbarIconSortDesc');
 				}
 			}).placeAt(div);
+
+			// sync grid header column and sort button
+			var signal = aspect.after(rfe, 'initGrid', function() {
+				signal.remove();
+				// grid not initialized yet, so we can't do this directly
+				aspect.after(rfe.grid, '_setSort', function(arrSort) {
+					var sortObj = arrSort[1] || arrSort[0];
+
+					bt4.set('iconClass', 'rfeIcon rfeToolbarIconSort' + (sortObj.descending ? 'Desc' : 'Asc'));
+					selSort.set('value', sortObj.attribute);
+				}, true);
+			});
 		},
 
 		_onContainerKeydown: function(evt) {
