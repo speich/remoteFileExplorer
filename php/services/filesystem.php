@@ -1,4 +1,6 @@
 <?php
+use remoteFileExplorer\fs as fs;
+
 require_once '../inc_global.php';
 require_once 'Error.php';
 require_once 'Controller.php';
@@ -20,9 +22,9 @@ $moduleType = 'session';
 switch($moduleType) {
 	case 'session':
 		// use session to store the user's filesystem
-		require_once('ModuleSession.php');
+		require_once('FileSession.php');
 		$fsData = require_once $rfeConfig['paths']['demo'].'demodata.php';
-		$fs = new ModuleSession($rfeConfig['paths']['demo'], $fsData);
+		$fs = new fs\FileSession($rfeConfig['paths']['demo'], $fsData);
 		break;
 	case 'sqlite':
 		// TODO: use ModuleSQLite to store user's file system
@@ -50,7 +52,12 @@ if ($resource || $data) {
 			}
 			break;
 		case 'POST':
-			$response = $fs->create($resource, $data);
+			if ($resource) {
+				$fs->copy($resource, $data);
+			}
+			else {
+				$response = $fs->create($resource, $data);
+			}
 			break;
 		case 'PUT':
 			$response = $fs->update($resource, $data);

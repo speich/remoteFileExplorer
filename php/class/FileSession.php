@@ -1,14 +1,10 @@
 <?php
-/**
- * Module for the class FileExplorer.
- * Allows you to store a virtual file system as an array in a session variable.
- * Directories are directly referenced for fast lookup.
- * @author Simon Speich
- */
+namespace remoteFileExplorer\fs;
+use remoteFileExplorer\fs as fs;
 
-require_once 'FileExplorer.php';
+require_once 'FileSystem.php';
 
-class ModuleSession extends FileExplorer {
+class FileSession extends fs\FileSystem {
 
 	/** @var int limit number of items that can be in filesystem */
 	private $numItemLimit = 100;
@@ -105,17 +101,27 @@ class ModuleSession extends FileExplorer {
 		}
 		return $json;
 	}
-	
+
 	/**
-	 * Create item located at resource.
+	 * Copy resource to new location.
 	 * @param string $resource REST resource
+	 * @param object $data request data
+	 * @return string|bool json or false resource as json
+	 */
+	public function copy($resource, $data) {
+		$json = false;
+		return $json;
+	}
+
+	/**
+	 * Create a new item.
 	 * @param object $data request data
 	 * @return string|bool json or false resource location or false
 	 */
-	public function create($resource, $data) {
+	public function create($data) {
 		$json = false;
 		if (count($this->fsDefault) <= $this->numItemLimit) {
-			// number of items in filesystem is limited
+			// number of items in filesystem is limited in demo
 			// TODO: raise error instead of $json = false
 			$fs = unserialize($_SESSION['rfe'][$this->getRoot()]);
 			$id = '/'.$this->getId();

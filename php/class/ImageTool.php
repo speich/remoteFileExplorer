@@ -7,6 +7,8 @@
  * Unsharp mask algorithm by Torstein Hønsi 2003-07.
  * thoensi_at_netcom_dot_no.
  */
+namespace remoteFileExplorer\image;
+
  
 class ImageTool {
 
@@ -157,8 +159,6 @@ class ImageTool {
 		}
 		imagedestroy($imgBlur);
 	}
-
-
 
 	//http://phpthumb.sourceforge.net/index.php?source=phpthumb.filters.php
 	public function createHistogram(&$gdImg, $calculateGray = false) {

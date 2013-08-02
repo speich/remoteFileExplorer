@@ -1,4 +1,7 @@
 <?php
+use remoteFileExplorer\fs as fs;
+use remoteFileExplorer\image as img;
+
 require_once '../inc_global.php';
 require_once 'CacheStore.php';
 require_once 'ImageTool.php';
@@ -21,11 +24,11 @@ $header = false;
 
 if ($resource) {
 
-	$imgTool = new ImageTool();
+	$imgTool = new img\ImageTool();
 
 	// check if image resource is already in cache, then either create it or return it
 	// TODO: Limit cache size!
-	$db = new CacheStore();
+	$db = new fs\CacheStore();
 	$db = $db->connect();
 
 	$db->beginTransaction();

@@ -4,7 +4,9 @@
  * @author Simon Speich
  */
 
-abstract class FileExplorer {
+namespace remoteFileExplorer\fs;
+
+abstract class FileSystem {
 		
 	/**
 	 * Set the root dir.
@@ -15,17 +17,16 @@ abstract class FileExplorer {
 	}
 	
 	/**
-	 * REST GET
+	 * Get a resource
 	 * @param string $resource REST resource
 	 */
 	abstract public function get($resource);
 	
 	/**
-	 * REST POST
-	 * @param string $resource REST resource
+	 * Create a new resource.
 	 * @param object $data request data
 	 */
-	abstract public function create($resource, $data);
+	abstract public function create($data);
 	
 	/**
 	 * REST PUT
@@ -35,10 +36,17 @@ abstract class FileExplorer {
 	abstract public function update($resource, $data);
 	
 	/**
-	 * REST DELETE
+	 * Delete a resource
 	 * @param string $resource REST resource
 	 */
 	abstract public function del($resource);
+
+	/**
+	 * Copy a resource.
+	 * @param string $resource REST resource to copy
+	 * @param object $data data to copy
+	 */
+	abstract public function copy($resource, $data);
 	
 	/**
 	 * Set the root directory.
@@ -57,9 +65,19 @@ abstract class FileExplorer {
 		return $this->rootDir;
 	}
 
+	/**
+	 * Search for a resource.
+	 * @param string $keyword
+	 * @param int $start
+	 * @param int $end
+	 * @return mixed
+	 */
 	abstract function search($keyword, $start, $end);
 
+	/**
+	 * Return the number of records found for a given search.
+	 * @param string $keyword
+	 * @return int
+	 */
 	abstract function getNumSearchRecords($keyword);
 }
-
-?>

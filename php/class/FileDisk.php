@@ -1,8 +1,10 @@
 <?php
+namespace remoteFileExplorer\fs;
+use remoteFileExplorer\fs as rfe;
 
-require_once 'FileExplorer.php';
+require_once 'FileSystem.php';
 
-class ModuleDisk extends FileExplorer {
+class FileDisk extends rfe\FileSystem {
 	
 	public function get($dir) {
 		$rootDir = $this->getRoot();

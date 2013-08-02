@@ -200,16 +200,12 @@ define([
 			// copy object
 			if (copy) {
 				// create new object based on child and use same id -> when server sees POST with id this means copy (implicitly)
-				// TODO: if object is a folder then copy all its children
+				// TODO: if object is a folder then copy all its children recursively on the server
 				newObject = lang.clone(object);
 				newObject[this.parentAttr] = newParentObject.id;
 				dfd = this.add(newObject, {
-					incremental: true   // otherwise store JsonRest does POST instead of PUT even if object has an id
-					// TODO: use overwrite: true instead of incremental?
-				});
-				dfd = dfd.then(function(newId) {
-					newObject.id = newId;
-					return newId;
+					incremental: true,	// lets jsonrest do a POST even if an id is present
+					parent: newParentObject
 				});
 			}
 			// move object
