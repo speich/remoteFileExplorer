@@ -99,7 +99,7 @@ define([
 			this.addChild(new ToolbarSeparator({ id: 'rfeTbSeparatorSearch'}));
 
 			this.addChild(new SearchBox({
-				target: require.toUrl('rfe-php') + '/filesystem.php/search',
+				target: require.toUrl('rfe-php') + '/services/filesystem.php/search',
 				rfe: rfe
 			}));
 
