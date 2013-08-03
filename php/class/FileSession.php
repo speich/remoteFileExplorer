@@ -1,10 +1,13 @@
 <?php
 namespace remoteFileExplorer\fs;
-use remoteFileExplorer\fs as fs;
 
 require_once 'FileSystem.php';
 
-class FileSession extends fs\FileSystem {
+class FileSession extends FileSystem {
+
+	public $fields = array(
+		'id', 'parId', 'name', 'size', 'mod', 'dir', 'mime'
+	);
 
 	/** @var int limit number of items that can be in filesystem */
 	private $numItemLimit = 100;
@@ -36,7 +39,7 @@ class FileSession extends fs\FileSystem {
 	/**
 	 * Reads requested resource from file system array.
 	 * @param string $resource REST resource
-	 * @return string|bool json or false
+	 * @return string|bool json or false item data
 	 */
 	public function get($resource) {
 		$json = false;
@@ -52,10 +55,10 @@ class FileSession extends fs\FileSystem {
 	}
 
 	/**
-	 * Returns the children of a directory.
+	 * Returns the children of an item (directory).
 	 * @param string $resource
 	 * @param array $fs array with files
-	 * @return string json
+	 * @return string json children data
 	 */
 	public function getChildren($resource, $fs) {
 		$arr = array();
@@ -83,40 +86,69 @@ class FileSession extends fs\FileSystem {
 	}
 
 	/**
-	 * Update item located at resource.
-	 * @param string $resource REST resource
-	 * @param object $data request data
-	 * @return string|bool json or false
+	 * Update item.
+	 * @param object $data item data
+	 * @return string|bool json or false item data
 	 */
-	public function update($resource, $data) {
-		$json = false;
+	public function update($data) {
+		$json = false;	// no need to raise error if not found. will be reported as resource not found if false
 		$fs = unserialize($_SESSION['rfe'][$this->getRoot()]);
-		if (array_key_exists($resource, $fs)) {
-			$fs[$resource]['name'] = $data->name;
-			$fs[$resource]['mod'] = $data->mod;
-			$fs[$resource]['parId'] = $data->parId;
+		if (array_key_exists($data->id, $fs)) {
+			foreach ($data as $prop => $val) {
+				$fs[$data->id][$prop] = $val;
+			}
 
 			$_SESSION['rfe'][$this->getRoot()] = serialize($fs);
-			$json = json_encode($fs[$resource], JSON_NUMERIC_CHECK);
+			$json = json_encode($fs[$data->id], JSON_NUMERIC_CHECK);
 		}
 		return $json;
 	}
 
 	/**
-	 * Copy resource to new location.
-	 * @param string $resource REST resource
-	 * @param object $data request data
-	 * @return string|bool json or false resource as json
+	 * Copy given resource.
+	 * parentId property of data is assumed to already be set to new target location.
+	 * @param $resource
+	 * @param $target
+	 * @return string|bool json or false item data
 	 */
-	public function copy($resource, $data) {
+	public function copy($resource, $target) {
 		$json = false;
+
+		$fs = unserialize($_SESSION['rfe'][$this->getRoot()]);
+
+		if (array_key_exists($resource, $fs)) {
+
+			// number of items in filesystem is limited in demo
+			if (count($fs) <= $this->numItemLimit) {
+				foreach ($fs[$resource] as $key => $value) {
+					$item[$key] = $value;
+				}
+				$id = $this->getId();
+				$item['id'] = $id;
+				$item['parId'] = $target;
+				$item['mod'] = date('d.m.Y H:i:s', time());
+				$fs[$id] = $item;
+
+				if (array_key_exists('dir', $fs[$resource])) {
+					// todo: how do we know we succeeded in copying all children?
+					$fs = $this->copyChildren($resource, $id, $fs);
+				}
+
+				$json = json_encode($item, JSON_NUMERIC_CHECK);
+			}
+			else {
+				trigger_error('limit of number of files in demo reached');
+			}
+		}
+		$_SESSION['rfe'][$this->getRoot()] = serialize($fs);
+
 		return $json;
 	}
 
 	/**
 	 * Create a new item.
 	 * @param object $data request data
-	 * @return string|bool json or false resource location or false
+	 * @return string|bool json or false item data
 	 */
 	public function create($data) {
 		$json = false;
@@ -124,17 +156,15 @@ class FileSession extends fs\FileSystem {
 			// number of items in filesystem is limited in demo
 			// TODO: raise error instead of $json = false
 			$fs = unserialize($_SESSION['rfe'][$this->getRoot()]);
-			$id = '/'.$this->getId();
-			$item = array(
-				'id' => $id,
-				'parId' => $data->parId,
-				'name' => $data->name,
-				'mod' => $data->mod,
-				'size' => 0,
-			);
+
+			foreach ($data as $property => $value) {
+				$item[$property] = $value;
+			}
 			if (property_exists($data, 'dir')) {
 				$item['dir'] = true;
 			}
+			$id = $this->getId();
+			$item['id'] = $id;
 			$fs[$id] = $item;
 			$_SESSION['rfe'][$this->getRoot()] = serialize($fs);
 			$json = json_encode($item, JSON_NUMERIC_CHECK);
@@ -145,7 +175,7 @@ class FileSession extends fs\FileSystem {
 	/**
 	 * Delete resource from filesystem.
 	 * @param string $resource REST resource
-	 * @return string|bool json or false
+	 * @return string|bool json or false message
 	 */
 	public function del($resource) {
 		$json = false;
@@ -171,7 +201,7 @@ class FileSession extends fs\FileSystem {
 	 * @return integer
 	 */
 	private function getId() {
-		return $_SESSION['rfe']['lastUsedItemId']++;
+		return '/'.($_SESSION['rfe']['lastUsedItemId']++);
 	}
 
 	/**
@@ -179,7 +209,7 @@ class FileSession extends fs\FileSystem {
 	 * @param $keyword
 	 * @param $start
 	 * @param $end
-	 * @return string json
+	 * @return string json search data
 	 */
 	public function search($keyword, $start, $end) {
 		// this would be slow on large arrays, but since the demo arrays are short it doesn't matter
@@ -209,6 +239,11 @@ class FileSession extends fs\FileSystem {
 		return json_encode($arr);
 	}
 
+	/**
+	 * Return the number of items found for provided keyword.
+	 * @param string $keyword
+	 * @return int
+	 */
 	public function getNumSearchRecords($keyword) {
 		// this would be slow on large arrays, but since the array of the demo is short it doesn't matter
 
@@ -226,6 +261,12 @@ class FileSession extends fs\FileSystem {
 		return $count;
 	}
 
+	/**
+	 * Create a path containing all parents of an item.
+	 * @param $fs
+	 * @param $file
+	 * @return string path
+	 */
 	public function createPath($fs, $file) {
 		$path = '';
 
@@ -239,5 +280,38 @@ class FileSession extends fs\FileSystem {
 			$parId = isset($fs[$parId]['parId']) ? $fs[$parId]['parId'] : null;
 		}
 		return $path.$file['id'];
+	}
+
+	/**
+	 * Recursively copy all children of a resource.
+	 * @param string $resource
+	 * @param string $target
+	 * @param array $fs file system
+	 * @return array file system
+	 */
+	protected function copyChildren($resource, $target, $fs) {
+		foreach ($fs as $row) {
+			if (count($fs) <= $this->numItemLimit) {
+				if (array_key_exists('parId', $row) && $row['parId'] == $resource) {
+					$item = array();
+					foreach ($row as $key => $value) {
+						$item[$key] = $value;
+					}
+					$id = $this->getId();
+					$item['id'] = $id;
+					$item['parId'] = $target;
+					$item['mod'] = date('d.m.Y H:i:s', time());
+					$fs[$id] = $item;
+
+					if (array_key_exists('dir', $row)) {
+						$fs = $this->copyChildren($row['id'], $id, $fs);
+					}
+				}
+			}
+			else {
+				trigger_error('limit of number of files in demo reached');
+			}
+		}
+		return $fs;
 	}
 }

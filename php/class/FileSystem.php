@@ -7,6 +7,9 @@
 namespace remoteFileExplorer\fs;
 
 abstract class FileSystem {
+
+	/** @var array properties of a file object */
+	public $fields = array();
 		
 	/**
 	 * Set the root dir.
@@ -17,36 +20,35 @@ abstract class FileSystem {
 	}
 	
 	/**
-	 * Get a resource
+	 * Get a resource.
 	 * @param string $resource REST resource
 	 */
 	abstract public function get($resource);
 	
 	/**
 	 * Create a new resource.
-	 * @param object $data request data
+	 * @param object $data file data
 	 */
 	abstract public function create($data);
 	
 	/**
-	 * REST PUT
-	 * @param string $resource REST resource
-	 * @param object $data request data
+	 * Update a resource.
+	 * @param object $data file data
 	 */
-	abstract public function update($resource, $data);
+	abstract public function update($data);
 	
 	/**
-	 * Delete a resource
+	 * Delete a resource.
 	 * @param string $resource REST resource
 	 */
 	abstract public function del($resource);
 
 	/**
 	 * Copy a resource.
-	 * @param string $resource REST resource to copy
-	 * @param object $data data to copy
+	 * @param string $resource
+	 * @param string $target
 	 */
-	abstract public function copy($resource, $data);
+	abstract public function copy($resource, $target);
 	
 	/**
 	 * Set the root directory.

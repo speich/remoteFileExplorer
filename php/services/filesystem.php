@@ -6,6 +6,7 @@ require_once 'Error.php';
 require_once 'Controller.php';
 require_once 'Header.php';
 require_once 'Http.php';
+require_once 'InputChecker.php';
 
 $err = new Error();
 $ctrl = new Controller(new Header(), $err);
@@ -36,39 +37,41 @@ switch($moduleType) {
 
 //sleep(1); // for testing async
 //time_nanosleep(0, 500000000);	// = 0.5 seconds
+$checker = new \remoteFileExplorer\InputChecker();
 
-if ($resource || $data) {
-	switch ($ctrl->getMethod()) {
-		case 'GET':
-			if ($controller == 'search') {
-				$keyword = str_replace('*', '', $data->name);
-				$numRec = $fs->getNumSearchRecords($keyword);
-				$ranges = $ctrl->header->getRange();
-				$header = $ctrl->header->createRange($ranges, $numRec);
-				$response = $fs->search($keyword, $ranges['start'], $ranges['end']);
-			}
-			else {
-				$response = $fs->get($resource);
-			}
-			break;
-		case 'POST':
-			if ($resource) {
-				$fs->copy($resource, $data);
-			}
-			else {
-				$response = $fs->create($resource, $data);
-			}
-			break;
-		case 'PUT':
-			$response = $fs->update($resource, $data);
-			break;
-		case 'DELETE':
-			$response = $fs->del($resource);
-			break;
+if (is_null($data) || $checker->sanitizeProperties($data, $fs->fields)) {
+
+	if ($resource || $data) {
+		switch ($ctrl->getMethod()) {
+			case 'GET':
+				if ($controller == 'search') {
+					$keyword = str_replace('*', '', $data->name);
+					$numRec = $fs->getNumSearchRecords($keyword);
+					$ranges = $ctrl->header->getRange();
+					$header = $ctrl->header->createRange($ranges, $numRec);
+					$response = $fs->search($keyword, $ranges['start'], $ranges['end']);
+				}
+				else {
+					$response = $fs->get($resource);
+				}
+				break;
+			case 'POST':
+				if ($resource) {
+					$response = $fs->copy($resource, $data->parId);
+				}
+				else {
+					$response = $fs->create($data);
+				}
+				break;
+			case 'PUT':
+				$response = $fs->update($data);
+				break;
+			case 'DELETE':
+				$response = $fs->del($resource);
+				break;
+		}
 	}
-}
-else {
-	$err->set(0, 'not a resource');
+
 }
 
 // resource found and processed
