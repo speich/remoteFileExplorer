@@ -5,9 +5,8 @@ define([
 ], function(declare, construct, Dialog) {
 
 	/**
-	 * @class
-	 * @name rfe.DialogFileProperties
-	 * @extends {DialogConfirm/DialogConfirm}
+	 * @class rfe.DialogFileProperties
+	 * @extends {DialogConfirm}
 	 * @property {string} type type of dialog
 	 * @property {boolean} hasUnderlay create the dialog underlay?
 	 */
@@ -16,6 +15,7 @@ define([
 		type: 'fileProperties',
 		hasUnderlay: false,
 		hasSkipCheckBox: false,
+		hasCancelButton: false,
 
 		_setContentAttr: function(fileObj) {
 			var prop, strTbl = '<table class="tblFileProperties">';
