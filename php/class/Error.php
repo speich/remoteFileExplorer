@@ -71,7 +71,7 @@ class Error {
 		$json = '[';
 		foreach ($errs as $key => $err) {
 			// json_encode does not work if arr contains null
-			$msg = 'Fehler: '.$err['msg'];
+			$msg = 'Error: '.$err['msg'];
 			if ($err['line'] > 0) {
 				$msg.= ' in '.$err['file'].' on line '.$err['line'];
 			}
