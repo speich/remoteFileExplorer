@@ -22,7 +22,8 @@ $ctrl->contentType = 'json';
 $response = false;
 $header = false;
 
-if ($resource) {
+
+if ($resource && file_exists($rfeConfig['paths']['fileSystemRoot'].ltrim($resource, '/'))) {
 
 	$imgTool = new img\ImageTool();
 
@@ -66,13 +67,10 @@ else {
 	$ctrl->notFound = true;
 }
 
-if ($err->get()) {
-	$ctrl->printHeader();
-	$ctrl->printBody();
-}
-else {
-	ob_start();
 	header('Content-Type: image/jpeg');	// thumbnails are always jpg
+	if ($err->get()) {
+		readfile($rfeConfig['paths']['webroot'].'js/resources/images/icons-64/file-image.png');
+	}
+else {
 	readfile($rfeConfig['paths']['thumbnailCache'].$id.".jpg");
-	ob_end_flush();
 }

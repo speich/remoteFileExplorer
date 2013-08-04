@@ -94,7 +94,8 @@ define([
 				case 'image':
 					img.className = 'iconImage';
 					img.src = this.services.thumbnail + obj.id + '?w=' + this.iconWidth;
-					img.width = this.iconWidth;
+					//img.width = this.iconWidth;
+					img.removeAttribute('width');
 					img.removeAttribute('height');
 					break;
 				case 'video':
