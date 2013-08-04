@@ -98,42 +98,6 @@ define([
 					object = sourceSource.getObject(node);	// TODO: do not use source.getObject, since node is a grid row (no item.data.item)
 					fileStore.pasteItem(object, oldParentObject, newParentObject, copy);
 				});
-			},
-
-			_isParentChildDrop: function(source, targetRow){
-				// summary:
-				//		Checks whether the dragged items are parent rows in the tree which are being
-				//		dragged into their own children.
-				//
-				// source:
-				//		The DragSource object.
-				//
-				// targetRow:
-				//		The tree row onto which the dragged nodes are being dropped.
-				//
-				// tags:
-				//		private
-
-				// Note: overriding to enable also checking when dropping from the grid
-
-				// If the dragged object is not coming from the tree this widget belongs to,
-				// it cannot be invalid.
-				if(!source.tree || source.tree !== this.tree){
-					return false;
-				}
-
-
-				var root = source.tree.domNode,
-					ids = source.selection,
-					node = targetRow.parentNode;
-
-				// Iterate up the DOM hierarchy from the target drop row,
-				// checking if it has the same ID as any of the selected nodes.
-				while(node !== root && !ids[node.id]){
-					node = node.parentNode;
-				}
-
-				return node.id && ids[node.id];
 			}
 
 		});
