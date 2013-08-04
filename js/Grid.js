@@ -95,34 +95,11 @@ define([
 			});
 			this.bodyNode.tabIndex = this.tabIndex;
 
-			this.initEvents();
-
-			topic.subscribe('grid/views/state', lang.hitch(this, function(view) {
+		topic.subscribe('grid/views/state', lang.hitch(this, function(view) {
 				this.set('view', view);
 			}));
 			this.set('showHeader', true);	// if headers are renderered is taken car of in setView
 			this.set('view', this.view);
-		},
-
-		initEvents: function() {
-			var rfe = this.rfe;
-
-			on(this.contentNode, 'keydown', function(evt) {
-				var fnc, keyCode = evt.keyCode,
-					nodeType = evt.target.nodeName.toLowerCase();
-
-				if (nodeType === 'input' || nodeType === 'textarea') {
-					// prevent calling delete
-					return;
-				}
-				fnc = {
-					46: rfe.del // delete key // TODO: mac is same keyCode?
-				}[keyCode];
-
-				if (typeof(fnc) !== 'undefined') {
-					fnc.apply(rfe, arguments);
-				}
-			});
 		},
 
 		/**
