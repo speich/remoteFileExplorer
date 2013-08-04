@@ -183,9 +183,9 @@ class FileSession extends FileSystem {
 		if (array_key_exists($resource, $fs)) {
 			// if $item has children, delete all children too
 			if (array_key_exists('dir', $fs[$resource])) {
-				for ($i = 0, $len = count($fs); $i < $len; $i++) {
-					if (isset($fs[$i]['parId']) && $fs[$i]['parId'] == $resource) {
-						unset($fs[$i]);
+				foreach ($fs as $key => $file) {
+					if (isset($file['parId']) && $file['parId'] == $resource) {
+						unset($fs[$key]);
 					}
 				}
 			}
