@@ -1,6 +1,5 @@
 define([
 	'dojo/_base/lang',
-	'dojo/_base/array',
 	'dojo/_base/declare',
 	'dojo/Deferred',
 	'dojo/when',
@@ -14,13 +13,15 @@ define([
 	'dojo/query',	// required for dojo/on event delegation
 	'dojo/Stateful',
 	'dijit/registry',
+	'rfe/_Base',
 	'rfe/Layout',
+	'rfe/History',
 	'rfe/Edit',
 	'rfe/store/FileStore',
 	'rfe/dialogs/dialogs',
 	'rfe/dnd/Manager'	// needs to be loaded for dnd
-], function(lang, array, declare, Deferred, when, cookie, keys, dom, domClass, locale, on, topic, query, Stateful,
-				registry, Layout, Edit, FileStore, dialogs) {
+], function(lang, declare, Deferred, when, cookie, keys, dom, domClass, locale, on, topic, query, Stateful,
+				registry, _Base, Layout, History, Edit, FileStore, dialogs) {
 
 	/**
 	 * A module that creates an application that allows you to manage and browse files and directories on a remote web server.
@@ -39,10 +40,10 @@ define([
 	 * @property {string} versionDate
 	 * @property {dojo/Stateful} currentTreeObject keeps track of currently selected store object in tree. Equals always parent of grid items
 	 * @property {dojo/Stateful} context keeps track of widget the context menu was created on (right clicked on)
-	 * @config {boolean} isOnGrid
-	 * @config {boolean} isOnTree
-	 * @config {boolean} isOnGridPane
-	 * @config {boolean} isOnTreePane
+	 * @config {boolean} isOnGridRow
+	 * @config {boolean} isOnTreeRow
+	 * @config {boolean} isOnGridContainer
+	 * @config {boolean} isOnTreeContainer
 	 * @property {object} history
 	 * @config {array} steps saves the steps
 	 * @config {int} curIdx index of current step we're on
@@ -50,29 +51,22 @@ define([
 	 * @property {rfe/store/FileStore} store
 	 *
 	 */
-	return declare([Layout, Edit], {
+	return declare([_Base, History, Layout, Edit], {
 		version: '0.9',
 		versionDate: '2013',
 		currentTreeObject: null,
 		context: null,
-		history: null,
 		store: null,
 
-		/** @constructor  */
 		constructor: function() {
 			// TODO: should tree connect also on right click as grid? If so, attache event to set currentTreeItem
 			this.currentTreeObject = new Stateful();	// allows Toolbar and Edit to keep track of selected object in tree
-			this.history = {
-				steps: [],
-				curIdx: null,
-				numSteps: 5
-			};
 			this.store = new FileStore();
 			this.context = {
-				isOnGrid: false,
-				isOnGridPane: false,
-				isOnTree: false,
-				isOnTreePane: false
+				isOnGridRow: false,
+				isOnGridContainer: false,
+				isOnTreeRow: false,
+				isOnTreeContainer: false
 			};
 			this.domNode = dom.byId(this.id);	// TODO: remove when using dijit._WidgetBase
 		},
@@ -90,7 +84,7 @@ define([
 
 			tree.on('click', function(object) {	// when calling tree.on(click, load) at once object is not passed
 				self.displayChildrenInGrid(object);
-				self.setHistory(object.id);
+				self.set('history', object.id);
 				self.currentTreeObject.set(object);
 			});
 			tree.on('load', lang.hitch(this, this.initState));
@@ -99,7 +93,7 @@ define([
 				var obj = grid.row(evt.target).data;
 				if (obj.dir){
 					self.display(obj);
-					self.setHistory(obj.id);
+					self.set('history', obj.id);
 				}
 			});
 			grid.on('dgrid-datachange', function(evt) {
@@ -116,8 +110,10 @@ define([
 
 			// TODO: Set context on keyboard navigation too
 			on(this.panes.domNode, '.rfeTreePane:mousedown, .rfeGridPane:mousedown', function(evt) {
-				lang.hitch(self, self._setContext(evt, this));
+				lang.hitch(self, self.set('context', evt, this));
 			});
+
+			//on(this.domNode, '.dgrid-content:keydown, .dijitTreeContainer:keydown', lang.hitch(this, '_onKeyDown'));
 		},
 
 		/**
@@ -211,67 +207,39 @@ define([
 		},
 
 		/**
-		 * Adds current object id to history.
-		 * @param {string} itemId id of JsonRestStore object
+		 * Handle key events on grid and tree.
+		 * @private
 		 */
-		setHistory: function(itemId) {
-			var hist = this.history;
+		_onKeyDown: function(evt) {
+			this.set('context', evt, this);
 
-			// first use: initialize history array
-			if (hist.curIdx === null) {
-				hist.curIdx = 0;
+			switch(evt.keyCode){
+				case keys.DELETE:
 			}
-			// move index since we have not used up all available steps yet
-			else if (hist.curIdx < hist.numSteps) {
-				hist.curIdx++;
-			}
-			// back button used: reset hist array
-			if (hist.curIdx < hist.steps.length - 1) {
-				hist.steps = hist.steps.slice(0, hist.curIdx);
-			}
-			// keep hist array at constant length of number of steps
-			if (hist.steps.length === hist.numSteps + 1) {
-				hist.steps.shift();
-			}
-			hist.steps.push(itemId);
+
+
+				var rfe = this.rfe;
+
+				on(this.contentNode, 'keydown', function(evt) {
+					var fnc, keyCode = evt.keyCode,
+						nodeType = evt.target.nodeName.toLowerCase();
+
+					if (nodeType === 'input' || nodeType === 'textarea') {
+						// prevent calling delete
+						return;
+					}
+					fnc = {
+						46: rfe.del // delete key // TODO: mac is same keyCode?
+					}[keyCode];
+
+					if (typeof(fnc) !== 'undefined') {
+						fnc.apply(rfe, arguments);
+					}
+				});
+
 		},
 
-		/**
-		 * Remove object form history.
-		 * @param {string} itemId
-		 */
-		removeHistory: function(itemId) {
-			var hist = this.history;
-			hist.steps = array.filter(hist.steps, function(object) {
-				return object !== itemId;
-			});
-			hist.curIdx--;
-		},
 
-		/**
-		 * Go back or forward in history.
-		 * @param {string} direction
-		 * @return {object} dojo.Deferred
-		 */
-		goHistory: function(direction) {
-			var def = new Deferred(),
-				hist = this.history,
-				id = null;
-			if (direction === 'back' && hist.curIdx > 0) {
-				id = hist.steps[--hist.curIdx];
-			}
-			else if (direction === 'forward' && hist.curIdx < hist.steps.length) {
-				id = hist.steps[++hist.curIdx];
-			}
-			if (id !== null) {
-				return when(this.store.get(id), lang.hitch(this, function(object) {
-					return this.display(object);
-				}));
-			}
-			else {
-				return def;
-			}
-		},
 
 		/**
 		 * Returns the current date.
@@ -295,12 +263,11 @@ define([
 				isTreeRow = widget && widget.baseClass === 'dijitTreeNode';
 
 			this.context = {
-				isOnGrid: isGridRow,
-				isOnGridPane: domClass.contains(node, 'rfeGridPane') && !isGridRow,
-				isOnTree: isTreeRow,
-				isOnTreePane: domClass.contains(node, 'rfeTreePane') && !isTreeRow
+				isOnGridRow: isGridRow,
+				isOnGridContainer: domClass.contains(node, 'rfeGridPane') && !isGridRow,
+				isOnTreeRow: isTreeRow,
+				isOnTreeContainer: domClass.contains(node, 'rfeTreePane') && !isTreeRow
 			};
-			topic.publish('rfe/context/set', this.context);
 		},
 
 		/**
@@ -333,8 +300,8 @@ define([
 					this.currentTreeObject.set(object);
 				}));
 
-				this.context.isOnTree = true;
-				this.setHistory(id);   // do not set history in display() since history uses display too in goHistory()
+				this.context.isOnTreeRow = true;
+				this.set('history', id);   // do not set history in display() since history uses display too in goHistory()
 			}));
 		},
 
@@ -342,7 +309,7 @@ define([
 			// Note: A visible file/folder object is always loaded
 			var dialog, id, store = this.store,
 				i = 0, len,
-				widget = this.context.isOnGrid || this.context.isOnGridPane ? this.grid : this.tree;
+				widget = this.context.isOnGridRow || this.context.isOnGridContainer ? this.grid : this.tree;
 
 			// TODO: if multiple selected file objects, only use one dialog with multiple values (and sum of all file sizes). Requires preloading folder contents first!
 			// grid

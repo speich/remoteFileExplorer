@@ -34,7 +34,7 @@ define([
 				});
 				dfd.then(function() {
 					self.removeHistory(id);
-					if (self.context.isOnTree || self.context.isOnTreePane) {
+					if (self.context.isOnTreeRow || self.context.isOnTreeContainer) {
 						obj = self.store.storeMemory.get(parId);
 						self.display(obj);
 					}
@@ -47,7 +47,7 @@ define([
 				};
 			}
 
-			if (this.context.isOnGrid || this.context.isOnGridPane) {
+			if (this.context.isOnGridRow || this.context.isOnGridContainer) {
 				widget = this.grid;
 				selection =  widget.selection;
 				for (id in selection) {
@@ -92,13 +92,13 @@ define([
 		 * @param {object} object file/folder object
 		 */
 		createRename: function(object) {
-			var widget = this.context.isOnGrid || this.context.isOnGridPane ? this.grid : this.tree,
+			var widget = this.context.isOnGridRow || this.context.isOnGridContainer ? this.grid : this.tree,
 				store = this.store;
 
 			return this.create(object).then(lang.hitch(this, function(object) {
 				var element, column;
 
-				if (this.context.isOnGrid || this.context.isOnGridPane) {
+				if (this.context.isOnGridRow || this.context.isOnGridContainer) {
 					column = widget.columns[store.labelAttr];
 					element = widget.get('editableElement', object.id, column.field);
 					widget.edit(element);
@@ -112,7 +112,7 @@ define([
 		rename: function() {
 			// TODO: make this work also for the tree which doesn't have the same selection object. Use dijit.inlineEditBox
 			// tree's selection is widget.selectedItems which is array of store objects
-			var widget = this.context.isOnGrid || this.context.isOnGridPane ? this.grid : this.tree,
+			var widget = this.context.isOnGridRow || this.context.isOnGridContainer ? this.grid : this.tree,
 				store = this.store,
 				column = widget.columns[store.labelAttr],
 				element,
