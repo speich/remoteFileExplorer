@@ -110,10 +110,13 @@ define([
 
 			// TODO: Set context on keyboard navigation too
 			on(this.panes.domNode, '.rfeTreePane:mousedown, .rfeGridPane:mousedown', function(evt) {
-				lang.hitch(self, self.set('context', evt, this));
+				self.set('context', evt, this);
 			});
 
-			//on(this.domNode, '.dgrid-content:keydown, .dijitTreeContainer:keydown', lang.hitch(this, '_onKeyDown'));
+			on(this.domNode, '.dgrid-content:keydown, .dijitTreeContainer:keydown',  function(evt) {
+				self.set('context', evt, this);
+				self._onKeyDown(evt, this);
+			});
 		},
 
 		/**
@@ -210,40 +213,25 @@ define([
 		 * Handle key events on grid and tree.
 		 * @private
 		 */
-		_onKeyDown: function(evt) {
-			this.set('context', evt, this);
+		_onKeyDown: function(evt, sourceNode) {
+
+			var nodeType = evt.target.nodeName.toLowerCase();
+
+			if (nodeType === 'input' || nodeType === 'textarea') {
+				// prevent calling delete
+				return;
+			}
 
 			switch(evt.keyCode){
 				case keys.DELETE:
+					this.del();
+					break;
 			}
-
-
-				var rfe = this.rfe;
-
-				on(this.contentNode, 'keydown', function(evt) {
-					var fnc, keyCode = evt.keyCode,
-						nodeType = evt.target.nodeName.toLowerCase();
-
-					if (nodeType === 'input' || nodeType === 'textarea') {
-						// prevent calling delete
-						return;
-					}
-					fnc = {
-						46: rfe.del // delete key // TODO: mac is same keyCode?
-					}[keyCode];
-
-					if (typeof(fnc) !== 'undefined') {
-						fnc.apply(rfe, arguments);
-					}
-				});
-
 		},
-
-
 
 		/**
 		 * Returns the current date.
-		 * @return {string} formated date
+		 * @return {string} formatted date
 		 */
 		getDate: function() {
 			return locale.format(new Date(), {
