@@ -46,7 +46,7 @@ define([
 					var def = rfe.goDirUp();
 					def.then(function(object) {
 						if (object) {
-							rfe.setHistory(rfe.currentTreeObject.id);
+							rfe.set('history', rfe.currentTreeObject.id);
 						}
 					});
 				}
@@ -65,7 +65,7 @@ define([
 					rfe.goHistory('back');
 				}
 			});
-			aspect.after(rfe, 'setHistory', function() {
+			rfe.watch('history', function() {
 				bt2.set('disabled', rfe.history.steps.length < 2);
 			});
 			aspect.after(rfe, 'goHistory', function() {
@@ -115,8 +115,7 @@ define([
 					// value shoud be name of store object property to be sorted
 					{ label: 'file name', value: 'name', selected: true },
 					{ label: 'size', value: 'size' },
-					{ label: 'modification date', value: 'mod' },
-					{ label: 'type', value: 'mime' }
+					{ label: 'modification date', value: 'mod' }
 				]
 			}).placeAt(div);
 			bt4 = new Button({
@@ -144,10 +143,12 @@ define([
 				signal.remove();
 				// grid not initialized yet, so we can't do this directly
 				aspect.after(rfe.grid, '_setSort', function(arrSort) {
-					var sortObj = arrSort[1] || arrSort[0];
+					if (arrSort && arrSort.length > 0) {	// set sort is also called by set('query') which doesn't mean user clicked sorting -> arrSort is undefined
+						var sortObj = arrSort[1] || arrSort[0];
 
-					bt4.set('iconClass', 'rfeIcon rfeToolbarIconSort' + (sortObj.descending ? 'Desc' : 'Asc'));
-					selSort.set('value', sortObj.attribute);
+						bt4.set('iconClass', 'rfeIcon rfeToolbarIconSort' + (sortObj.descending ? 'Desc' : 'Asc'));
+						selSort.set('value', sortObj.attribute);
+					}
 				}, true);
 			});
 		},
