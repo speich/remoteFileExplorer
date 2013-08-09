@@ -1,11 +1,10 @@
 define([
-	'dojo/_base/lang',
 	'dojo/_base/declare',
 	'dojo/_base/array',
 	'dojo/Deferred',
 	'dojo/when'
 ],
-function(lang, declare, array, Deferred, when) {
+function(declare, array, Deferred, when) {
 	'use strict';
 
 	return declare(null, {
@@ -16,7 +15,7 @@ function(lang, declare, array, Deferred, when) {
 			this.history = {
 				steps: [],
 				curIdx: null,
-				numSteps: 5
+				numSteps: 10
 			};
 		},
 
@@ -44,6 +43,7 @@ function(lang, declare, array, Deferred, when) {
 				hist.steps.shift();
 			}
 			hist.steps.push(itemId);
+			history.pushState('', '', this.origPageUrl + itemId + window.location.search);
 		},
 
 		/**
@@ -66,7 +66,9 @@ function(lang, declare, array, Deferred, when) {
 		goHistory: function(direction) {
 			var def = new Deferred(),
 			hist = this.history,
-			id = null;
+			id = null,
+			self = this;
+
 			if (direction === 'back' && hist.curIdx > 0) {
 				id = hist.steps[--hist.curIdx];
 			}
@@ -74,13 +76,16 @@ function(lang, declare, array, Deferred, when) {
 				id = hist.steps[++hist.curIdx];
 			}
 			if (id !== null) {
-				return when(this.store.get(id), lang.hitch(this, function(object) {
-					return this.display(object);
-				}));
+				return when(this.store.get(id), function(object) {
+					return self.display(object).then(function() {
+						window.history.pushState('', '', self.origPageUrl + id + window.location.search);
+					})
+				});
 			}
 			else {
 				return def;
 			}
 		}
+
 	});
 });

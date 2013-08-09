@@ -40,6 +40,7 @@ define([
 
 		/**
 		 * Returns paths of nodes that were selected previously and saved in a cookie.
+		 * If no path is found returns empty array.
 		 * @return {Array} paths
 		 */
 		loadPaths: function() {

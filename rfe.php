@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <title>Remote File Explorer (rfe)</title>
-<link rel="stylesheet" type="text/css" href="dojo/1.9.1/dijit/themes/claro/document.css">
-<link rel="stylesheet" type="text/css" href="dojo/1.9.1/dijit/themes/claro/claro.css">
-<link rel="stylesheet" href="dgrid/css/skins/claro.css">
-<link rel="stylesheet" href="js/resources/reset.css">
-<link rel="stylesheet" href="js/resources/rfe.css">
+<link rel="stylesheet" type="text/css" href="/dojo/1.9.1/dijit/themes/claro/document.css">
+<link rel="stylesheet" type="text/css" href="/dojo/1.9.1/dijit/themes/claro/claro.css">
+<link rel="stylesheet" href="/dgrid/css/skins/claro.css">
+<link rel="stylesheet" href="/js/resources/reset.css">
+<link rel="stylesheet" href="/js/resources/rfe.css">
 </head>
 
 <body class="claro rfe">
@@ -24,19 +24,20 @@ var dojoConfig = {
 	],
 	map: {
 		// redirect the following modules to my own modules
-	  	'dijit/tree': {
+		'dijit/tree': {
 			'dijit/tree/_dndSelector': 'rfe/dnd/TreeSelector',
-      	'dijit/tree/dndSource': 'rfe/dnd/TreeSource'
+			'dijit/tree/dndSource': 'rfe/dnd/TreeSource'
 		}
 	}
 };
 </script>
-<script type="text/javascript" src="dojo/1.9.1/dojo/dojo.js"></script>
+<script type="text/javascript" src="/dojo/1.9.1/dojo/dojo.js"></script>
 <script type="text/javascript">
 require(['dojo/ready', 'rfe/FileExplorer'], function(ready, FileExplorer) {
 	ready(function() {
 		var rfe = new FileExplorer({
-			id: 'remoteFileExplorer'
+			id: 'remoteFileExplorer',
+			origPageUrl: '/rfe.php'
 		});
 		rfe.startup();
 	});

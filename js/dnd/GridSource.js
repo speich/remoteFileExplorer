@@ -10,8 +10,7 @@ function(declare, lang, when, on, mouse, DnDSource) {
 
 	/**
 	 * Class to handle drag and drop of the dgrid.
-	 * @class
-	 * @name rfe.dnd.GridSource
+	 * @class rfe.dnd.GridSource
 	 * @extends {dojo.dnd.Source}
 	 * @see dgrid/extensions/DnD.js
 	 * @property {OnDemandGrid} grid

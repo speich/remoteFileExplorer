@@ -11,6 +11,7 @@ define([
 	'dojo/on',
 	'dojo/topic',
 	'dojo/query',	// required for dojo/on event delegation
+	'dojo/io-query',
 	'dojo/Stateful',
 	'dijit/registry',
 	'rfe/_Base',
@@ -20,7 +21,7 @@ define([
 	'rfe/store/FileStore',
 	'rfe/dialogs/dialogs',
 	'rfe/dnd/Manager'	// needs to be loaded for dnd
-], function(lang, declare, Deferred, when, cookie, keys, dom, domClass, locale, on, topic, query, Stateful,
+], function(lang, declare, Deferred, when, cookie, keys, dom, domClass, locale, on, topic, query, ioQuery, Stateful,
 				registry, _Base, Layout, History, Edit, FileStore, dialogs) {
 
 	/**
@@ -29,7 +30,6 @@ define([
 	 * @module FileExplorer rfe/FileExplorer
 	 */
 
-	// TODO: use dijit._WidgetBase
 	// TODO: multiselect (in tree allow only of files but not of folders)
 
 	/*
@@ -58,6 +58,12 @@ define([
 		context: null,
 		store: null,
 
+		/**
+		 * Need to know the page url in order to know which part of path is resource to load into app
+		 * @param {string} origPageUrl url of application without path to a file/folder
+		 **/
+		origPageUrl: '/',
+
 		constructor: function() {
 			// TODO: should tree connect also on right click as grid? If so, attache event to set currentTreeItem
 			this.currentTreeObject = new Stateful();	// allows Toolbar and Edit to keep track of selected object in tree
@@ -68,7 +74,7 @@ define([
 				isOnTreeRow: false,
 				isOnTreeContainer: false
 			};
-			this.domNode = dom.byId(this.id);	// TODO: remove when using dijit._WidgetBase
+			this.domNode = dom.byId(this.id);
 		},
 
 		startup: function() {
@@ -83,17 +89,19 @@ define([
 				store = this.store;
 
 			tree.on('click', function(object) {	// when calling tree.on(click, load) at once object is not passed
-				self.displayChildrenInGrid(object);
-				self.set('history', object.id);
-				self.currentTreeObject.set(object);
+				self.displayChildrenInGrid(object).then(function() {
+					self.currentTreeObject.set(object);
+					self.set('history', object.id);
+				});
 			});
 			tree.on('load', lang.hitch(this, this.initState));
 
 			grid.on('.dgrid-row:dblclick', function(evt) {
-				var obj = grid.row(evt.target).data;
-				if (obj.dir){
-					self.display(obj);
-					self.set('history', obj.id);
+				var object = grid.row(evt.target).data;
+				if (object.dir){
+					self.display(object).then(function() {
+						self.set('history', object.id);
+					});
 				}
 			});
 			grid.on('dgrid-datachange', function(evt) {
@@ -108,7 +116,6 @@ define([
 				});
 			});
 
-			// TODO: Set context on keyboard navigation too
 			on(this.panes.domNode, '.rfeTreePane:mousedown, .rfeGridPane:mousedown', function(evt) {
 				self.set('context', evt, this);
 			});
@@ -223,6 +230,7 @@ define([
 			}
 
 			switch(evt.keyCode){
+				// TODO: copy, paste, cut
 				case keys.DELETE:
 					this.del();
 					break;
@@ -263,11 +271,16 @@ define([
 		 * Expects the tree to be loaded and expanded otherwise it will be set to root, then displays the correct folder in the grid.
 		 */
 		initState: function() {
-			var tree = this.tree, grid = this.grid, store = this.store,
-				object, arr, id, paths;
+			var object, arr, id,
+				tree = this.tree,
+				grid = this.grid,
+				store = this.store,
+				path = window.location.pathname.replace(this.origPageUrl, ''),
+				paths = this.tree.loadPaths();
 
-			paths = this.tree.loadPaths();
-			tree.set('paths', paths).then(lang.hitch(this, function(){
+			paths = path !== '' ? [[tree.rootNode.item.id, path]] : paths;
+
+			tree.set('paths', paths).then(lang.hitch(this, function() {
 				if (paths.length > 0) {
 					// we only use last object in array to set the folders in the grid (normally there would be one selection only anyway)
 					arr = paths.pop();
@@ -280,16 +293,16 @@ define([
 				}
 
 				when(store.get(id), lang.hitch(this, function(object) {
-					when(store.getChildren(object), function() {	// load children first before setting store
+					when(store.getChildren(object), lang.hitch(this, function() {	// load children first before setting store
 						// Setting caching store for grid would not use cache, because cache.query() always uses the
 						// master store => use storeMemory.
 						grid.set('store', store.storeMemory, { parId: id });
-					});
+						this.set('history', id);
+					}));
 					this.currentTreeObject.set(object);
 				}));
 
 				this.context.isOnTreeRow = true;
-				this.set('history', id);   // do not set history in display() since history uses display too in goHistory()
 			}));
 		},
 
@@ -297,13 +310,14 @@ define([
 			// Note: A visible file/folder object is always loaded
 			var dialog, id, store = this.store,
 				i = 0, len,
-				widget = this.context.isOnGridRow || this.context.isOnGridContainer ? this.grid : this.tree;
+				widget = this.context.isOnGridRow || this.context.isOnGridContainer ? this.grid : this.tree,
+				sel = widget.selection;
 
 			// TODO: if multiple selected file objects, only use one dialog with multiple values (and sum of all file sizes). Requires preloading folder contents first!
 			// grid
-			if (widget.selection) {
-				for (id in widget.selection) {
-					if (widget.selection[id] === true) {
+			if (sel) {
+				for (id in sel) {
+					if (sel[id] === true) {
 						dialog = dialogs.getByFileObj('fileProperties', store.get(id));
 						dialog.show();
 					}
