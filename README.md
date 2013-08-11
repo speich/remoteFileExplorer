@@ -13,6 +13,7 @@ Working [demo of the remoteFileExplorer](http://www.speich.net/projects/programm
 * vertical or horizontal layout with or without navigation pane (tree view)
 * searching for files and folders
 * sorting of files and folders
+* access folders and files directly over the address bar of the browser
 * net panel logging all requests and server errors
 * remember opened folder and selection state
 * server side automatic generation of thumbnails with caching
@@ -30,4 +31,3 @@ Requires the following additional extensions to be loaded:
 * php_mbstring.dll
 * php_exif
 * php_pdo_sqlite.dll
-

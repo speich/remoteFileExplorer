@@ -7,6 +7,8 @@ define([
 	'dojo/_base/declare',
 	'dojo/_base/lang',
 	'dojo/when',
+	'dojo/Deferred',
+	'dojo/promise/all',
 	'dojo/aspect',
 	'dojo/_base/array',
 	'dojo/store/Memory',
@@ -14,7 +16,7 @@ define([
 	'dojo/store/Observable',
 	'dojo/store/Cache',
 	'dijit/tree/ObjectStoreModel'
-], function(declare, lang, when, aspect, array, Memory, JsonRest, Observable, Cache, ObjectStoreModel) {
+], function(declare, lang, when, Deferred, all, aspect, array, Memory, JsonRest, Observable, Cache, ObjectStoreModel) {
 
 	// references for MonkeyPatching the store.Cache
 	var refPut, refDel, refAdd;
@@ -51,14 +53,18 @@ define([
 			storeMaster = new JsonRest({
 				target: require.toUrl('rfe-php') + '/services/filesystem.php'
 			});
-			this.storeMaster = storeMaster;
+			this.storeMaster = lang.delegate(storeMaster, {
+				getPath: lang.hitch(this, this._getPath)
+			});
 
 			storeMemory = new Observable(new Memory({
 				parentAttr: this.parentAttr,
 				childrenAttr: this.childrenAttr,
 				labelAttr: this.labelAttr
 			}));
-			this.storeMemory = storeMemory;
+			this.storeMemory = lang.delegate(storeMemory, {
+				getPath: lang.hitch(this, this._getPathFromCache)
+			});
 
 			storeCache = new Cache(storeMaster, storeMemory);
 			refPut = storeCache.put;
@@ -92,7 +98,6 @@ define([
 				object[self.parentAttr] = oldParentId;
 			});
 		},
-
 
 		add: function(object, options) {
 			var self = this;
@@ -243,20 +248,52 @@ define([
 
 
 		/**
-		 * Find all ids of and item's parents and return them as an array.
+		 * Find all id parent id of an item in the cache and return them as an array.
+		 * Assumes that if an item is loaded all it's parent items must be loaded to.
 		 * Includes the item's own id in the path.
 		 * @param {object} object
+		 * @private
 		 * @return {Array}
 		 */
-		getPath: function(object) {
+		_getPathFromCache: function(object) {
+			// TODO: add this to subclassed memory store instead?
 			var store = this.storeMemory, arr = [];
+
 			while (object[this.parentAttr]) {
 				// Convert ids to string, since tree.set(path) expects strings
 				arr.unshift(String(object[this.idProperty]));
 				object = store.get(object[this.parentAttr]);
 			}
 			arr.unshift(String(object[this.idProperty]));
+
 			return arr;
+		},
+
+		/**
+		 * Recursively load all parent objects and return their paths.
+		 * @param object
+		 * @returns {dojo/promise}
+		 * @private
+		 */
+		_getPath: function(object) {
+			var self = this,
+				arr = [],
+				dfd = new Deferred();
+
+			function loadParent(object) {
+				if (object[self.parentAttr]) {
+					arr.unshift(String(object[self.idProperty]));
+					return when(self.get(object[self.parentAttr]), function(object) {
+						return loadParent(object);
+					});
+				}
+				else {
+					arr.unshift(self.rootId);
+					return dfd.resolve(arr);
+				}
+			}
+
+			return loadParent(object);
 		},
 
 

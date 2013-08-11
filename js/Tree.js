@@ -74,7 +74,10 @@ define([
 			selects.push(arr.join(this.pathSeparator));
 
 			if (this.persist && selects.length > 0) {
-				cookie(this.cookieNameSelNodes, selects.join(this.multiplePathSeparator), {expires: 365});
+				cookie(this.cookieNameSelNodes, selects.join(this.multiplePathSeparator), {
+					expires: 365,
+					path: '/'
+				});
 			}
 		}
 

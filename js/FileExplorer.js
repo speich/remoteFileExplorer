@@ -96,12 +96,15 @@ define([
 			});
 			tree.on('load', lang.hitch(this, this.initState));
 
-			grid.on('.dgrid-row:dblclick', function(evt) {
+			grid.on('.dgrid-row:click, .dgrid-row:dblclick', function(evt) {
 				var object = grid.row(evt.target).data;
-				if (object.dir){
+				if (evt.type == 'dblclick' && object.dir){
 					self.display(object).then(function() {
 						self.set('history', object.id);
 					});
+				}
+				else {
+					self.set('history', object.id);
 				}
 			});
 			grid.on('dgrid-datachange', function(evt) {
@@ -158,7 +161,7 @@ define([
 		display: function(object) {
 			var path, dfd = new Deferred();
 			if (object.dir) {
-				path = this.store.getPath(object);
+				path = this.store.storeMemory.getPath(object);
 				dfd = this.tree.set('path', path);
 			}
 			else {
@@ -271,39 +274,74 @@ define([
 		 * Expects the tree to be loaded and expanded otherwise it will be set to root, then displays the correct folder in the grid.
 		 */
 		initState: function() {
-			var object, arr, id,
+			var self = this, arr, id,
 				tree = this.tree,
 				grid = this.grid,
 				store = this.store,
+				file = false,
 				path = window.location.pathname.replace(this.origPageUrl, ''),
+				paths,
+				dfd = new Deferred();
+
+			// id form url, can either be a file or a folder
+			if (path !== '') {
+				// load all parent paths since path can also just be an id instead of a full hierarchical file path
+				dfd = when(store.get(path), function(object) {
+					return store.storeMaster.getPath(object).then(function(paths) {
+						if (object.dir) {
+							id = object.id;
+						}
+						else {
+							file = object;
+							id = object.parId; // display parent folder of file in tree
+							paths.pop();
+						}
+						return [paths];
+					});
+				});
+			}
+			// id from cookie
+			else {
 				paths = this.tree.loadPaths();
-
-			paths = path !== '' ? [[tree.rootNode.item.id, path]] : paths;
-
-			tree.set('paths', paths).then(lang.hitch(this, function() {
 				if (paths.length > 0) {
 					// we only use last object in array to set the folders in the grid (normally there would be one selection only anyway)
-					arr = paths.pop();
-					id = arr[arr.length - 1];
+					arr = paths[paths.length - 1];
+					id = path = arr[arr.length - 1];
 				}
+				// use tree root
 				else {
-					// no cookie available use root
-					object = tree.rootNode.item;
-					id = object.id;
+					id = tree.rootNode.item.id;
 				}
+				dfd.resolve(paths);
+			}
 
-				when(store.get(id), lang.hitch(this, function(object) {
-					when(store.getChildren(object), lang.hitch(this, function() {	// load children first before setting store
+			// expand all paths
+			dfd = dfd.then(function(paths) {
+				return tree.set('paths', paths);
+			});
+			// get object from id of last item in path
+			dfd = dfd.then(function() {
+				return when(store.get(id), function(object) {
+					self.set('history', path);
+					self.currentTreeObject.set(object);
+					self.context.isOnTreeRow = true;
+					return object;
+				});
+			});
+			// get objects children and display them in grid
+			dfd = dfd.then(function(object) {
+					// TODO: when object is a file get parent object's children
+					return when(store.getChildren(object), function() {	// load children puts them in the cache, then set grid's store
 						// Setting caching store for grid would not use cache, because cache.query() always uses the
 						// master store => use storeMemory.
 						grid.set('store', store.storeMemory, { parId: id });
-						this.set('history', id);
-					}));
-					this.currentTreeObject.set(object);
-				}));
-
-				this.context.isOnTreeRow = true;
-			}));
+						if (file) {
+							var row = grid.row(file.id);
+							grid.select(row);
+						}
+					});
+			});
+			return dfd;
 		},
 
 		showFileDetails: function() {
