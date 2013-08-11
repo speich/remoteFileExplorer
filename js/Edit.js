@@ -26,14 +26,15 @@ define([
 
 			function remove(id, parId) {
 				// note: remove creates closure for id in loop
-				var dfd, obj, dialog;
-				dialog = dialogs.getByFileObj('deleteFile', store.storeMemory.get(id));
-				dfd = dialog.show();
-				dfd = dfd.then(function() {
+				var obj = store.storeMemory.get(id),
+					dialog = dialogs.getByFileObj('deleteFile', obj);
+
+				dialog.show().then(function() {
 					return store.remove(id);
-				});
-				dfd.then(function() {
+				}).then(function() {
 					self.removeHistory(id);
+					// point address bar (history) to parent folder of deleted
+					window.history.pushState('', '', self.origPageUrl + obj.parId + window.location.search);
 					if (self.context.isOnTreeRow || self.context.isOnTreeContainer) {
 						obj = self.store.storeMemory.get(parId);
 						self.display(obj);
