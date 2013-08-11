@@ -97,7 +97,7 @@ function(declare, lang, when, on, mouse, DnDSource) {
 				targetSource = this,
 				oldParentObject;
 
-			// Don't bother continuing if not moving anything.
+			// Don't bother continuing if not moving onto anything.
 			// (Don't need to worry about edge first/last cases since dropping
 			// directly on self doesn't fire onDrop, but we do have to worry about
 			// dropping last node into empty space beyond rendered rows, if we don't copy)
@@ -112,6 +112,8 @@ function(declare, lang, when, on, mouse, DnDSource) {
 				// all nodes in grid share same parent, only get it once from first node. Since you can only drag an object
 				// that's visible (hence loaded an cached) we can directly use the memoryStore
 				oldParentObject = oldParentObject || storeMemory.get(object[fileStore.parentAttr]);
+				// if dropped on empty space beyond rendered row newParentObject (target) is undefined, use same parent
+				newParentObject = newParentObject || oldParentObject;
 				fileStore.pasteItem(object, oldParentObject, newParentObject, copy);
 			});
 		},
