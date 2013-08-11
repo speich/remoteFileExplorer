@@ -4,7 +4,7 @@ use remoteFileExplorer\fs as rfe;
 
 require_once 'FileSystem.php';
 
-class FileDisk extends rfe\FileSystem {
+class FileDisk implements FileSystem {
 	
 	public function get($dir) {
 		$rootDir = $this->getRoot();

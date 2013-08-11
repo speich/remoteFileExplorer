@@ -6,8 +6,8 @@ class CacheStore {
 
 	/** @var string|null  */
 	private $dbName = 'store.sqlite';
-	/** @var string|null */
 
+	/** @var string|null */
 	private $dbPath = 'php/fs/cache/';
 
 	/** @var null|\PDO  */

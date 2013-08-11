@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This class is used as a REST controller.
  * REST resources are transformed into a controller (first path segment) and an array of resources, e.g.:

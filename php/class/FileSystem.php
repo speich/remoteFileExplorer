@@ -1,71 +1,51 @@
 <?php
-/**
- * 
- * @author Simon Speich
- */
-
 namespace remoteFileExplorer\fs;
 
-abstract class FileSystem {
+interface FileSystem {
 
-	/** @var array properties of a file object */
-	public $fields = array();
-		
-	/**
-	 * Set the root dir.
-	 * @param string $rootDir
-	 */
-	public function __construct($rootDir) {
-		$this->rootDir = $rootDir;
-	}
-	
 	/**
 	 * Get a resource.
 	 * @param string $resource REST resource
 	 */
-	abstract public function get($resource);
+	public function get($resource);
 	
 	/**
 	 * Create a new resource.
 	 * @param object $data file data
 	 */
-	abstract public function create($data);
+	public function create($data);
 	
 	/**
 	 * Update a resource.
 	 * @param object $data file data
 	 */
-	abstract public function update($data);
+	public function update($data);
 	
 	/**
 	 * Delete a resource.
 	 * @param string $resource REST resource
 	 */
-	abstract public function del($resource);
+	public function del($resource);
 
 	/**
 	 * Copy a resource.
 	 * @param string $resource
 	 * @param string $target
 	 */
-	abstract public function copy($resource, $target);
+	public function copy($resource, $target);
 	
 	/**
 	 * Set the root directory.
 	 * @param string $rootDir
 	 * @return void
 	 */
-	public function setRoot($rootDir) {
-		$this->rootDir = $rootDir;
-	}
+	public function setRoot($rootDir);
 	
 	/**
-	 * Get root directory
+	 * Return the root directory.
 	 * @return string
 	 */
-	public function getRoot() {
-		return $this->rootDir;
-	}
+	public function getRoot();
 
 	/**
 	 * Search for a resource.
@@ -74,12 +54,12 @@ abstract class FileSystem {
 	 * @param int $end
 	 * @return mixed
 	 */
-	abstract function search($keyword, $start, $end);
+	function search($keyword, $start, $end);
 
 	/**
 	 * Return the number of records found for a given search.
 	 * @param string $keyword
 	 * @return int
 	 */
-	abstract function getNumSearchRecords($keyword);
+	function getNumSearchRecords($keyword);
 }
