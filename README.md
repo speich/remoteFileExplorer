@@ -34,6 +34,6 @@ Requires the following additional extensions to be loaded:
 
 ## Installation
 * Clone this repository anywhere into your web project
-* Change all paths of the [dojoConfig in rfe.php](/speich/remoteFileExplorer/blob/master/rfe.php#L16)
+* Change all paths of the [dojoConfig in rfe.php](rfe.php#L16)
 to point to your installation directory. Also set the [parameter origPageUrl](rfe.php#L40).
 * Change the $path variable in [php/inc_lobal.php on line 16](php/inc_global.php#L16) to your installation directory
