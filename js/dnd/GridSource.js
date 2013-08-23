@@ -26,34 +26,6 @@ function(declare, lang, when, on, mouse, DnDSource) {
 			return this.grid.row(node).data;
 		},
 
-		// Allow bubbling up by fixing dojo/dnd/Selector.js calling event.stop(et
-		// make sure event is only emitted once if necessary, e.g. left mouse down on grid.row
-		onMouseDown: function(evt) {
-			// Note: Overriding to bubble up
-						// to know where user clicked at in FileExplorer.getWidget
-			if (evt._dndSelf || !this.grid.row(evt) || mouse.isRight(evt)) {
-				// prevent endless loop when called from grid.row mousedown,
-				// also ignore when not on row or when right mousedown, which is not canceled by parent mouse down
-				return;
-			}
-			this.inherited('onMouseDown', arguments);
-			on.emit(evt.target, 'mousedown', {
-				bubbles: true,
-				cancelable: true,
-				_dndSelf: true
-			});
-			evt.preventDefault();
-		},
-
-		_legalMouseDown: function(evt){
-			// summary:
-			//		fix _legalMouseDown to only allow starting drag from an item
-			//		(not from bodyNode outside contentNode)
-			var legal = this.inherited("_legalMouseDown", arguments);
-			// DnDSource.prototype._legalMouseDown.apply(this, arguments);
-			return legal && evt.target !== this.grid.bodyNode;
-		},
-
 		/**
 		 * Topic event processor for /dnd/drop, called to finish the DnD operation.
 		 * @param {object} sourceSource dojo/dnd/Source dgrid or dijit/tree which is providing the items

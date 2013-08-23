@@ -1,6 +1,12 @@
+/**
+ * A module that creates an application that allows you to manage and browse files and directories on a remote web server.
+ * It consists of tree and a grid. The tree loads file data over REST via php from remote server.
+ * @module FileExplorer rfe/FileExplorer
+ */
 define([
 	'dojo/_base/lang',
 	'dojo/_base/declare',
+	'dojo/has',
 	'dojo/Deferred',
 	'dojo/when',
 	'dojo/cookie',
@@ -21,19 +27,13 @@ define([
 	'rfe/store/FileStore',
 	'rfe/dialogs/dialogs',
 	'rfe/dnd/Manager'	// needs to be loaded for dnd
-], function(lang, declare, Deferred, when, cookie, keys, dom, domClass, locale, on, topic, query, ioQuery, Stateful,
+], function(lang, declare, has, Deferred, when, cookie, keys, dom, domClass, locale, on, topic, query, ioQuery, Stateful,
 				registry, _Base, Layout, History, Edit, FileStore, dialogs) {
 
-	/**
-	 * A module that creates an application that allows you to manage and browse files and directories on a remote web server.
-	 * It consists of tree and a grid. The tree loads file data over REST via php from remote server.
-	 * @module FileExplorer rfe/FileExplorer
-	 */
-
-	// TODO: multiselect (in tree allow only of files but not of folders)
+	var ctrlEquiv = has("mac") ? "metaKey" : "ctrlKey";
 
 	/*
-	 *	@constructor
+	 *	@class rfe/FileExporer
 	 *	@extends {rfe/Layout}
 	 * @mixes {rfe/Edit}
 	 * @property {string} version
@@ -71,8 +71,10 @@ define([
 			this.context = {
 				isOnGridRow: false,
 				isOnGridContainer: false,
+				isOnGrid: false,
 				isOnTreeRow: false,
-				isOnTreeContainer: false
+				isOnTreeContainer: false,
+				isOnTree: false
 			};
 			this.domNode = dom.byId(this.id);
 		},
@@ -98,14 +100,23 @@ define([
 
 			grid.on('.dgrid-row:click, .dgrid-row:dblclick', function(evt) {
 				var object = grid.row(evt.target).data;
-				if (evt.type == 'dblclick' && object.dir){
-					self.display(object).then(function() {
+
+				switch (evt.type) {
+					case 'dblclick':
+						if (object.dir) {
+							self.display(object).then(function() {
+								self.set('history', object.id);
+							});
+						}
+						else {
+							window.open(store.storeMaster.target + object.id, '_blank');
+						}
+						break;
+					case 'click':
 						self.set('history', object.id);
-					});
+						break;
 				}
-				else {
-					self.set('history', object.id);
-				}
+
 			});
 			grid.on('dgrid-datachange', function(evt) {
 				// catch using editor when renaming
@@ -198,12 +209,13 @@ define([
 		},
 
 		/**
-		 * Reload current folder.
+		 * Reload file explorer.
 		 */
 		reload: function() {
+			window.location.reload();
+			// TODO: only reload files and folders
 			/*
 			var dndController = this.tree.dndController.declaredClass;
-
 			this.store.storeMemory.setData([]);
 			this.grid.refresh();
 
@@ -228,14 +240,32 @@ define([
 			var nodeType = evt.target.nodeName.toLowerCase();
 
 			if (nodeType === 'input' || nodeType === 'textarea') {
-				// prevent calling delete
+				// prevent calling delete/copy-paste in form
 				return;
 			}
 
 			switch(evt.keyCode){
-				// TODO: copy, paste, cut
 				case keys.DELETE:
 					this.del();
+					evt.preventDefault();
+					break;
+				case 67:
+					if (evt[ctrlEquiv]) {
+						this.copy();
+						evt.preventDefault();
+					}
+					break;
+				case 86:
+					if (evt[ctrlEquiv]) {
+						this.paste();
+						evt.preventDefault();
+					}
+					break;
+				case 88:
+					if (evt[ctrlEquiv]) {
+						this.cut();
+						evt.preventDefault();
+					}
 					break;
 			}
 		},
@@ -267,6 +297,9 @@ define([
 				isOnTreeRow: isTreeRow,
 				isOnTreeContainer: domClass.contains(node, 'rfeTreePane') && !isTreeRow
 			};
+
+			this.context.isOnGrid = this.context.isOnGridRow || this.context.isOnGridContainer;
+			this.context.isOnTree = this.context.isOnTreeRow || this.context.isOnTreeContainer;
 		},
 
 		/**

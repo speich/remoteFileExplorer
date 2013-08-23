@@ -105,6 +105,7 @@ define([
 					accept: ['treeNode'],
 					fileStore: this.store
 				}
+
 			}, div);
 		},
 
