@@ -247,7 +247,7 @@ class FileSession implements FileSystem {
 		}
 		else {
 			foreach($fs as $file) {
-				if (strpos($file['name'], $keyword) !== false) {
+				if (stripos($file['name'], $keyword) !== false) {
 					if ($count >= $start && $count <= $end) {
 						$file['path'] = $this->createPath($fs, $file);
 						$arr[] = $file;
@@ -274,7 +274,7 @@ class FileSession implements FileSystem {
 		}
 		$count = 0;
 		foreach($fs as $file) {
-			if (strpos($file['name'], $keyword) !== false) {
+			if (stripos($file['name'], $keyword) !== false) {
 				$count++;
 			}
 		}
