@@ -3,6 +3,7 @@ remoteFileExplorer (rfe) is programmed in JavaScript using dojo on the client si
 All communication with the web server is done through REST.
 
 Working [demo of the remoteFileExplorer](http://www.speich.net/projects/programming/remoteFileExplorer.php)
+![Screenshot](js/resources/images/screenshot.jpg "Screenshot of remoteFileExplorer")
 
 ## Features
 * REST-based file operations on remote server (create, rename and delete)
