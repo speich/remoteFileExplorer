@@ -43,7 +43,7 @@ function(declare, array, Deferred, when) {
 				hist.steps.shift();
 			}
 			hist.steps.push(itemId);
-			history.pushState('', '', this.origPageUrl + itemId + window.location.search);
+			window.history.pushState('', '', this.origPageUrl + itemId + window.location.search);
 		},
 
 		/**
@@ -51,9 +51,10 @@ function(declare, array, Deferred, when) {
 		 * @param {string} itemId
 		 */
 		removeHistory: function(itemId) {
-			var hist = this.history;
-			hist.steps = array.filter(hist.steps, function(object) {
-				return object !== itemId;
+			var hist = this.history, self = this;
+
+			hist.steps = array.filter(hist.steps, function(id) {
+				return id !== itemId;
 			});
 			hist.curIdx--;
 		},

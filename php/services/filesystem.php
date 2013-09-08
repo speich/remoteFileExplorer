@@ -1,5 +1,6 @@
 <?php
-use remoteFileExplorer\fs as fs;
+use remoteFileExplorer\fs\FileSession;
+use remoteFileExplorer\InputChecker;
 
 require_once '../inc_global.php';
 require_once 'Error.php';
@@ -25,7 +26,7 @@ switch($moduleType) {
 		// use session to store the user's filesystem
 		require_once('FileSession.php');
 		$fsData = require_once $rfeConfig['paths']['demo'].'demodata.php';
-		$fs = new fs\FileSession($rfeConfig['paths']['demo'], $fsData);
+		$fs = new FileSession($rfeConfig['paths']['demo'], $fsData);
 		break;
 	case 'sqlite':
 		// TODO: use ModuleSQLite to store user's file system
@@ -37,7 +38,7 @@ switch($moduleType) {
 
 //sleep(1); // for testing async
 //time_nanosleep(0, 500000000);	// = 0.5 seconds
-$checker = new \remoteFileExplorer\InputChecker();
+$checker = new InputChecker();
 
 if (is_null($data) || $checker->sanitizeProperties($data, $fs->fields)) {
 

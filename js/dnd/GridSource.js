@@ -26,34 +26,6 @@ function(declare, lang, when, on, mouse, DnDSource) {
 			return this.grid.row(node).data;
 		},
 
-		// Allow bubbling up by fixing dojo/dnd/Selector.js calling event.stop(et
-		// make sure event is only emitted once if necessary, e.g. left mouse down on grid.row
-		onMouseDown: function(evt) {
-			// Note: Overriding to bubble up
-						// to know where user clicked at in FileExplorer.getWidget
-			if (evt._dndSelf || !this.grid.row(evt) || mouse.isRight(evt)) {
-				// prevent endless loop when called from grid.row mousedown,
-				// also ignore when not on row or when right mousedown, which is not canceled by parent mouse down
-				return;
-			}
-			this.inherited('onMouseDown', arguments);
-			on.emit(evt.target, 'mousedown', {
-				bubbles: true,
-				cancelable: true,
-				_dndSelf: true
-			});
-			evt.preventDefault();
-		},
-
-		_legalMouseDown: function(evt){
-			// summary:
-			//		fix _legalMouseDown to only allow starting drag from an item
-			//		(not from bodyNode outside contentNode)
-			var legal = this.inherited("_legalMouseDown", arguments);
-			// DnDSource.prototype._legalMouseDown.apply(this, arguments);
-			return legal && evt.target !== this.grid.bodyNode;
-		},
-
 		/**
 		 * Topic event processor for /dnd/drop, called to finish the DnD operation.
 		 * @param {object} sourceSource dojo/dnd/Source dgrid or dijit/tree which is providing the items
@@ -97,7 +69,7 @@ function(declare, lang, when, on, mouse, DnDSource) {
 				targetSource = this,
 				oldParentObject;
 
-			// Don't bother continuing if not moving anything.
+			// Don't bother continuing if not moving onto anything.
 			// (Don't need to worry about edge first/last cases since dropping
 			// directly on self doesn't fire onDrop, but we do have to worry about
 			// dropping last node into empty space beyond rendered rows, if we don't copy)
@@ -112,6 +84,8 @@ function(declare, lang, when, on, mouse, DnDSource) {
 				// all nodes in grid share same parent, only get it once from first node. Since you can only drag an object
 				// that's visible (hence loaded an cached) we can directly use the memoryStore
 				oldParentObject = oldParentObject || storeMemory.get(object[fileStore.parentAttr]);
+				// if dropped on empty space beyond rendered row newParentObject (target) is undefined, use same parent
+				newParentObject = newParentObject || oldParentObject;
 				fileStore.pasteItem(object, oldParentObject, newParentObject, copy);
 			});
 		},

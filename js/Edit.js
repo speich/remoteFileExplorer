@@ -12,6 +12,9 @@ define([
 	 */
 	return declare(null, {
 
+		/** @property {object} stores objects for copy-paste */
+		objects: {},
+
 		/**
 		 * Delete selected file or folder object(s).
 		 */
@@ -26,14 +29,15 @@ define([
 
 			function remove(id, parId) {
 				// note: remove creates closure for id in loop
-				var dfd, obj, dialog;
-				dialog = dialogs.getByFileObj('deleteFile', store.storeMemory.get(id));
-				dfd = dialog.show();
-				dfd = dfd.then(function() {
+				var obj = store.storeMemory.get(id),
+					dialog = dialogs.getByFileObj('deleteFile', obj);
+
+				dialog.show().then(function() {
 					return store.remove(id);
-				});
-				dfd.then(function() {
+				}).then(function() {
 					self.removeHistory(id);
+					// point address bar (history) to parent folder of deleted
+					window.history.pushState('', '', self.origPageUrl + obj.parId + window.location.search);
 					if (self.context.isOnTreeRow || self.context.isOnTreeContainer) {
 						obj = self.store.storeMemory.get(parId);
 						self.display(obj);
@@ -47,25 +51,14 @@ define([
 				};
 			}
 
-			if (this.context.isOnGridRow || this.context.isOnGridContainer) {
-				widget = this.grid;
-				selection =  widget.selection;
-				for (id in selection) {
-					if (selection.hasOwnProperty(id) && selection[id] === true) {
-						remove(id);
-					}
+			widget = (this.context.isOnGridRow || this.context.isOnGridContainer) ? this.grid : this.tree;
+			selection =  widget.selection;
+			for (id in selection) {
+				if (selection[id] === true) {
+					remove(id);
 				}
 			}
-			else {
-				widget = this.tree;
-				selection = widget.selectedItems;
-				// multiple selection in tree is/has to be disabled, only one at a time
-				if (selection.length > 0) {
-					id = selection[0].id;
-					parId = selection[0].parId;
-					remove(id, parId);
-				}
-			}
+
 		},
 
 		/**
@@ -119,12 +112,64 @@ define([
 				id, selection = widget.selection;
 
 			for (id in selection) {
-				if (selection.hasOwnProperty(id) && selection[id] === true) {
+				if (selection[id] === true) {
 					element = widget.get('editableElement', id, column.field);
 					widget.edit(element);
 				}
 			}
-		}
-	})
+		},
 
+		copy: function() {
+			var id, selection,
+				store = this.store,
+				objects = this.objects = {},
+				widget;
+
+			widget = this.context.isOnGrid ? this.grid : this.tree;
+			selection =  widget.selection;
+			for (id in selection) {
+				if (selection[id] === true) {
+					objects[id] = store.storeMemory.get(id);	// todo: only store ids (speed vs memory)?
+				}
+			}
+		},
+
+		cut: function() {
+
+		},
+
+		paste: function() {
+			var id, selection,
+				store = this.store,
+				objects = this.objects,
+				storeMemory = store.storeMemory,
+				widget, newParentObject, oldParentObject;
+
+			// Note: all nodes in grid share same parent and you can only select one node in tree
+
+			// selection/focus in grid takes precedence over tree
+			widget = this.context.isOnGrid ? this.grid : this.tree;
+
+			// get new parent object
+			selection = widget.selection;
+			for (id in selection) {
+				if (selection[id] === true) {
+					newParentObject = storeMemory.get(id);
+					break;
+				}
+			}
+			if (widget === this.grid) {
+				// target object type does not matter we just paste to to current grid folder
+				newParentObject = storeMemory.get(newParentObject.parId);
+			}
+
+			for (id in objects) {
+				if (objects[id]) {
+					oldParentObject = oldParentObject || storeMemory.get(objects[id].parId);
+					store.pasteItem(objects[id], oldParentObject, newParentObject, true);
+				}
+			}
+		}
+
+	})
 });

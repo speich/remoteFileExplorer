@@ -5,9 +5,7 @@
  * Date: 03.08.13
  * Time: 15:56
  */
-
 namespace remoteFileExplorer;
-
 
 class InputChecker {
 

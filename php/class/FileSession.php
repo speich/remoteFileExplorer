@@ -3,8 +3,9 @@ namespace remoteFileExplorer\fs;
 
 require_once 'FileSystem.php';
 
-class FileSession extends FileSystem {
+class FileSession implements FileSystem {
 
+	/** @var array define 'database' fields */
 	public $fields = array(
 		'id', 'parId', 'name', 'size', 'mod', 'dir', 'mime'
 	);
@@ -21,6 +22,8 @@ class FileSession extends FileSystem {
 	 */
 	private $fsDefault = array();
 
+	private $rootDir = '/';
+
 	/**
 	 * Instantiates the session based filesystem.
 	 * The string root dir is used as the session name.
@@ -28,12 +31,29 @@ class FileSession extends FileSystem {
 	 * @param array $data
 	 */
 	public function __construct($rootDir, $data) {
-		parent::__construct($rootDir);
+		$this->rootDir = $rootDir;
 		if (!isset($_SESSION['rfe'])) {
 			$this->fsDefault = $data;
 			$_SESSION['rfe'][$rootDir] = serialize($data);
 			$_SESSION['rfe']['lastUsedItemId'] = count($data);	// this is a very simple way which is not very robust // TODO: better way to create an id
 		}
+	}
+
+	/**
+	 * Set the root directory.
+	 * @param string $rootDir
+	 * @return void
+	 */
+	public function setRoot($rootDir) {
+		$this->rootDir = $rootDir;
+	}
+
+	/**
+	 * Get root directory
+	 * @return string
+	 */
+	public function getRoot() {
+		return $this->rootDir;
 	}
 	
 	/**
@@ -227,7 +247,7 @@ class FileSession extends FileSystem {
 		}
 		else {
 			foreach($fs as $file) {
-				if (strpos($file['name'], $keyword) !== false) {
+				if (stripos($file['name'], $keyword) !== false) {
 					if ($count >= $start && $count <= $end) {
 						$file['path'] = $this->createPath($fs, $file);
 						$arr[] = $file;
@@ -254,7 +274,7 @@ class FileSession extends FileSystem {
 		}
 		$count = 0;
 		foreach($fs as $file) {
-			if (strpos($file['name'], $keyword) !== false) {
+			if (stripos($file['name'], $keyword) !== false) {
 				$count++;
 			}
 		}

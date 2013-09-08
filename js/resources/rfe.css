@@ -183,14 +183,12 @@ p {
 	margin: 5px;
 	text-align: center;
 	vertical-align: bottom;
+	min-width: 64px;
 	max-width: 90px;
 }
 
 .gridViewIcons img {
 	margin-bottom: 3px;
-}
-
-.iconImage {
 	box-shadow: 2px 2px 4px #cccccc;
 }
 
