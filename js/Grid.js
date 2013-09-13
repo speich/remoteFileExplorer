@@ -7,6 +7,7 @@ define([
 	'dojo/aspect',
 	'dojo/topic',
 	'dojo/query',
+	'dojo/date/locale',
 	'dgrid/OnDemandGrid',
 	'dgrid/Selection',
 	'dgrid/editor',
@@ -15,7 +16,7 @@ define([
 	'dgrid/extensions/ColumnResizer',
 	'dgrid/extensions/ColumnHider',
 	'rfe/grid/View'
-], function(lang, Deferred, declare, array, on, aspect, topic, query, Grid, Selection, editor, Keyboard, DnD, ColumnResizer, ColumnHider, View) {
+], function(lang, Deferred, declare, array, on, aspect, topic, query, locale, Grid, Selection, editor, Keyboard, DnD, ColumnResizer, ColumnHider, View) {
 
 	/**
 	 * Format integer to display file size in kilobyte.
@@ -34,8 +35,20 @@ define([
 	}
 
 	/**
-	 * @class
-	 * @name rfe.Grid
+	 * Format date object.
+	 * Date Integer value representing the number of milliseconds since 1 January 1970 00:00:00 UTC (Unix Epoch).
+	 * @param value number of milliseconds (Unix Epoch)
+	 * @returns {String} formatted date
+	 */
+	function formatDate(value) {
+		return locale.format(new Date(value), {
+			datePattern: 'dd.MM.yyyy',
+			timePattern: 'HH:mm'
+		});
+	}
+
+	/**
+	 * @class rfe.Grid
 	 * @extends {OnDemandGrid} Grid
 	 * @extends {dgrid/Selection} Selection
 	 * @extends {dgrid.editor} editor
@@ -62,21 +75,23 @@ define([
 			}),
 			size: {
 				sortable: false, // lets us apply own header click sort
-				label: 'size',
-				formatter: function(value) {
-					return formatFileSize(value);
-				}
+				label: 'Size',
+				formatter: formatFileSize
 			},
 			dir: {
 				sortable: false, // lets us apply own header click sort
-				label: 'type',
-				formatter: function(value) {
-					return formatType(value);
-				}
+				label: 'Type',
+				formatter: formatType
+			},
+			cre: {
+				sortable: false, // lets us apply own header click sort
+				label: 'Date created',
+				formatter: formatDate
 			},
 			mod: {
 				sortable: false, // lets us apply own header click sort
-				label: 'last modified'
+				label: 'Date modified',
+				formatter: formatDate
 			}
 		},
 

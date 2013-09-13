@@ -1,13 +1,12 @@
 <?php
 namespace remoteFileExplorer\fs;
-
 require_once 'FileSystem.php';
 
 class FileSession implements FileSystem {
 
-	/** @var array define 'database' fields */
+	/** @var array define allowed 'database' fields */
 	public $fields = array(
-		'id', 'parId', 'name', 'size', 'mod', 'dir', 'mime'
+		'id', 'parId', 'name', 'size', 'mod', 'cre', 'dir', 'mime'
 	);
 
 	/** @var int limit number of items that can be in filesystem */
@@ -32,11 +31,11 @@ class FileSession implements FileSystem {
 	 */
 	public function __construct($rootDir, $data) {
 		$this->rootDir = $rootDir;
-		if (!isset($_SESSION['rfe'])) {
+		//if (!isset($_SESSION['rfe'])) {
 			$this->fsDefault = $data;
 			$_SESSION['rfe'][$rootDir] = serialize($data);
 			$_SESSION['rfe']['lastUsedItemId'] = count($data);	// this is a very simple way which is not very robust // TODO: better way to create an id
-		}
+		//}
 	}
 
 	/**
@@ -117,7 +116,7 @@ class FileSession implements FileSystem {
 			foreach ($data as $prop => $val) {
 				$fs[$data->id][$prop] = $val;
 			}
-
+			$fs[$data->id]['mod'] = time() * 1000;
 			$_SESSION['rfe'][$this->getRoot()] = serialize($fs);
 			$json = json_encode($fs[$data->id], JSON_NUMERIC_CHECK);
 		}
@@ -146,7 +145,7 @@ class FileSession implements FileSystem {
 				$id = $this->getId();
 				$item['id'] = $id;
 				$item['parId'] = $target;
-				$item['mod'] = date('d.m.Y H:i:s', time());
+				$item['mod'] = time() * 1000;
 				$fs[$id] = $item;
 
 				if (array_key_exists('dir', $fs[$resource])) {
@@ -184,7 +183,10 @@ class FileSession implements FileSystem {
 				$item['dir'] = true;
 			}
 			$id = $this->getId();
+			$date = time() * 1000;
 			$item['id'] = $id;
+			$item['cre'] = $date;
+			$item['mod'] = $date;
 			$fs[$id] = $item;
 			$_SESSION['rfe'][$this->getRoot()] = serialize($fs);
 			$json = json_encode($item, JSON_NUMERIC_CHECK);
@@ -320,7 +322,7 @@ class FileSession implements FileSystem {
 					$id = $this->getId();
 					$item['id'] = $id;
 					$item['parId'] = $target;
-					$item['mod'] = date('d.m.Y H:i:s', time());
+					$item['mod'] = time() * 1000;
 					$fs[$id] = $item;
 
 					if (array_key_exists('dir', $row)) {
