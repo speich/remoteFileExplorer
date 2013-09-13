@@ -3,6 +3,7 @@ remoteFileExplorer (rfe) is programmed in JavaScript using dojo on the client si
 All communication with the web server is done through REST.
 
 Working [demo of the remoteFileExplorer](http://www.speich.net/projects/programming/remoteFileExplorer.php)
+![Screenshot](js/resources/images/screenshot.jpg "Screenshot of remoteFileExplorer")
 
 ## Features
 * REST-based file operations on remote server (create, rename and delete)
@@ -37,3 +38,4 @@ Requires the following additional extensions to be loaded:
 * Change all paths of the [dojoConfig in rfe.php](rfe.php#L16)
 to point to your installation directory. Also set the [parameter origPageUrl](rfe.php#L40).
 * Change the $path variable in [php/inc_lobal.php on line 16](php/inc_global.php#L16) to your installation directory
+* See [code on page rfe.php](rfe.php) for more information
