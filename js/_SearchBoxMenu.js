@@ -5,8 +5,9 @@ define([
 	'dojo/dom-construct',
 	'dojo/dom-attr',
 	'dojo/on',
-	'dijit/form/_ComboBoxMenu'
-], function(lang, array, declare, domConstruct, domAttr, on, _ComboBoxMenu) {
+	'dijit/form/_ComboBoxMenu',
+	'rfe/util/stringUtil'
+], function(lang, array, declare, domConstruct, domAttr, on, _ComboBoxMenu, stringUtil) {
 
 	return declare([_ComboBoxMenu], {
 		// TODO: find better solution to get store target url
@@ -30,7 +31,9 @@ define([
 			// TODO: add more info, e.g. path
 			menuItem.innerHTML = obj.name + '<br>' +
 				'/' + this.target + '/' + obj.path + '<br>' +
-				'<span class="rfeSearchBoxItemLabel">Date modified:</span> ' + obj.mod + ', <span class="rfeSearchBoxItemLabel">Size:</span> ' + obj.size;
+			'<span class="rfeSearchBoxItemLabel">Date created:</span> ' + stringUtil.formatDate(obj.cre) +
+			', <span class="rfeSearchBoxItemLabel">Date modified:</span> '	+ stringUtil.formatDate(obj.mod) + '<br>' +
+			'<span class="rfeSearchBoxItemLabel">Size:</span> ' + stringUtil.formatFileSize(obj.size);
 
 			return menuItem;
 		}
