@@ -12,9 +12,9 @@ define([
 	'dijit/ToolbarSeparator',
 	'dijit/form/Button',
 	'dijit/form/Select',
-	'rfe/util/stringUtil',
+	'rfe/config/fileObject',
 	'rfe/SearchBox'
-], function(lang, declare, array, on, when, aspect, domConstruct, query, registry, Toolbar, ToolbarSeparator, Button, Select, stringUtil, SearchBox) {
+], function(lang, declare, array, on, when, aspect, domConstruct, query, registry, Toolbar, ToolbarSeparator, Button, Select, fileObject, SearchBox) {
 
 	/**
 	 * @class rfe.layout.Toolbar
@@ -103,20 +103,19 @@ define([
 				rfe: rfe
 			}));
 
-			// TODO: do not hardcode sortable (file) properties
+			// TODO: file and label properties should not be hardcoded
 			div = domConstruct.create('div', {
 				'class': 'rfeToolbarSort'
 			}, this.domNode);
 			domConstruct.create('label', {
 				innerHTML: 'sort by'
 			}, div);
+
+			var options = array.map(fileObject.sortOptions, function(prop) {
+				return { label: fileObject.label[prop], value: prop }
+			});
 			selSort = new Select({
-				options: [
-					// value shoud be name of store object property to be sorted
-					{ label: 'file name', value: 'name', selected: true },
-					{ label: 'size', value: 'size' },
-					{ label: 'modification date', value: 'mod' }
-				]
+				options: options
 			}).placeAt(div);
 			bt4 = new Button({
 				label: 'sort',

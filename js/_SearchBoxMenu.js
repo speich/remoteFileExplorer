@@ -21,14 +21,13 @@ define([
 		},
 
 		/**
-		 * Creates an option to appear on the popup menu.
+		 * Creates an option to appear on the search popup menu.
 		 * @param {Object} obj store object
 		 * @return {HTMLTableRowElement}
 		 */
 		_createOption: function(obj) {
 			var menuItem = this._createMenuItem();
 
-			// TODO: add more info, e.g. path
 			menuItem.innerHTML = obj.name + '<br>' +
 				'/' + this.target + '/' + obj.path + '<br>' +
 			'<span class="rfeSearchBoxItemLabel">Date created:</span> ' + stringUtil.formatDate(obj.cre) +

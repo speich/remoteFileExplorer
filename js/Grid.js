@@ -15,8 +15,8 @@ define([
 	'dgrid/extensions/ColumnResizer',
 	'dgrid/extensions/ColumnHider',
 	'rfe/grid/View',
-	'rfe/util/stringUtil'
-], function(lang, Deferred, declare, array, on, aspect, topic, query, Grid, Selection, editor, Keyboard, DnD, ColumnResizer, ColumnHider, View, stringUtil) {
+	'rfe/config/fileObject'
+], function(lang, Deferred, declare, array, on, aspect, topic, query, Grid, Selection, editor, Keyboard, DnD, ColumnResizer, ColumnHider, View, fileObject) {
 
 	/**
 	 * @class rfe.Grid
@@ -42,27 +42,27 @@ define([
 				editOn: 'dummyEvent',
 				sortable: false, // lets us apply own header click sort
 				autoSave: false,
-				label: "Name"
+				label: fileObject.label['name']
 			}),
 			size: {
 				sortable: false, // lets us apply own header click sort
-				label: 'Size',
-				formatter: stringUtil.formatFileSize
+				label: fileObject.label['size'],
+				formatter: fileObject.formatter['size']
 			},
 			dir: {
 				sortable: false, // lets us apply own header click sort
-				label: 'Type',
-				formatter: stringUtil.formatType
+				label: fileObject.label['dir'],
+				formatter: fileObject.formatter['dir']
 			},
 			cre: {
 				sortable: false, // lets us apply own header click sort
-				label: 'Date created',
-				formatter: stringUtil.formatDate
+				label: fileObject.label['cre'],
+				formatter: fileObject.formatter['cre']
 			},
 			mod: {
 				sortable: false, // lets us apply own header click sort
-				label: 'Date modified',
-				formatter: stringUtil.formatDate
+				label: fileObject.label['mod'],
+				formatter: fileObject.formatter['mod']
 			}
 		},
 
