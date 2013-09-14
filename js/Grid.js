@@ -71,7 +71,7 @@ define([
 				editOn: 'dummyEvent',
 				sortable: false, // lets us apply own header click sort
 				autoSave: false,
-				label: "name"
+				label: "Name"
 			}),
 			size: {
 				sortable: false, // lets us apply own header click sort

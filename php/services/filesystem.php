@@ -36,8 +36,9 @@ switch($moduleType) {
 		break;
 }
 
-//sleep(1); // for testing async
-//time_nanosleep(0, 500000000);	// = 0.5 seconds
+// for testing async
+time_nanosleep(0, rand(1, 2) * 250000000);	// = rand * 0.25 seconds
+
 $checker = new InputChecker();
 
 if (is_null($data) || $checker->sanitizeProperties($data, $fs->fields)) {

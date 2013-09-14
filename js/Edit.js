@@ -11,6 +11,7 @@ define([
 	 * @module Edit rfe/Edit
 	 */
 	return declare(null, {
+		// Note: An item might be selected, but not ma
 
 		/** @property {object} stores objects for copy-paste */
 		objects: {},
@@ -22,24 +23,33 @@ define([
 			// Note: delete is a reserved word -> del
             // TODO: return deferred list of all deleted items
 			// Notes:
-			// A. When deleting from toolbar we only use selected items from the grid (or use focus?). Currently this
+			// A. When deleting from toolbar, we only use selected items from the grid (or use focus?). Currently this
 			// happens from the different menu in layout.js -> move here?
-			// B. When deleting from context menu use context to decide which selected items to use
-			var self = this, id, parId, store = this.store, widget, selection;
+			// B. When deleting from context menu, use context to decide which selected items to use
+			var self = this, store = this.store,
+				selection, id, doNotAskAgain = true, dfd = new Deferred();
 
-			function remove(id, parId) {
+			function remove(id) {
 				// note: remove creates closure for id in loop
 				var obj = store.storeMemory.get(id),
 					dialog = dialogs.getByFileObj('deleteFile', obj);
 
-				dialog.show().then(function() {
+				dfd.resolve(doNotAskAgain).then(function(remember) {
+					if (remember === false) {
+						return dialog.show();
+					}
+					else {
+						return true;
+					}
+				}).then(function(remember) {
+					doNotAskAgain = remember;
 					return store.remove(id);
 				}).then(function() {
 					self.removeHistory(id);
 					// point address bar (history) to parent folder of deleted
 					window.history.pushState('', '', self.origPageUrl + obj.parId + window.location.search);
-					if (self.context.isOnTreeRow || self.context.isOnTreeContainer) {
-						obj = self.store.storeMemory.get(parId);
+					if (self.context.isOnTree) {
+						obj = self.store.storeMemory.get(obj.parId);
 						self.display(obj);
 					}
 				}, error);
@@ -51,14 +61,11 @@ define([
 				};
 			}
 
-			widget = (this.context.isOnGridRow || this.context.isOnGridContainer) ? this.grid : this.tree;
-			selection =  widget.selection;
+			// create one dialog for all selected nodes per call of this method and only update its content
+			selection = this.context.isOnGrid ? this.grid.selection : this.tree.selectedItems;
 			for (id in selection) {
-				if (selection[id] === true) {
-					remove(id);
-				}
+				remove(id);
 			}
-
 		},
 
 		/**
@@ -72,8 +79,7 @@ define([
 
 			object = lang.mixin(object || {}, {
 				parId: parId,
-				size: 0,
-				mod: this.getDate()
+				size: 0
 			});
 			object.name = object.dir ? 'new directory' : object.name = 'new text file.txt';
 			return store.add(object);
@@ -85,13 +91,14 @@ define([
 		 * @param {object} object file/folder object
 		 */
 		createRename: function(object) {
-			var widget = this.context.isOnGridRow || this.context.isOnGridContainer ? this.grid : this.tree,
+			var context = this.context,
+				widget = context.isOnGrid ? this.grid : this.tree,
 				store = this.store;
 
 			return this.create(object).then(lang.hitch(this, function(object) {
 				var element, column;
 
-				if (this.context.isOnGridRow || this.context.isOnGridContainer) {
+				if (context.isOnGrid) {
 					column = widget.columns[store.labelAttr];
 					element = widget.get('editableElement', object.id, column.field);
 					widget.edit(element);
@@ -105,32 +112,26 @@ define([
 		rename: function() {
 			// TODO: make this work also for the tree which doesn't have the same selection object. Use dijit.inlineEditBox
 			// tree's selection is widget.selectedItems which is array of store objects
-			var widget = this.context.isOnGridRow || this.context.isOnGridContainer ? this.grid : this.tree,
+			var widget = this.context.isOnGrid ? this.grid : this.tree,
 				store = this.store,
 				column = widget.columns[store.labelAttr],
 				element,
-				id, selection = widget.selection;
+				id, selection = widget.selectedItems || widget.selection;
 
 			for (id in selection) {
-				if (selection[id] === true) {
-					element = widget.get('editableElement', id, column.field);
-					widget.edit(element);
-				}
+				element = widget.get('editableElement', id, column.field);
+				widget.edit(element);
 			}
 		},
 
 		copy: function() {
 			var id, selection,
 				store = this.store,
-				objects = this.objects = {},
-				widget;
+				objects = this.objects = {};
 
-			widget = this.context.isOnGrid ? this.grid : this.tree;
-			selection =  widget.selection;
+			selection = this.context.isOnGrid ? this.grid.selection : this.tree.selectedItems;
 			for (id in selection) {
-				if (selection[id] === true) {
-					objects[id] = store.storeMemory.get(id);	// todo: only store ids (speed vs memory)?
-				}
+				objects[id] = store.storeMemory.get(id);	// todo: store only store ids or whole objects (speed vs memory)?
 			}
 		},
 
@@ -151,7 +152,7 @@ define([
 			widget = this.context.isOnGrid ? this.grid : this.tree;
 
 			// get new parent object
-			selection = widget.selection;
+			selection = widget.selectedItems || widget.selection;
 			for (id in selection) {
 				if (selection[id] === true) {
 					newParentObject = storeMemory.get(id);

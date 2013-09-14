@@ -91,52 +91,55 @@ define([
 				store = this.store;
 
 			tree.on('click', function(object) {	// when calling tree.on(click, load) at once object is not passed
-				self.displayChildrenInGrid(object).then(function() {
+				when(self.displayChildrenInGrid(object), function() {	// use when since dfd might already have resolved from previous click
 					self.currentTreeObject.set(object);
 					self.set('history', object.id);
 				});
 			});
-			tree.on('load', lang.hitch(this, this.initState));
+			tree.on('load', function() {
+				self.initState().then(function() {
 
-			grid.on('.dgrid-row:click, .dgrid-row:dblclick', function(evt) {
-				var object = grid.row(evt.target).data;
+					grid.on('.dgrid-row:click, .dgrid-row:dblclick', function(evt) {
+						var object = grid.row(evt.target).data;
 
-				switch (evt.type) {
-					case 'dblclick':
-						if (object.dir) {
-							self.display(object).then(function() {
+						switch(evt.type) {
+							case 'dblclick':
+								if (object.dir) {
+									self.display(object).then(function() {
+										self.set('history', object.id);
+									});
+								}
+								else {
+									window.open(store.storeMaster.target + object.id, '_blank');
+								}
+								break;
+							case 'click':
 								self.set('history', object.id);
-							});
+								break;
 						}
-						else {
-							window.open(store.storeMaster.target + object.id, '_blank');
-						}
-						break;
-					case 'click':
-						self.set('history', object.id);
-						break;
-				}
 
-			});
-			grid.on('dgrid-datachange', function(evt) {
-				// catch using editor when renaming
-				var obj = evt.cell.row.data;
+					});
+					grid.on('dgrid-datachange', function(evt) {
+						// catch using editor when renaming
+						var obj = evt.cell.row.data;
 
-				obj[store.labelAttr] = evt.value;
-				store.put(obj).then(function() {
-					grid.save();
-				}, function() {
-					grid.revert();
+						obj[store.labelAttr] = evt.value;
+						store.put(obj).then(function() {
+							grid.save();
+						}, function() {
+							grid.revert();
+						});
+					});
+
+					on(this.panes.domNode, '.rfeTreePane:mousedown, .rfeGridPane:mousedown', function(evt) {
+						self.set('context', evt, this);
+					});
+
+					on(this.domNode, '.dgrid-content:keydown, .dijitTreeContainer:keydown', function(evt) {
+						self.set('context', evt, this);
+						self._onKeyDown(evt, this);
+					});
 				});
-			});
-
-			on(this.panes.domNode, '.rfeTreePane:mousedown, .rfeGridPane:mousedown', function(evt) {
-				self.set('context', evt, this);
-			});
-
-			on(this.domNode, '.dgrid-content:keydown, .dijitTreeContainer:keydown',  function(evt) {
-				self.set('context', evt, this);
-				self._onKeyDown(evt, this);
 			});
 		},
 
@@ -271,19 +274,8 @@ define([
 		},
 
 		/**
-		 * Returns the current date.
-		 * @return {string} formatted date
-		 */
-		getDate: function() {
-			return locale.format(new Date(), {
-				datePattern: 'dd.MM.yyyy',
-				timePattern: 'HH:mm'
-			});
-		},
-
-		/**
 		 * Set object properties describing on which part of the file explorer we are on.
-		 * @param {Event} evt
+		 * @param {Event} evtwidth
 		 * @param {HTMLElement} node
 		 */
 		_setContext: function(evt, node) {
@@ -381,14 +373,14 @@ define([
 			// Note: A visible file/folder object is always loaded
 			var dialog, id, store = this.store,
 				i = 0, len,
-				widget = this.context.isOnGridRow || this.context.isOnGridContainer ? this.grid : this.tree,
-				sel = widget.selection;
+				widget = this.context.isOnGrid ? this.grid : this.tree,
+				selection = widget.selection;
 
 			// TODO: if multiple selected file objects, only use one dialog with multiple values (and sum of all file sizes). Requires preloading folder contents first!
 			// grid
-			if (sel) {
-				for (id in sel) {
-					if (sel[id] === true) {
+			if (selection) {
+				for (id in selection) {
+					if (selection[id] === true) {
 						dialog = dialogs.getByFileObj('fileProperties', store.get(id));
 						dialog.show();
 					}

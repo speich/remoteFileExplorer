@@ -19,11 +19,12 @@ define([
 		tabIndex: 21,
 		pathSeparator: ';',	// should be character that does not occur in id
 		multiplePathSeparator: ',',
+		dndSource: null,	// expose instance of dndController as in dgrid
 		dndController: function(arg, params) {
 			return new TreeSource(arg, lang.mixin(params || {}, {
 				accept: ['dgrid-row'],
 				fileStore: arg.rfe.store,
-				singular: true
+				singular: true	// to keep things simple and logical, remoteFileExplorer assumes this is always true
 			}));
 		},
 
@@ -36,6 +37,7 @@ define([
 					this.savePaths(newVal);
 				}));
 			}));
+			this.dndSource = this.dndController;
 		},
 
 		/**

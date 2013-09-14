@@ -25,7 +25,6 @@ define([
 		 * @return {HTMLTableRowElement}
 		 */
 		_createOption: function(obj) {
-
 			var menuItem = this._createMenuItem();
 
 			// TODO: add more info, e.g. path

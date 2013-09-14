@@ -83,27 +83,16 @@ define([
 		 */
 		enableMenuItems: function(context) {
 			var id, selected = false,
-				widget = context.isOnGridRow || context.isOnGridContainer ? this.rfe.grid : this.rfe.tree,
-				selection = context.isOnGridRow || context.isOnGridContainer ? widget.selection : widget.selectedItems;
+				selection = context.isOnGrid ? this.rfe.grid.dndSource.selection : this.rfe.tree.dndSource.selection;
 
-			// set file properties menu depending on if a file object is selected
-			// TODO: unify tree and grid selection object
-			// grid
-			if (selection && (context.isOnGridRow || context.isOnGridContainer)) {
+			// set file properties menu depending on if at least one file object is selected
+			if (selection && context.isOnGrid) {
 				// note: disable here if not in selection
 				for (id in selection) {
-					if (selection.hasOwnProperty(id) && selection[id] === true) {
-						selected = true;
-						break;
-					}
+					selected = true;
+					break;
 				}
 				this.menuItems.rename.set('disabled', !selected);
-			}
-			// tree
-			else if (selection && selection.length > 0 && (context.isOnTreeRow || context.isOnTreeContainer)) {
-				// if id = root do not allow rename?
-				selected = true;
-				this.menuItems.rename.set('disabled', true); // not implemented for tree yet
 			}
 
 			this.menuItems.del.set('disabled', !selected);
