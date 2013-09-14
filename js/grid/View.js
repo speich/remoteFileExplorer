@@ -11,7 +11,7 @@ define([
 	return declare(null, {
 
 		/** default view */
-		view: 'icons',
+		view: 'list',
 
 		/** width of icons */
 		iconWidth: 80,
@@ -84,10 +84,10 @@ define([
 		 * @returns {HTMLImageElement}
 		 */
 		_getIconType: function(obj) {
-			var mime, img = put('img', {
+			var mime, img = put('img'); /*, {
 				width: 64,
 				height: 64
-			});
+			});*/
 
 			mime = obj.mime ? obj.mime.split('/')[0] : null;
 			switch (mime) {
