@@ -1,8 +1,9 @@
 define([
 	'dojo/_base/declare',
 	'dojo/dom-construct',
-	'rfe/DialogConfirm'
-], function(declare, construct, Dialog) {
+	'rfe/DialogConfirm',
+	'rfe/util/stringUtil'
+], function(declare, construct, Dialog, stringUtil) {
 
 	/**
 	 * @class rfe.DialogFileProperties
@@ -20,8 +21,32 @@ define([
 		_setContentAttr: function(fileObj) {
 			var prop, strTbl = '<table class="tblFileProperties">';
 			for (prop in fileObj) {
-				if(fileObj.hasOwnProperty(prop)) {
-					strTbl += '<tr><td>' + prop + ':</td><td>' + fileObj[prop] + '</td>';
+				if (fileObj.hasOwnProperty(prop)) {
+					// TODO: create a property - label object and use that to map prop to label / formatter throughout rfe
+					var label, value = fileObj[prop];
+					switch (prop) {
+						case 'parId':
+							label = 'Parent id';
+							break;
+						case 'dir':
+							label = 'Directory';
+							break;
+						case 'cre':
+							label = 'Created';
+							value = stringUtil.formatDate(value);
+							break;
+						case 'mod':
+							label = 'Modified';
+							value = stringUtil.formatDate(value);
+							break;
+						case 'size':
+							label = 'Size';
+							value = stringUtil.formatFileSize(value);
+							break;
+						default:
+							label = stringUtil.ucFirst(prop);
+					}
+					strTbl += '<tr><td>' + label + ':</td><td>' + value + '</td>';
 				}
 			}
 			strTbl += '</table>';
