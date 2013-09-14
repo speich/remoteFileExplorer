@@ -7,7 +7,6 @@ define([
 	'dojo/aspect',
 	'dojo/topic',
 	'dojo/query',
-	'dojo/date/locale',
 	'dgrid/OnDemandGrid',
 	'dgrid/Selection',
 	'dgrid/editor',
@@ -15,37 +14,9 @@ define([
 	'dgrid/extensions/DnD',
 	'dgrid/extensions/ColumnResizer',
 	'dgrid/extensions/ColumnHider',
-	'rfe/grid/View'
-], function(lang, Deferred, declare, array, on, aspect, topic, query, locale, Grid, Selection, editor, Keyboard, DnD, ColumnResizer, ColumnHider, View) {
-
-	/**
-	 * Format integer to display file size in kilobyte.
-	 * @param {string} value
-	 */
-	function formatFileSize(value) {
-		return Math.round(value / 1000 * 10) / 10 + 'kb';
-	}
-
-	/**
-	 * Return file type.
-	 * @param {string} value
-	 */
-	function formatType(value) {
-		return value ? 'directory' : 'file';
-	}
-
-	/**
-	 * Format date object.
-	 * Date Integer value representing the number of milliseconds since 1 January 1970 00:00:00 UTC (Unix Epoch).
-	 * @param value number of milliseconds (Unix Epoch)
-	 * @returns {String} formatted date
-	 */
-	function formatDate(value) {
-		return locale.format(new Date(value), {
-			datePattern: 'dd.MM.yyyy',
-			timePattern: 'HH:mm'
-		});
-	}
+	'rfe/grid/View',
+	'rfe/util/stringUtil'
+], function(lang, Deferred, declare, array, on, aspect, topic, query, Grid, Selection, editor, Keyboard, DnD, ColumnResizer, ColumnHider, View, stringUtil) {
 
 	/**
 	 * @class rfe.Grid
@@ -76,22 +47,22 @@ define([
 			size: {
 				sortable: false, // lets us apply own header click sort
 				label: 'Size',
-				formatter: formatFileSize
+				formatter: stringUtil.formatFileSize
 			},
 			dir: {
 				sortable: false, // lets us apply own header click sort
 				label: 'Type',
-				formatter: formatType
+				formatter: stringUtil.formatType
 			},
 			cre: {
 				sortable: false, // lets us apply own header click sort
 				label: 'Date created',
-				formatter: formatDate
+				formatter: stringUtil.formatDate
 			},
 			mod: {
 				sortable: false, // lets us apply own header click sort
 				label: 'Date modified',
-				formatter: formatDate
+				formatter: stringUtil.formatDate
 			}
 		},
 
