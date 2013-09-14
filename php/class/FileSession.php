@@ -31,11 +31,11 @@ class FileSession implements FileSystem {
 	 */
 	public function __construct($rootDir, $data) {
 		$this->rootDir = $rootDir;
-		//if (!isset($_SESSION['rfe'])) {
+		if (!isset($_SESSION['rfe'])) {
 			$this->fsDefault = $data;
 			$_SESSION['rfe'][$rootDir] = serialize($data);
 			$_SESSION['rfe']['lastUsedItemId'] = count($data);	// this is a very simple way which is not very robust // TODO: better way to create an id
-		//}
+		}
 	}
 
 	/**
@@ -145,6 +145,7 @@ class FileSession implements FileSystem {
 				$id = $this->getId();
 				$item['id'] = $id;
 				$item['parId'] = $target;
+				$item['cre'] = time() * 1000;
 				$item['mod'] = time() * 1000;
 				$fs[$id] = $item;
 
