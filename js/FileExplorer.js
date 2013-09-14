@@ -90,6 +90,14 @@ define([
 				tree = this.tree,
 				store = this.store;
 
+			on(this.panes.domNode, '.rfeTreePane:mousedown, .rfeGridPane:mousedown', function(evt) {
+				self.set('context', evt, this);
+			});
+
+			on(this.domNode, '.dgrid-content:keydown, .dijitTreeContainer:keydown', function(evt) {
+				self.set('context', evt, this);
+				self._onKeyDown(evt, this);
+			});
 			tree.on('click', function(object) {	// when calling tree.on(click, load) at once object is not passed
 				when(self.displayChildrenInGrid(object), function() {	// use when since dfd might already have resolved from previous click
 					self.currentTreeObject.set(object);
@@ -129,15 +137,6 @@ define([
 						}, function() {
 							grid.revert();
 						});
-					});
-
-					on(this.panes.domNode, '.rfeTreePane:mousedown, .rfeGridPane:mousedown', function(evt) {
-						self.set('context', evt, this);
-					});
-
-					on(this.domNode, '.dgrid-content:keydown, .dijitTreeContainer:keydown', function(evt) {
-						self.set('context', evt, this);
-						self._onKeyDown(evt, this);
 					});
 				});
 			});
