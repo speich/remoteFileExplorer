@@ -11,7 +11,7 @@
 </head>
 
 <body class="claro rfe">
-<div id="remoteFileExplorer"></div>
+<div id="remoteFileExplorer" class="rfe"></div>
 <script type="text/javascript">
 var dojoConfig = {
 	async: true,

@@ -6,11 +6,9 @@
 define([
 	'dojo/_base/lang',
 	'dojo/_base/declare',
-	'dojo/has',
 	'dojo/Deferred',
 	'dojo/when',
 	'dojo/cookie',
-	'dojo/keys',
 	'dojo/dom',
 	'dojo/dom-class',
 	'dojo/date/locale',
@@ -26,11 +24,10 @@ define([
 	'rfe/Edit',
 	'rfe/store/FileStore',
 	'rfe/dialogs/dialogs',
+	'rfe/Keyboard',
 	'rfe/dnd/Manager'	// needs to be loaded for dnd
-], function(lang, declare, has, Deferred, when, cookie, keys, dom, domClass, locale, on, topic, query, ioQuery, Stateful,
-				registry, _Base, Layout, History, Edit, FileStore, dialogs) {
-
-	var ctrlEquiv = has("mac") ? "metaKey" : "ctrlKey";
+], function(lang, declare, Deferred, when, cookie, dom, domClass, locale, on, topic, query, ioQuery, Stateful,
+				registry, _Base, Layout, History, Edit, FileStore, dialogs, Keyboard) {
 
 	/*
 	 *	@class rfe/FileExporer
@@ -51,7 +48,7 @@ define([
 	 * @property {rfe/store/FileStore} store
 	 *
 	 */
-	return declare([_Base, History, Layout, Edit], {
+	return declare([_Base, History, Layout, Edit, Keyboard], {
 		version: '0.9',
 		versionDate: '2013',
 		currentTreeObject: null,
@@ -81,6 +78,7 @@ define([
 
 		startup: function() {
 			this.init();
+			this.postCreate();
 			this.initEvents();
 		},
 
@@ -94,10 +92,6 @@ define([
 				self.set('context', evt, this);
 			});
 
-			on(this.domNode, '.dgrid-content:keydown, .dijitTreeContainer:keydown', function(evt) {
-				self.set('context', evt, this);
-				self._onKeyDown(evt, this);
-			});
 			tree.on('click', function(object) {	// when calling tree.on(click, load) at once object is not passed
 				when(self.displayChildrenInGrid(object), function() {	// use when since dfd might already have resolved from previous click
 					self.currentTreeObject.set(object);
@@ -234,47 +228,8 @@ define([
 		},
 
 		/**
-		 * Handle key events on grid and tree.
-		 * @private
-		 */
-		_onKeyDown: function(evt, sourceNode) {
-
-			var nodeType = evt.target.nodeName.toLowerCase();
-
-			if (nodeType === 'input' || nodeType === 'textarea') {
-				// prevent calling delete/copy-paste in form
-				return;
-			}
-
-			switch(evt.keyCode){
-				case keys.DELETE:
-					this.del();
-					evt.preventDefault();
-					break;
-				case 67:
-					if (evt[ctrlEquiv]) {
-						this.copy();
-						evt.preventDefault();
-					}
-					break;
-				case 86:
-					if (evt[ctrlEquiv]) {
-						this.paste();
-						evt.preventDefault();
-					}
-					break;
-				case 88:
-					if (evt[ctrlEquiv]) {
-						this.cut();
-						evt.preventDefault();
-					}
-					break;
-			}
-		},
-
-		/**
 		 * Set object properties describing on which part of the file explorer we are on.
-		 * @param {Event} evtwidth
+		 * @param {Event} evt
 		 * @param {HTMLElement} node
 		 */
 		_setContext: function(evt, node) {

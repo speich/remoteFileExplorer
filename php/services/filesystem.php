@@ -37,7 +37,7 @@ switch($moduleType) {
 }
 
 // for testing async
-time_nanosleep(0, rand(1, 2) * 250000000);	// = rand * 0.25 seconds
+//time_nanosleep(0, rand(1, 2) * 250000000);	// = rand * 0.25 seconds
 
 $checker = new InputChecker();
 

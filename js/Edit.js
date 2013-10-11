@@ -11,7 +11,7 @@ define([
 	 * @module Edit rfe/Edit
 	 */
 	return declare(null, {
-		// Note: An item might be selected, but not ma
+		// Note: An item might be selected, but not have focus
 
 		/** @property {object} stores objects for copy-paste */
 		objects: {},
