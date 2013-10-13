@@ -4,9 +4,10 @@ define([
 	'dojo/when',
 	'dojo/on',
 	'dojo/mouse', // mouse.isLeft
-	'dojo/dnd/Source'
+	'dojo/dnd/Source',
+	'dojo/dnd/Manager'
 ],
-function(declare, lang, when, on, mouse, DnDSource) {
+function(declare, lang, when, on, mouse, DnDSource, DndManager) {
 
 	/**
 	 * Class to handle drag and drop of the dgrid.
@@ -125,12 +126,46 @@ function(declare, lang, when, on, mouse, DnDSource) {
 			});
 		},
 
-		checkAcceptance: function(source, nodes){
-			// summary:
-			//		augment checkAcceptance to block drops from sources without getObject or
-			return source.getObject &&
-				//source.singular &&
-				DnDSource.prototype.checkAcceptance.apply(this, arguments);
+		/**
+		 * Process mouse move events
+		 */
+		onMouseMove: function(evt) {
+			this.inherited('onMouseMove', arguments);
+
+			var m = DndManager.manager(),
+				grid = this.grid;
+
+			// prevent dropping from tree onto own child in grid, e.g. parent folder onto its own child
+			if (this.isDragging && m.source.tree && this._isParentChildDrop(m.nodes[0], grid.row(evt))){
+				m.canDrop(false);
+			}
+		},
+
+		/**
+		 * Checks whether the dragged node is a parent of the grid row we are currently over.
+		 * @param {dojo/dnd/Source} source
+		 * @param {dgrid/row} row
+		 * @return {Boolean}
+		 * @private
+		 */
+		_isParentChildDrop: function(source, row){
+			var store = this.fileStore,
+				memoryStore = store.storeMemory,
+				sourceId = DndManager.manager().source.getObject(source).id,	// id of dragged node
+				// also check when dropping beyond rows
+				object = (row && store.storeMemory.get(row.id)) || this.grid.rfe.currentTreeObject; // object must be in cache since it is displayed in the grid
+
+			if (object.id === sourceId) {
+				return true;
+			}
+
+			while (object[store.parentAttr]) {
+				object = memoryStore.get(object[store.parentAttr]);
+				if (object.id === sourceId) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 
