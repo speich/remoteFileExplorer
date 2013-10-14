@@ -103,7 +103,7 @@ define([
 				dndConstructor: GridSource,	// dgrid/extension/dnd can't be overridden directly
 				dndParams: {
 					accept: ['treeNode'],
-					fileStore: this.store
+					rfe: this
 				}
 			}, div);
 		},

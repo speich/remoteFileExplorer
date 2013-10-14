@@ -5,9 +5,10 @@ define([
 	'dojo/on',
 	'dojo/mouse', // mouse.isLeft
 	'dojo/dnd/Source',
-	'dojo/dnd/Manager'
+	'dojo/dnd/Manager',
+	'rfe/dnd/_SourceMixin'
 ],
-function(declare, lang, when, on, mouse, DnDSource, DndManager) {
+function(declare, lang, when, on, mouse, DnDSource, DndManager, _SourceMixin) {
 
 	/**
 	 * Class to handle drag and drop of the dgrid.
@@ -17,11 +18,9 @@ function(declare, lang, when, on, mouse, DnDSource, DndManager) {
 	 * @property {OnDemandGrid} grid
 	 * @property {FileStore}
 	 */
-	return declare(DnDSource, /** @lends rfe.dnd.GridSource.prototype */ {
+	return declare([DnDSource, _SourceMixin], /** @lends rfe.dnd.GridSource.prototype */ {
 
-		grid: null,
-
-		fileStore: null,
+		rfe: null,
 
 		getObject: function(node) {
 			return this.grid.row(node).data;
@@ -65,7 +64,7 @@ function(declare, lang, when, on, mouse, DnDSource, DndManager) {
 		 * @param newParentObject
 		 */
 		onDropInternal: function(nodes, copy, newParentObject) {
-			var fileStore = this.fileStore,
+			var fileStore = this.rfe.store,
 				storeMemory = fileStore.storeMemory,
 				targetSource = this,
 				oldParentObject;
@@ -95,7 +94,7 @@ function(declare, lang, when, on, mouse, DnDSource, DndManager) {
 		 * Handle objects dropped from an external source onto the grid.
 		 */
 		onDropExternal: function(sourceSource, nodes, copy, newParentObject) {
-			var fileStore = this.fileStore,
+			var fileStore = this.rfe.store,
 				storeMemory = fileStore.storeMemory,
 				row, grid = this.grid,
 				oldParentObject;
@@ -112,7 +111,7 @@ function(declare, lang, when, on, mouse, DnDSource, DndManager) {
 					newParentObject = storeMemory.get(row.data[fileStore.parentAttr]);
 				}
 				else {	// empty folder get parent from tree (TODO: find solution which uses dnd interface (possible?)
-					newParentObject = grid.rfe.currentTreeObject;
+					newParentObject = this.rfe.currentTreeObject;
 				}
 			}
 
@@ -129,45 +128,20 @@ function(declare, lang, when, on, mouse, DnDSource, DndManager) {
 		/**
 		 * Process mouse move events
 		 */
-		onMouseMove: function(evt) {
+		onMouseMove: function() {
 			this.inherited('onMouseMove', arguments);
 
-			var m = DndManager.manager(),
-				grid = this.grid;
+			var parentObj, id,
+				m = DndManager.manager();
 
-			// prevent dropping from tree onto own child in grid, e.g. parent folder onto its own child
-			if (this.isDragging && m.source.tree && this._isParentChildDrop(m.nodes[0], grid.row(evt))){
-				m.canDrop(false);
-			}
-		},
-
-		/**
-		 * Checks whether the dragged node is a parent of the grid row we are currently over.
-		 * @param {dojo/dnd/Source} source
-		 * @param {dgrid/row} row
-		 * @return {Boolean}
-		 * @private
-		 */
-		_isParentChildDrop: function(source, row){
-			var store = this.fileStore,
-				memoryStore = store.storeMemory,
-				sourceId = DndManager.manager().source.getObject(source).id,	// id of dragged node
-				// also check when dropping beyond rows
-				object = (row && store.storeMemory.get(row.id)) || this.grid.rfe.currentTreeObject; // object must be in cache since it is displayed in the grid
-
-			if (object.id === sourceId) {
-				return true;
-			}
-
-			while (object[store.parentAttr]) {
-				object = memoryStore.get(object[store.parentAttr]);
-				if (object.id === sourceId) {
-					return true;
+			// guard against dragging from tree into own child in grid
+			if (this.isDragging && m.source.tree) {
+				id = m.source.getObject(m.nodes[0]).id;
+				parentObj = this.rfe.currentTreeObject;
+				if (this._isParentChild(id, parentObj)){
+					m.canDrop(false);
 				}
 			}
-			return false;
 		}
-
-
 	});
 });

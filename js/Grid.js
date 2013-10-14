@@ -42,27 +42,27 @@ define([
 				editOn: 'dummyEvent',
 				sortable: false, // lets us apply own header click sort
 				autoSave: false,
-				label: fileObject.label['name']
+				label: fileObject.label.name
 			}),
 			size: {
 				sortable: false, // lets us apply own header click sort
-				label: fileObject.label['size'],
-				formatter: fileObject.formatter['size']
+				label: fileObject.label.size,
+				formatter: fileObject.formatter.size
 			},
 			dir: {
 				sortable: false, // lets us apply own header click sort
-				label: fileObject.label['dir'],
-				formatter: fileObject.formatter['dir']
+				label: fileObject.label.dir,
+				formatter: fileObject.formatter.dir
 			},
 			cre: {
 				sortable: false, // lets us apply own header click sort
-				label: fileObject.label['cre'],
-				formatter: fileObject.formatter['cre']
+				label: fileObject.label.cre,
+				formatter: fileObject.formatter.cre
 			},
 			mod: {
 				sortable: false, // lets us apply own header click sort
-				label: fileObject.label['mod'],
-				formatter: fileObject.formatter['mod']
+				label: fileObject.label.mod,
+				formatter: fileObject.formatter.mod
 			}
 		},
 

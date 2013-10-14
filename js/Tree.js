@@ -23,8 +23,7 @@ define([
 		dndController: function(arg, params) {
 			return new TreeSource(arg, lang.mixin(params || {}, {
 				accept: ['dgrid-row'],
-				fileStore: arg.rfe.store,
-				singular: true	// to keep things simple and logical, remoteFileExplorer assumes this is always true
+				rfe: arg.rfe
 			}));
 		},
 
@@ -59,11 +58,11 @@ define([
 		},
 
 		/**
- 		 * Save selected nodes in a cookie.
+		 * Save selected nodes in a cookie.
 		 * Converts the path array to a string separated with slashes. If there are multiple nodes selected, they
 		 * are separated by this.multiplePathSeparator.
 		 * @param {array} paths
- 		 */
+		 */
 		savePaths: function(paths) {
 			var arr = [], selects = [],
 			model = this.tree.model;

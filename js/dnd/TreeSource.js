@@ -5,16 +5,21 @@ define([
 	'dojo/_base/Deferred',
 	'dojo/on',
 	'dojo/dom-class',
-	'dijit/tree/dndSource'
-], function(lang, array, declare, Deferred, on, domClass, dndSource) {
+	'dijit/tree/dndSource',
+	'dojo/dnd/Manager',
+	'rfe/dnd/_SourceMixin'
+], function(lang, array, declare, Deferred, on, domClass, dndSource, DndManager, _SourceMixin) {
 
-		return declare([dndSource], {
+		return declare([dndSource, _SourceMixin], {
+
+			rfe: null,
+			singular: true,	// all dnd operations assume that we only drag single tree nodes
 
 			getObject: function(node){
 				// summary:
 				//		getObject is a method which should be defined on any source intending
 				//		on interfacing with dgrid DnD
-				var item = this.getItem(node.id);	// TODO: use store to get object as with dgrid.getObject()?
+				var item = this.getItem(node.id);
 				return item.data.item;
 			},
 
@@ -58,7 +63,7 @@ define([
 			 * @param newParentObject
 			 */
 			onDropInternal: function(nodes, copy, newParentObject) {
-				var fileStore = this.fileStore,
+				var fileStore = this.rfe.store,
 					storeMemory = fileStore.storeMemory,
 					targetSource = this,
 					object, oldParentObject;
@@ -81,7 +86,7 @@ define([
 			 */
 			onDropExternal: function(sourceSource, nodes, copy, newParentObject) {
 
-				var fileStore = this.fileStore,
+				var fileStore = this.rfe.store,
 					storeMemory = fileStore.storeMemory,
 					object, oldParentObject;
 
@@ -97,8 +102,26 @@ define([
 					object = sourceSource.getObject(node);	// TODO: do not use source.getObject, since node is a grid row (no item.data.item)
 					fileStore.pasteItem(object, oldParentObject, newParentObject, copy);
 				});
+			},
+
+			/**
+			 * Helper method for processing onmousemove/onmouseover events while drag is in progress.
+			 * @private
+			 */
+			_onDragMouse: function() {
+				this.inherited('_onDragMouse', arguments);
+
+				var id, parentObj,
+					m = DndManager.manager();
+
+				// Cancel dropping onto own descendant from grid
+				if (m.source.grid) {
+					parentObj = this.current.item;
+					id = m.source.getObject(m.nodes[0]).id;
+					if (this._isParentChild(id, parentObj)) {
+						m.canDrop(false);
+					}
+				}
 			}
-
 		});
-
 });
