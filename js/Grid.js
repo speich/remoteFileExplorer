@@ -36,6 +36,7 @@ define([
 		allowSelectAll: true,
 		maintainOddEven: false,
 		showHeader: false,
+		cleanEmptyObservers: false,	// otherwise adding to empty grid will not show added in grid
 		columns: {
 			name: editor({
 				editor: 'textarea',
@@ -84,7 +85,7 @@ define([
 		topic.subscribe('grid/views/state', lang.hitch(this, function(view) {
 				this.set('view', view);
 			}));
-			this.set('showHeader', true);	// if headers are renderered is taken car of in setView
+			this.set('showHeader', true);	// if headers are re-rendered this taken care of in setView
 			this.set('view', this.view);
 		},
 
@@ -134,7 +135,5 @@ define([
 
 			this.set('sort', arrSort);
 		}
-
-
 	});
 });
