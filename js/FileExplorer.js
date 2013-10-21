@@ -237,11 +237,13 @@ define([
 				isGridRow = typeof this.grid.row(evt) !== 'undefined',
 				isTreeRow = widget && widget.baseClass === 'dijitTreeNode';
 
+			node = node || widget.domNode;
+
 			this.context = {
 				isOnGridRow: isGridRow,
 				isOnGridContainer: domClass.contains(node, 'rfeGridPane') && !isGridRow,
 				isOnTreeRow: isTreeRow,
-				isOnTreeContainer: domClass.contains(node, 'rfeTreePane') && !isTreeRow
+				isOnTreeContainer: widget.baseClass === 'dijitTree'
 			};
 
 			this.context.isOnGrid = this.context.isOnGridRow || this.context.isOnGridContainer;
@@ -309,14 +311,16 @@ define([
 			});
 			// get objects children and display them in grid
 			dfd = dfd.then(function(object) {
-					// TODO: when object is a file get parent object's children
 					return when(store.getChildren(object), function() {	// load children puts them in the cache, then set grid's store
+						var row, cell;
 						// Setting caching store for grid would not use cache, because cache.query() always uses the
 						// master store => use storeMemory.
 						grid.set('store', store.storeMemory, { parId: id });
 						if (file) {
-							var row = grid.row(file.id);
+							row = grid.row(file.id);
+							cell = grid.cell(file, 'name');
 							grid.select(row);
+							grid.focus(grid.cellNavigation ? cell : row);
 						}
 					});
 			});

@@ -24,12 +24,6 @@ define(['dojo/_base/declare', 'dojo/has', 'dojo/on'], function(declare, has, on)
 					88: this.cut			// x
 				}
 			};
-
-			this.keyMap = {
-				ctrl: {
-					65: this.selectAll	// a
-				}
-			};
 		},
 
 		_handleKey: function(evt) {
@@ -41,7 +35,8 @@ define(['dojo/_base/declare', 'dojo/has', 'dojo/on'], function(declare, has, on)
 				// prevent calling delete/copy-paste in form
 				return;
 			}
-			map = (this.context.isOnGrid || this.context.isOnTree) ? this.keyMapContent : this.keyMap;
+			//map = (this.context.isOnGrid || this.context.isOnTree) ? this.keyMapContent : this.keyMap;
+			map = this.keyMapContent;
 			map = evt[ctrlEquiv] ? map.ctrl : map;
 			handler = map[evt.keyCode];
 			if (handler) {
@@ -51,11 +46,10 @@ define(['dojo/_base/declare', 'dojo/has', 'dojo/on'], function(declare, has, on)
 		},
 
 		postCreate: function() {
-			var rfe = this;
-
 			this.inherited('postCreate', arguments);
 
-			//on(this.domNode, '.dgrid-content:keydown, .dijitTreeContainer:keydown', function(evt) {
+			var rfe = this;
+
 			on(this.domNode, 'keydown', function(evt) {
 				rfe.set('context', evt, this);
 				rfe._handleKey(evt);
@@ -67,6 +61,10 @@ define(['dojo/_base/declare', 'dojo/has', 'dojo/on'], function(declare, has, on)
 		 * Cancels selecting of all text in file explorer by browser.
 		 */
 		selectAll: function() {
+			if (this.context.isOnGrid) {
+				// already handled by grid Keyboard.js
+				return;
+			}
 			// do not select everything, only grid content
 			this.grid[this.grid.allSelected ? "clearSelection" : "selectAll"]();
 		}

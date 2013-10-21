@@ -66,7 +66,7 @@ define([
 		},
 
 		/**
-		 * Rerender headings and rows
+		 * Re-render headings and rows
 		 * @param {String} view
 		 */
 		_setView: function(view) {
@@ -136,6 +136,10 @@ define([
 					this.columns[prop].renderCell = this.cellRenderers[view][prop];
 				}
 			}
+
+			// Should keyboard navigation occur at row or cell level?
+			// @see dgrid/Keyboard.js
+			this.cellNavigation = view === 'list';
 
 			put(this.domNode, "!gridViewList!gridViewIcons!gridViewDetails." + cssClass);
 		},
