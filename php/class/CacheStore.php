@@ -1,6 +1,7 @@
 <?php
 namespace remoteFileExplorer\fs;
 
+// TODO: if cache folder is missing created it!
 
 class CacheStore {
 
@@ -23,6 +24,9 @@ class CacheStore {
 			$this->dbName = $dbName;
 			$this->dbPath = rtrim($dbPath, '/').'/';
 		}
+		else {
+			$this->dbPath = rtrim($_SERVER['DOCUMENT_ROOT'],'/').'/';
+		}
 	}
 
 	/**
@@ -30,7 +34,7 @@ class CacheStore {
 	 * @return \PDO|bool
 	 */
 	public function connect() {
-		$db = rtrim($_SERVER['DOCUMENT_ROOT'],'/').'/'.$this->dbPath.$this->dbName;   // depending on the env, docroot has trailing slash or not
+		$db = $this->dbPath.$this->dbName;   // depending on the env, docroot has trailing slash or not
 		$isCreated = file_exists($db);
 		if (is_null($this->db)) {	// check if not already connected to db
 			try {				

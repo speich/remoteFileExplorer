@@ -29,6 +29,7 @@ if ($resource && file_exists($rfeConfig['paths']['fileSystemRoot'].ltrim($resour
 
 	// check if image resource is already in cache, then either create it or return it
 	// TODO: Limit cache size!
+	// TODO: do not use default, pass arguemtns to CacheStore()
 	$db = new fs\CacheStore();
 	$db = $db->connect();
 
