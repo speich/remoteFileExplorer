@@ -19,9 +19,9 @@ define(['dojo/_base/declare', 'dojo/has', 'dojo/on'], function(declare, has, on)
 				46: this.del,
 				ctrl: {
 					65: this.selectAll,	// a
-					67: this.copy,			// c
+					67: this.copy,		// c
 					86: this.paste,		// v
-					88: this.cut			// x
+					88: this.cut		// x
 				}
 			};
 		},
@@ -29,7 +29,6 @@ define(['dojo/_base/declare', 'dojo/has', 'dojo/on'], function(declare, has, on)
 		_handleKey: function(evt) {
 			var map, handler,
 				nodeType = evt.target.nodeName.toLowerCase();
-
 
 			if (nodeType === 'input' || nodeType === 'textarea') {
 				// prevent calling delete/copy-paste in form

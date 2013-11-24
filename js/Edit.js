@@ -26,25 +26,32 @@ define([
 			// A. When deleting from toolbar, we only use selected items from the grid (or use focus?). Currently this
 			// happens from the different menu in layout.js -> move here?
 			// B. When deleting from context menu, use context to decide which selected items to use
-			var self = this, store = this.store,
-				selection, id, doNotAskAgain = true, dfd = new Deferred();
+			var self = this,
+				store = this.store,
+				selection, id,
+				dfd = new Deferred(),
+				skip = false,	// TODO: load from cookie ?
+				dialog = null;
+
 
 			function remove(id) {
 				// note: remove creates closure for id in loop
-				var obj = store.storeMemory.get(id),
-					dialog = dialogs.getByFileObj('deleteFile', obj);
+				var obj = store.storeMemory.get(id);
 
-				dfd.resolve(doNotAskAgain).then(function(remember) {
-					if (remember === false) {
-						return dialog.show();
-					}
-					else {
-						return true;
-					}
-				}).then(function(remember) {
-					doNotAskAgain = remember;
+				// create a new dialog for every file to delete
+				dialog = dialogs.getByFileObj('deleteFile', obj);
+
+
+				if (skip === false) {
+					dfd = dialog.show();
+				}
+				else {
+					dfd.resolve(true);
+				}
+				dfd.then(function (resolvedSkip) {
+					skip = resolvedSkip;
 					return store.remove(id);
-				}).then(function() {
+				}).then(function () {
 					self.removeHistory(id);
 					// point address bar (history) to parent folder of deleted
 					window.history.pushState('', '', self.origPageUrl + obj.parId + window.location.search);

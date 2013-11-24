@@ -48,7 +48,7 @@ define([
 		postCreate: function() {
 			this.inherited('postCreate', arguments);
 
-			var label, div, remember = false;
+			var label, div, skip = false;
 
 			div = construct.create('div', {
 				className: 'dijitDialogPaneContent dialogConfirm'
@@ -68,9 +68,9 @@ define([
 				this.okButton = new Button({
 					label: 'OK',
 					onClick: lang.hitch(this, function() {
-						remember = this.hasSkipCheckBox ? this.skipCheckBox.get('checked') : false;
+						skip = this.hasSkipCheckBox ? this.skipCheckBox.get('checked') : false;
 						this.hide();
-						this.dfd.resolve(remember);
+						this.dfd.resolve(skip); // continue in chain and pass if decision should be remembered
 					})
 				}, construct.create('div'));
 				div.appendChild(this.okButton.domNode);
@@ -79,9 +79,9 @@ define([
 				this.cancelButton = new Button({
 					label: 'Cancel',
 					onClick: lang.hitch(this, function() {
-						remember = this.hasSkipCheckBox ? this.skipCheckBox.get('checked') : false;
+						skip = this.hasSkipCheckBox ? this.skipCheckBox.get('checked') : false;
 						this.hide();
-						this.dfd.cancel(remember);
+						this.dfd.cancel(skip); // cancel chain and pass if decision should be remembered
 					})
 				}, construct.create('div'));
 				div.appendChild(this.cancelButton.domNode);
