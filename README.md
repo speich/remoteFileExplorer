@@ -2,7 +2,7 @@ This web application manages files and folders on a remote web server directly w
 remoteFileExplorer (rfe) is programmed in JavaScript using dojo on the client side and PHP on the server side.
 All communication with the web server is done through REST.
 
-Working [demo of the remoteFileExplorer](http://www.speich.net/projects/programming/remoteFileExplorer.php)
+Working [demo of the remoteFileExplorer](http://www.speich.net/projects/programming/remoteFileExplorer.php/demo/photos)
 ![Screenshot](js/resources/images/screenshot.jpg "Screenshot of remoteFileExplorer")
 
 ## Features

@@ -95,6 +95,7 @@ define([
 			this.grid = new Grid({
 				rfe: this,
 				tabIndex: 31,
+				view: 'icons',
 				store: null, // store is set in FileExplorer.initState()
 				dndConstructor: GridSource,	// dgrid/extension/dnd can't be overridden directly
 				dndParams: {
