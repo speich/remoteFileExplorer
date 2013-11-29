@@ -1,10 +1,9 @@
 define([
 	'dojo/_base/lang',
-	'dojo/_base/array',
 	'dojo/_base/declare',
 	'dojo/Deferred',
 	'rfe/dialogs/dialogs'
-], function(lang, array, declare, Deferred, dialogs) {
+], function(lang, declare, Deferred, dialogs) {
 
 	/**
 	 * Provides functionality to edit files and folders.
@@ -27,8 +26,7 @@ define([
 			// happens from the different menu in layout.js -> move here?
 			// B. When deleting from context menu, use context to decide which selected items to use
 			var self = this, store = this.store,
-				selection, id, doNotAskAgain = false, dfdDiaolog,
-			i = 0, dfds = [];
+				selection, id, i = 0, dfds = [];
 
 			function remove(id) {
 				// note: remove creates closure for id in loop
