@@ -6,7 +6,7 @@ define([
 	'dijit/Dialog',
 	'dijit/form/Button',
 	'dijit/form/CheckBox'
-], function(lang, declare, Deferred, construct, Dialog, Button, Checkbox) {
+], function(lang, declare, Deferred, domConstruct, Dialog, Button, Checkbox) {
 
 	/**
 	 * @class
@@ -48,18 +48,18 @@ define([
 		postCreate: function() {
 			this.inherited('postCreate', arguments);
 
-			var label, div, remember = false;
+			var label, div, skip = false;
 
-			div = construct.create('div', {
+			div = domConstruct.create('div', {
 				className: 'dijitDialogPaneContent dialogConfirm'
 			}, this.domNode, 'last');
 
 			if (this.hasSkipCheckBox) {
 				this.skipCheckBox = new Checkbox({
 					checked: false
-				}, construct.create('div'));
+				}, domConstruct.create('div'));
 				div.appendChild(this.skipCheckBox.domNode);
-				label = construct.create('label', {
+				label = domConstruct.create('label', {
 					'for': this.skipCheckBox.id,
 					innerHTML: 'Remember my decision and do not ask again.<br/>'
 				}, div);
@@ -68,22 +68,22 @@ define([
 				this.okButton = new Button({
 					label: 'OK',
 					onClick: lang.hitch(this, function() {
-						remember = this.hasSkipCheckBox ? this.skipCheckBox.get('checked') : false;
+						skip = this.hasSkipCheckBox ? this.skipCheckBox.get('checked') : false;
 						this.hide();
-						this.dfd.resolve(remember);
+						this.dfd.resolve(skip);
 					})
-				}, construct.create('div'));
+				}, domConstruct.create('div'));
 				div.appendChild(this.okButton.domNode);
 			}
 			if (this.hasCancelButton) {
 				this.cancelButton = new Button({
 					label: 'Cancel',
 					onClick: lang.hitch(this, function() {
-						remember = this.hasSkipCheckBox ? this.skipCheckBox.get('checked') : false;
+						skip = this.hasSkipCheckBox ? this.skipCheckBox.get('checked') : false;
 						this.hide();
-						this.dfd.cancel(remember);
+						this.dfd.cancel(skip);
 					})
-				}, construct.create('div'));
+				}, domConstruct.create('div'));
 				div.appendChild(this.cancelButton.domNode);
 			}
 			this.buttonNode = div;
@@ -91,12 +91,13 @@ define([
 
 		/**
 		 * Shows the dialog.
-		 * @return {Deferred}
+		 * Returns a deferred which is resolved when the user clicks the ok or cancel button.
+		 * @return {dojo/Deferred}
 		 */
 		show: function() {
 			this.inherited('show', arguments);
 			if (!this.hasUnderlay) {
-				construct.destroy(this.id + '_underlay');	// remove underlay
+				domConstruct.destroy(this.id + '_underlay');	// remove underlay
 			}
 			this.dfd = new Deferred();
 			return this.dfd;

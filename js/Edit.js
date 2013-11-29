@@ -27,32 +27,37 @@ define([
 			// happens from the different menu in layout.js -> move here?
 			// B. When deleting from context menu, use context to decide which selected items to use
 			var self = this, store = this.store,
-				selection, id, doNotAskAgain = true, dfd = new Deferred();
+				selection, id, doNotAskAgain = false, dfdDiaolog,
+			i = 0, dfds = [];
 
 			function remove(id) {
 				// note: remove creates closure for id in loop
 				var obj = store.storeMemory.get(id),
 					dialog = dialogs.getByFileObj('deleteFile', obj);
 
-				dfd.resolve(doNotAskAgain).then(function(remember) {
-					if (remember === false) {
+				dfds[i + 1] = dfds[i].then(function(skip) {
+					if (!skip) {
 						return dialog.show();
 					}
 					else {
-						return true;
+						var dfd = new Deferred();
+						dfd.resolve(true);
+						return dfd;
 					}
-				}).then(function(remember) {
-					doNotAskAgain = remember;
-					return store.remove(id);
-				}).then(function() {
-					self.removeHistory(id);
-					// point address bar (history) to parent folder of deleted
-					window.history.pushState('', '', self.origPageUrl + obj.parId + window.location.search);
-					if (self.context.isOnTree) {
-						obj = self.store.storeMemory.get(obj.parId);
-						self.display(obj);
-					}
+				}).then(function(skip) {
+					store.remove(id).then(function() {
+						self.removeHistory(id);
+						// point address bar (history) to parent folder of deleted
+						window.history.pushState('', '', self.origPageUrl + obj.parId + window.location.search);
+						if (self.context.isOnTree) {
+							obj = self.store.storeMemory.get(obj.parId);
+							self.display(obj);
+						}
+					});
+					return skip;
 				}, error);
+
+				i++;
 			}
 
 			function error() {
@@ -60,6 +65,9 @@ define([
 					console.log(err);
 				};
 			}
+
+			dfds[0] = new Deferred();
+			dfds[0].resolve(false); // start resolving chain
 
 			// create one dialog for all selected nodes per call of this method and only update its content
 			selection = this.context.isOnGrid ? this.grid.selection : this.tree.selectedItems;
