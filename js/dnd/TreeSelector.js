@@ -10,10 +10,9 @@
 define([
 	'dojo/_base/array',
 	'dojo/_base/lang',
-	'dojo/_base/event',
 	'dojo/_base/connect',
 	'dijit/tree/_dndSelector'
-], function(array, lang, event, connect, _dndSelector) {
+], function(array, lang, connect, _dndSelector) {
 
 	// set references to be able to call overridden methods
 	var  ref = _dndSelector.prototype,

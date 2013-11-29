@@ -8,15 +8,13 @@ define([
 	'dojo/_base/lang',
 	'dojo/when',
 	'dojo/Deferred',
-	'dojo/promise/all',
-	'dojo/aspect',
 	'dojo/_base/array',
 	'dojo/store/Memory',
 	'dojo/store/JsonRest',
 	'dojo/store/Observable',
 	'dojo/store/Cache',
 	'dijit/tree/ObjectStoreModel'
-], function(declare, lang, when, Deferred, all, aspect, array, Memory, JsonRest, Observable, Cache, ObjectStoreModel) {
+], function(declare, lang, when, Deferred, array, Memory, JsonRest, Observable, Cache, ObjectStoreModel) {
 
 	// references for MonkeyPatching the store.Cache
 	var refPut, refDel, refAdd;

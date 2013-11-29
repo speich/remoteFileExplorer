@@ -1,13 +1,9 @@
 define([
 	'dojo/_base/lang',
-	'dojo/_base/array',
 	'dojo/_base/declare',
-	'dojo/dom-construct',
-	'dojo/dom-attr',
-	'dojo/on',
 	'dijit/form/_ComboBoxMenu',
 	'rfe/util/stringUtil'
-], function(lang, array, declare, domConstruct, domAttr, on, _ComboBoxMenu, stringUtil) {
+], function(lang, declare, _ComboBoxMenu, stringUtil) {
 
 	return declare([_ComboBoxMenu], {
 		// TODO: find better solution to get store target url

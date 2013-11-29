@@ -1,8 +1,6 @@
 define([
 	'dojo/_base/lang',
-	'dojo/Deferred',
 	'dojo/_base/declare',
-	'dojo/_base/array',
 	'dojo/on',
 	'dojo/aspect',
 	'dojo/topic',
@@ -16,7 +14,7 @@ define([
 	'dgrid/extensions/ColumnHider',
 	'rfe/grid/View',
 	'rfe/config/fileObject'
-], function(lang, Deferred, declare, array, on, aspect, topic, query, Grid, Selection, editor, Keyboard, DnD, ColumnResizer, ColumnHider, View, fileObject) {
+], function(lang, declare, on, aspect, topic, query, Grid, Selection, editor, Keyboard, DnD, ColumnResizer, ColumnHider, View, fileObject) {
 
 	/**
 	 * @class rfe.Grid

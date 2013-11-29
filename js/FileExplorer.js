@@ -8,14 +8,9 @@ define([
 	'dojo/_base/declare',
 	'dojo/Deferred',
 	'dojo/when',
-	'dojo/cookie',
 	'dojo/dom',
 	'dojo/dom-class',
-	'dojo/date/locale',
 	'dojo/on',
-	'dojo/topic',
-	'dojo/query',	// required for dojo/on event delegation
-	'dojo/io-query',
 	'dojo/Stateful',
 	'dijit/registry',
 	'rfe/_Base',
@@ -26,7 +21,7 @@ define([
 	'rfe/dialogs/dialogs',
 	'rfe/Keyboard',
 	'rfe/dnd/Manager'	// needs to be loaded for dnd
-], function(lang, declare, Deferred, when, cookie, dom, domClass, locale, on, topic, query, ioQuery, Stateful,
+], function(lang, declare, Deferred, when, dom, domClass, on, Stateful,
 				registry, _Base, Layout, History, Edit, FileStore, dialogs, Keyboard) {
 
 	/*

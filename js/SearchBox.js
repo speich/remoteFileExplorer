@@ -1,11 +1,10 @@
 define([
-	'dojo/_base/lang',
 	'dojo/_base/declare',
 	'dijit/form/ComboBox',
 	'rfe/_SearchBoxMenu',
 	'dojo/store/JsonRest',
 	'dojo/when'
-], function(lang, declare, ComboBox, _SearchBoxMenu, JsonRest, when) {
+], function(declare, ComboBox, _SearchBoxMenu, JsonRest, when) {
 
 	return declare([ComboBox], {
 		value: 'search',

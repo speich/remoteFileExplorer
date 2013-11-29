@@ -1,13 +1,9 @@
 define([
-	'dojo/_base/array',
 	'dojo/_base/lang',
 	'dojo/_base/declare',
-	'dojo/on',
-	'dojo/topic',
 	'dojo/cookie',
 	'dojo/dom-construct',
 	'dojo/query',
-	'dojo/Stateful',
 	'rfe/Tree',
 	'rfe/Grid',
 	'rfe/dnd/GridSource',
@@ -19,7 +15,7 @@ define([
 	'rfe/layout/Panes',
 	'rfe/Console',
 	'rfe/ContextMenu'
-], function(array, lang, declare, on, topic, cookie, domConstruct, query, Stateful, Tree, Grid, GridSource,
+], function(lang, declare, cookie, domConstruct, query, Tree, Grid, GridSource,
 				registry, CheckBox, Dialog, Toolbar, Menubar, Panes, Console, ContextMenu) {
 
 	/**

@@ -3,11 +3,10 @@ define([
 	'dojo/_base/lang',
 	'dijit/_WidgetBase',
 	'dojo/request/notify',
-	'dojo/dom',
 	'dojo/dom-construct',
 	'dojo/json',
 	'dojo/date/locale'
-], function(declare, lang, _WidgetBase, notify, dom, domConstruct, json, locale) {
+], function(declare, lang, _WidgetBase, notify, domConstruct, json, locale) {
 
 	var autoId = 0;
 

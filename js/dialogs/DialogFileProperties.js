@@ -3,7 +3,7 @@ define([
 	'dojo/dom-construct',
 	'rfe/DialogConfirm',
 	'rfe/config/fileObject'
-], function(declare, construct, Dialog, fileObject) {
+], function(declare, domConstruct, DialogConfirm, fileObject) {
 
 	/**
 	 * @class rfe.DialogFileProperties
@@ -11,7 +11,7 @@ define([
 	 * @property {string} type type of dialog
 	 * @property {boolean} hasUnderlay create the dialog underlay?
 	 */
-	return declare(Dialog, /* @lends rfe.DialogFileProperties.prototype */ {
+	return declare(DialogConfirm, /* @lends rfe.DialogFileProperties.prototype */ {
 
 		type: 'fileProperties',
 		hasUnderlay: false,
@@ -36,7 +36,7 @@ define([
 		show: function() {
 			// override to allow to display without underlay
 			if (!this.hasUnderlay) {
-				construct.destroy(this.id + '_underlay');	// remove underlay
+				domConstruct.destroy(this.id + '_underlay');	// remove underlay
 			}
 			this.inherited('show', arguments);
 		},

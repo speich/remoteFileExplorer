@@ -1,14 +1,12 @@
 define([
-	'dojo/_base/lang',
 	'dojo/_base/window',
 	'dojo/_base/array',
 	'dojo/_base/declare',
 	'dojo/dom-construct',
 	'dojo/dom-class',
 	'dojo/dom-attr',
-	'dojo/query',
 	'dojo/dnd/Avatar'],
-function(lang, window, array, declare, construct, domClass, attr, query, Avatar) {
+function(window, array, declare, domConstruct, domClass, domAttr, Avatar) {
 
 	// preloading icons. Note: Can't be done in constructor, because it is only called when used
 	var images = {
@@ -28,7 +26,7 @@ function(lang, window, array, declare, construct, domClass, attr, query, Avatar)
 			this.images = images;
 
 			this.isA11y = domClass.contains(window.body(), "dijit_a11y");
-			var a = construct.create("table", {
+			var a = domConstruct.create("table", {
 				"class": "dojoDndAvatar",
 				style: {
 					position: "absolute",
@@ -37,26 +35,26 @@ function(lang, window, array, declare, construct, domClass, attr, query, Avatar)
 				}
 			}),
 			source = this.manager.source, node,
-			b = construct.create("tbody", null, a),
-			tr = construct.create("tr", null, b),
-			td = construct.create("td", null, tr),
-			span = construct.create("span", {
+			b = domConstruct.create("tbody", null, a),
+			tr = domConstruct.create("tr", null, b),
+			td = domConstruct.create("td", null, tr),
+			span = domConstruct.create("span", {
 				innerHTML: source.generateText ? this._generateText(): ""
 			}, td);
 
 			// we have to set the opacity on IE only after the node is live
-			attr.set(tr, {
+			domAttr.set(tr, {
 				"class": "dojoDndAvatarHeader",
 				style: {opacity: 0.9}
 			});
 
-			node = construct.create('div');
+			node = domConstruct.create('div');
 			node.appendChild(this.createIcon());
 			node.id = "";
-			tr = construct.create("tr", null, b);
-			td = construct.create("td", null, tr);
+			tr = domConstruct.create("tr", null, b);
+			td = domConstruct.create("td", null, tr);
 			td.appendChild(node);
-			attr.set(tr, {
+			domAttr.set(tr, {
 				"class": "dojoDndAvatarItem",
 				style: {opacity: 0.9}
 			});

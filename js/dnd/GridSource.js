@@ -1,14 +1,11 @@
 define([
 	'dojo/_base/declare',
-	'dojo/_base/lang',
 	'dojo/when',
-	'dojo/on',
-	'dojo/mouse', // mouse.isLeft
 	'dojo/dnd/Source',
 	'dojo/dnd/Manager',
 	'rfe/dnd/_SourceMixin'
 ],
-function(declare, lang, when, on, mouse, DnDSource, DndManager, _SourceMixin) {
+function(declare, when, DnDSource, DndManager, _SourceMixin) {
 
 	/**
 	 * Class to handle drag and drop of the dgrid.

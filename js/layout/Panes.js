@@ -2,15 +2,13 @@
  * @module rfe/layout/Panes
  */
 define([
-	'dojo/_base/lang',
 	'dojo/_base/declare',
-	'dojo/dom',
 	'dojo/dom-construct',
 	'dojo/dom-geometry',
 	'dojo/dom-style',
 	'dijit/layout/BorderContainer',
 	'dijit/layout/ContentPane'
-], function(lang, declare, dom, construct, geometry, style, BorderContainer, ContentPane) {
+], function(declare, domConstruct, domGeometry, domStyle, BorderContainer, ContentPane) {
 
 	var cpPosition;	// remember position of contentPane when show/hide treePane to restore layout
 	// this information is only available after child panes (treePane, gridPane) are added
@@ -63,7 +61,7 @@ define([
 
 			this.contentPaneBc = new BorderContainer({
 				gutters: false
-			}, construct.create('div'));
+			}, domConstruct.create('div'));
 			this.treePane = new ContentPane({
 				region: 'left',
 				splitter: true,
@@ -108,7 +106,7 @@ define([
 				}
 				// hiding treePane messes up layout, fix that
 				if (this.contentPane._started && cpPosition) {
-					style.set(this.contentPane.domNode, {
+					domStyle.set(this.contentPane.domNode, {
 						left: cpPosition.x + 'px',
 						top: cpPosition.y + 'px',
 						width: cpPosition.w + 'px',
@@ -129,7 +127,7 @@ define([
 			var treePane = this.treePane;
 			// before removing pane, remember position of contentPane when show/hide treePane to restore layout
 			if (this.contentPane._started) {
-				cpPosition = geometry.position(this.contentPane.domNode);
+				cpPosition = domGeometry.position(this.contentPane.domNode);
 			}
 			visible === false ? this.removeChild(treePane) : this.addChild(treePane);
 			this._set('treePaneVisible', visible);

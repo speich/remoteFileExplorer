@@ -1,14 +1,10 @@
 define([
-	'dojo/_base/lang',
 	'dojo/_base/array',
 	'dojo/_base/declare',
-	'dojo/_base/Deferred',
-	'dojo/on',
-	'dojo/dom-class',
 	'dijit/tree/dndSource',
 	'dojo/dnd/Manager',
 	'rfe/dnd/_SourceMixin'
-], function(lang, array, declare, Deferred, on, domClass, dndSource, DndManager, _SourceMixin) {
+], function(array, declare, dndSource, DndManager, _SourceMixin) {
 
 		return declare([dndSource, _SourceMixin], {
 

@@ -1,12 +1,9 @@
 define([
 	'dojo/_base/declare',
-	'dojo/_base/lang',
-	'dojo/request/xhr',
 	'dojo/on',
-	'dojo/aspect',
 	'dgrid/Grid',
 	'put-selector/put'
-], function(declare, lang, xhr, on, aspect, Grid, put) {
+], function(declare, on, Grid, put) {
 
 	return declare(null, {
 

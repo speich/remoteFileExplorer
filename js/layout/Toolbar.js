@@ -3,7 +3,6 @@ define([
 	'dojo/_base/declare',
 	'dojo/_base/array',
 	'dojo/on',
-	'dojo/when',
 	'dojo/aspect',
 	'dojo/dom-construct',
 	'dojo/query',
@@ -14,7 +13,7 @@ define([
 	'dijit/form/Select',
 	'rfe/config/fileObject',
 	'rfe/SearchBox'
-], function(lang, declare, array, on, when, aspect, domConstruct, query, registry, Toolbar, ToolbarSeparator, Button, Select, fileObject, SearchBox) {
+], function(lang, declare, array, on, aspect, domConstruct, query, registry, Toolbar, ToolbarSeparator, Button, Select, fileObject, SearchBox) {
 
 	/**
 	 * @class rfe.layout.Toolbar
