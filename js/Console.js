@@ -91,8 +91,14 @@ define([
 		 * @return {String}
 		 */
 		extractMsg: function(response) {
-			var i, len, msg = '',
+			var i, len, msg = '', result;
+
+			try {
 				result = json.parse(response);
+			}
+			catch(err) {
+				msg += '<br>' + err.message || err;
+			}
 
 			if (result instanceof Array) {
 				len = result.length;
