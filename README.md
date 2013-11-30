@@ -8,9 +8,9 @@ Working [demo of the remoteFileExplorer](http://www.speich.net/projects/programm
 ## Features
 * REST-based file operations on remote server (create, rename and delete)
 * lazy loading combined with client-side caching of files and folders
-* move (multiple) files and folder with drag and drop (copy not implemented yet)
+* move or copy (multiple) files and folder with drag and drop
 * keyboard support
-* list and icons view of files
+* switch between list or icons view of files and folders
 * vertical or horizontal layout with or without navigation pane (tree view)
 * searching for files and folders
 * sorting of files and folders
@@ -21,7 +21,7 @@ Working [demo of the remoteFileExplorer](http://www.speich.net/projects/programm
 
 ## JavaScript Dependencies
 Requires the following dependencies to be installed or mapped:
-* [The Dojo Toolkit](http://dojotoolkit.org) SDK version 1.8.1 or higher, mapped to /dojo
+* [The Dojo Toolkit](http://dojotoolkit.org) SDK version 1.9.1 or higher, mapped to /dojo
 * [dgrid](https://github.com/SitePen/dgrid), mapped to /dgrid
 * [xstyle](https://github.com/kriszyp/xstyle), mapped to /xstyle
 * [put-selector](https://github.com/kriszyp/put-selector), mapped to /put-selector
