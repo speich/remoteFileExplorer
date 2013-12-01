@@ -1,8 +1,9 @@
 define([
 	'dijit/registry',
+	'rfe/util/stringUtil',
 	'rfe/dialogs/DialogFileProperties',
 	'rfe/DialogConfirm'
-], function(registry, DialogFileProperties, DialogConfirm) {
+], function(registry, stringUtil, DialogFileProperties, DialogConfirm) {
 
 	return {
 
@@ -65,7 +66,7 @@ define([
 						title: 'Delete ' + this.ucfirst(str),
 						content: '<p>Do you really want to delete this ' + str + '?</p>' +
 							'<img src="' + require.toUrl('rfe') + '/resources/images/icons-64/' + str + '.png' + '" alt="' + str + ' icon" class="dialogContentIconImg">' +
-							'<div class="dialogContentTxt">' + args.obj.name + '<br>Modified: ' + args.obj.mod + '</div>'
+							'<div class="dialogContentTxt">' + args.obj.name + '<br>Modified: ' + stringUtil.formatDate(args.obj.mod) + '</div>'
 					});
 					break;
 				case 'fileProperties':
