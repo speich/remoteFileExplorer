@@ -80,7 +80,7 @@ define([
 			});
 			this.bodyNode.tabIndex = this.tabIndex;
 
-		topic.subscribe('grid/views/state', lang.hitch(this, function(view) {
+			topic.subscribe('grid/views/state', lang.hitch(this, function(view) {
 				this.set('view', view);
 			}));
 			this.set('showHeader', true);	// if headers are re-rendered this taken care of in setView

@@ -1,5 +1,6 @@
 /**
  * @module rfe/layout/Panes
+ * TODO: use css display flex for layout, also to switch from vertical to horizontal
  */
 define([
 	'dojo/_base/declare',

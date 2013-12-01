@@ -83,7 +83,7 @@ define([
 		 */
 		enableMenuItems: function(context) {
 			var id, selected = false,
-				selection = context.isOnGrid ? this.rfe.grid.dndSource.selection : this.rfe.tree.dndSource.selection;
+				selection = context.isOnGrid ? this.rfe.grid.selection : this.rfe.tree.dndSource.selection;
 
 			// set file properties menu depending on if at least one file object is selected
 			if (selection && context.isOnGrid) {
