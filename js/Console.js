@@ -21,12 +21,11 @@ define([
 			notify('done', lang.hitch(this, this.log));
 		},
 
-
 		buildRendering: function() {
 			this.inherited('buildRendering', arguments);
 
 			// create the DOM for this widget
-			var menu, id = 'rfeButtReset_' + autoId++;
+			var div, menu, id = 'rfeButtReset_' + (autoId++);
 			menu = domConstruct.create('menu', {
 				'class': 'dijitToolbar',
 				type: 'toolbar'
@@ -44,11 +43,11 @@ define([
 				innerHTML: '<img src="' + require.toUrl('rfe') + '/resources/images/icon_reset.png' + '" alt="reset icon" title="reset">'
 			}, menu);
 
-			domConstruct.create('div', {
-				innerHTML: '<div></div>'
+			div = domConstruct.create('div', {
+				'class': this.baseClass + ' containerNode'
 			}, this.domNode);
 
-			this.containerNode = domConstruct.create('ul', null, this.domNode);
+			this.containerNode = domConstruct.create('ul', null, div);
 
 		},
 

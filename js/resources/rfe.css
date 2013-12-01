@@ -72,8 +72,20 @@ p {
 	color: green;
 }
 
+.rfeLogPane {
+	overflow: hidden;
+
+}
 .rfeConsole {
 	font-size: 10px;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.rfeConsole .containerNode {
+	overflow: auto;
 }
 
 .rfeConsole ul {
