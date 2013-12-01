@@ -122,11 +122,12 @@ define([
 					'</div>'
 			});
 
+			// TODO: move to dialogs.js
 			var self = this;
 			var dialog = new Dialog({
 				id: 'rfeDialogSettings',
 				title: "Settings",
-				content: '<div>' +
+				content: '<div>Not implmented yet' +
 				'<fieldset><legend>Navigation Pane (Folders)</legend></fieldset>' +
 				'</div>'
 			});
@@ -139,6 +140,7 @@ define([
 			var input = domConstruct.create('input', null, label, 'first');
 			new CheckBox({
 				checked: cookie(this._cnDialogSettingsFolderState) || true,
+				disabled: 'disabled',
 				onChange: function() {
 					self.tree.set('persist', this.checked);
 					cookie(this._cnDialogSettingsFolderState, this.checked);
@@ -151,6 +153,7 @@ define([
 			input = domConstruct.create('input', null, label, 'first');
 			new CheckBox({
 				checked: true,
+				disabled: 'disabled',
 				onClick: function() {
 					self.store.skipWithNoChildren = this.checked;
 					self.reload();

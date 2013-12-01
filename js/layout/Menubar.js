@@ -129,7 +129,12 @@ define([
 			menuTools = new DropDownMenu({ id: 'rfeMenuTools' });
 			menuTools.addChild(new MenuItem({
 				label: 'Settings',
+				disabled: 'disabled',
 				onClick: this.rfe.showDialogSettings
+			}));
+			menuTools.addChild(new MenuItem({
+				label: 'Batch rename...',
+				disabled: 'disabled'
 			}));
 
 

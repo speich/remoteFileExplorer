@@ -238,7 +238,7 @@ define([
 				isOnGridRow: isGridRow,
 				isOnGridContainer: domClass.contains(node, 'rfeGridPane') && !isGridRow,
 				isOnTreeRow: isTreeRow,
-				isOnTreeContainer: widget.baseClass === 'dijitTree'
+				isOnTreeContainer: widget && widget.baseClass === 'dijitTree'
 			};
 
 			this.context.isOnGrid = this.context.isOnGridRow || this.context.isOnGridContainer;
