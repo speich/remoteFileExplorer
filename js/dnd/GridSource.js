@@ -5,7 +5,7 @@ define([
 	'dojo/dnd/Manager',
 	'rfe/dnd/_SourceMixin'
 ],
-function(declare, when, DnDSource, DndManager, _SourceMixin) {
+function(declare, when, DndSource, DndManager, _SourceMixin) {
 
 	/**
 	 * Class to handle drag and drop of the dgrid.
@@ -15,7 +15,7 @@ function(declare, when, DnDSource, DndManager, _SourceMixin) {
 	 * @property {OnDemandGrid} grid
 	 * @property {FileStore}
 	 */
-	return declare([DnDSource, _SourceMixin], /** @lends rfe.dnd.GridSource.prototype */ {
+	return declare([DndSource, _SourceMixin], /** @lends rfe.dnd.GridSource.prototype */ {
 
 		rfe: null,
 
