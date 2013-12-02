@@ -27,6 +27,9 @@ var dojoConfig = {
 		'dijit/tree': {
 			'dijit/tree/_dndSelector': 'rfe/dnd/TreeSelector',
 			'dijit/tree/dndSource': 'rfe/dnd/TreeSource'
+		},
+		'dojo/dnd': {
+			'dojo/dnd/Selector': 'rfe/dnd/Selector'
 		}
 	}
 };
