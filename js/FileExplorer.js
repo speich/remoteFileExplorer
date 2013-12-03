@@ -203,23 +203,25 @@ define([
 		 * Reload file explorer.
 		 */
 		reload: function() {
-			window.location.reload();
+			//window.location.reload();
 			// TODO: only reload files and folders
-			/*
-			var dndController = this.tree.dndController.declaredClass;
+
+			//var dndController = this.tree.dndController.declaredClass;
 			this.store.storeMemory.setData([]);
 			this.grid.refresh();
 
 			// reset and rebuild tree
-			this.tree.dndController.destroy();	// cleanup dnd connections and such
+			//this.tree.dndController = null;
 			this.tree._itemNodesMap = {};
 			this.tree.rootNode.destroyRecursive();
 			this.tree.rootNode.state = "UNCHECKED";
-			this.tree.dndController = dndController; //'rfe.dnd.TreeSource',
+			//this.tree.dndController = dndController; //'rfe.dnd.TreeSource',
 			this.tree.postMixInProperties();
+		//	this.tree._load();
 			this.tree.postCreate();
 			this.initState();
-			*/
+
+
 		},
 
 		/**

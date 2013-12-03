@@ -89,8 +89,12 @@ p {
 }
 
 .rfeConsole ul {
-	list-style: disc inside;
-	padding: 5px;
+	list-style: disc outside;
+	margin-left: 18px;
+}
+.rfeConsole li {
+	padding: 2px 0;
+	line-height: 1.2em;
 }
 
 .rfeConsole label {
@@ -214,7 +218,7 @@ p {
 }
 
 .dijitDialog {
-	min-width: 200px;
+	min-width: 300px;
 }
 
 .rfe .dijitDialogPaneContent {

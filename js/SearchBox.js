@@ -41,12 +41,18 @@ define([
 
 				if (file.dir) {
 					rfe.display(file);
+					// TODO: set focus in tree
+					//focusNode()
 				}
 				else {
 					when(rfe.store.get(file.parId), function(object) {
 						rfe.display(object).then(function() {
-							var row = rfe.grid.row(file.id);
-							rfe.grid.select(row);
+							var grid = rfe.grid,
+								row = grid.row(file.id),
+								cell = grid.cell(file, 'name');
+
+							grid.select(row);
+							grid.focus(grid.cellNavigation ? cell : row);
 						});
 					});
 				}
