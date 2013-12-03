@@ -146,7 +146,7 @@ define([
 		},
 
 		paste: function() {
-			var id, selection,
+			var id, selection = {},
 				store = this.store,
 				objects = this.objects,
 				storeMemory = store.storeMemory,
@@ -155,10 +155,16 @@ define([
 			// Note: all nodes in grid share same parent and you can only select one node in tree
 
 			// selection/focus in grid takes precedence over tree
-			widget = this.context.isOnGrid ? this.grid : this.tree;
+			if (this.context.isOnGrid) {
+				widget = this.grid;
+				selection = widget.selection;
+			}
+			else if (this.context.isOnTree) {
+				widget = this.tree;
+				selection = widget.selectedItems ? widget.selectedItems[0] : {};
+			}
 
 			// get new parent object
-			selection = widget.selectedItems || widget.selection;
 			for (id in selection) {
 				if (selection[id] === true) {
 					newParentObject = storeMemory.get(id);

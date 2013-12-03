@@ -229,7 +229,7 @@ define([
 		 */
 		_setContext: function(evt, node) {
 			var widget = registry.getEnclosingWidget(evt.target),
-				isGridRow = this.grid.row(evt) !== 'undefined',
+				isGridRow = this.grid.row(evt) !== undefined,
 				isTreeRow = widget && widget.baseClass === 'dijitTreeNode';
 
 			node = node || widget.domNode;

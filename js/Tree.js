@@ -80,7 +80,12 @@ define([
 					path: '/'
 				});
 			}
-		}
+		} //,
 
+
+	//	_setSelectedItemAttr: function(/*Item or id*/ item){
+	//		//this.selection[item];
+	//		this.set('selectedItems', [item]);
+	//	}
 	});
 });

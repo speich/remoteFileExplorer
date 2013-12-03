@@ -14,7 +14,7 @@ define([
 	'dgrid/extensions/ColumnHider',
 	'rfe/grid/View',
 	'rfe/config/fileObject'
-], function(lang, declare, on, aspect, topic, query, Grid, Selection, editor, Keyboard, DnD, ColumnResizer, ColumnHider, View, fileObject) {
+], function(lang, declare, on, aspect, topic, query, Grid, Selection, editor, Keyboard, Dnd, ColumnResizer, ColumnHider, View, fileObject) {
 
 	/**
 	 * @class rfe.Grid
@@ -28,7 +28,7 @@ define([
 	 * @property {string} allowSelectAll
 	 * @property {object} columns
 	 */
-	return declare([Grid, Selection, editor, Keyboard, ColumnResizer, ColumnHider, DnD, View], /** @lends rfe.Grid.prototype */ {
+	return declare([Grid, Selection, editor, Keyboard, Dnd, ColumnResizer, ColumnHider, View], /** @lends rfe.Grid.prototype */ {
 
 		selectionMode: 'extended',
 		allowSelectAll: true,
@@ -38,7 +38,7 @@ define([
 		columns: {
 			name: editor({
 				editor: 'textarea',
-				editOn: 'dummyEvent',
+				editOn: 'dummyEvent',	// lets have an editor, but do not turn it on
 				sortable: false, // lets us apply own header click sort
 				autoSave: false,
 				label: fileObject.label.name
@@ -80,7 +80,7 @@ define([
 			});
 			this.bodyNode.tabIndex = this.tabIndex;
 
-			topic.subscribe('grid/views/state', lang.hitch(this, function(view) {
+		topic.subscribe('grid/views/state', lang.hitch(this, function(view) {
 				this.set('view', view);
 			}));
 			this.set('showHeader', true);	// if headers are re-rendered this taken care of in setView
