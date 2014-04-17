@@ -18,12 +18,14 @@ define([
 		store: null,
 		rfe: null,
 		target: '',
-		dropDownClass: _SearchBoxMenu,
+		dropDownClass: null,
 
 		constructor: function(args) {
 			this.store = new JsonRest({
 				target: args.target
 			});
+
+			this.dropDownClass = declare([_SearchBoxMenu], { target: args.target});
 		},
 
 		postMixInProperties: function() {
