@@ -1,10 +1,13 @@
+/**
+ * Module containing a class to create a search box in the toolbar.
+ */
 define([
 	'dojo/_base/declare',
 	'dijit/form/ComboBox',
-	'rfe/_SearchBoxMenu',
 	'dojo/store/JsonRest',
-	'dojo/when'
-], function(declare, ComboBox, _SearchBoxMenu, JsonRest, when) {
+	'dojo/when',
+	'rfe/util/stringUtil'
+], function(declare, ComboBox, JsonRest, when, stringUtil) {
 
 	return declare([ComboBox], {
 		value: 'search',
@@ -18,14 +21,12 @@ define([
 		store: null,
 		rfe: null,
 		target: '',
-		dropDownClass: null,
+		labelType: 'html',
 
 		constructor: function(args) {
 			this.store = new JsonRest({
 				target: args.target
 			});
-
-			this.dropDownClass = declare([_SearchBoxMenu], { target: args.target});
 		},
 
 		postMixInProperties: function() {
@@ -38,6 +39,7 @@ define([
 
 			var rfe = this.rfe;
 
+			// display selected folder or file in grid and tree
 			this.on('change', function() {
 				var file = this.item;
 
@@ -65,7 +67,16 @@ define([
 					evt.stopPropagation();
 				}
 			});
+		},
+
+		labelFunc: function(obj) {
+			return obj.name + '<br>' +
+				this.target + '/' + obj.path + '<br>' +
+				'<span class="rfeSearchBoxItemLabel">Date created:</span> ' + stringUtil.formatDate(obj.cre) +
+				', <span class="rfeSearchBoxItemLabel">Date modified:</span> ' + stringUtil.formatDate(obj.mod) + '<br>' +
+				'<span class="rfeSearchBoxItemLabel">Size:</span> ' + stringUtil.formatFileSize(obj.size);
 		}
+
 	});
 });
 
