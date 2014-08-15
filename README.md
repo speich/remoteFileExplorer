@@ -39,3 +39,8 @@ Requires the following additional extensions to be loaded:
 to point to your installation directory. Also set the [parameter origPageUrl](rfe.php#L40).
 * Change the $path variable in [php/inc_lobal.php on line 16](php/inc_global.php#L16) to your installation directory
 * See [code on page rfe.php](rfe.php) for more information
+
+## Licence
+remoteFileExplorer (rfe) is available under the same dual BSD/AFL license as the Dojo Toolkit.
+For more information on the license please see the [License Information](http://dojotoolkit.org/license).
+The remoteFileExplorer (rfe) is Copyright (c) 2005-2013, Simon Speich. All rights reserved.
