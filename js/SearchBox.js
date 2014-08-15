@@ -43,6 +43,11 @@ define([
 			this.on('change', function() {
 				var file = this.item;
 
+				if (!file) {
+					// nothing selected
+					return;
+				}
+
 				if (file.dir) {
 					rfe.display(file);
 					// TODO: set focus in tree
