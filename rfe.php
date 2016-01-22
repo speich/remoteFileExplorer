@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <title>Remote File Explorer (rfe)</title>
-<link rel="stylesheet" type="text/css" href="/dojo/1.10/dijit/themes/claro/document.css">
-<link rel="stylesheet" type="text/css" href="/dojo/1.10/dijit/themes/claro/claro.css">
+<link rel="stylesheet" type="text/css" href="/dojo/1.10.4/dijit/themes/claro/document.css">
+<link rel="stylesheet" type="text/css" href="/dojo/1.10.4/dijit/themes/claro/claro.css">
 <link rel="stylesheet" href="/dgrid/css/skins/claro.css">
 <link rel="stylesheet" href="/js/resources/reset.css">
 <link rel="stylesheet" href="/js/resources/rfe.css">
@@ -34,7 +34,7 @@ var dojoConfig = {
 	}
 };
 </script>
-<script type="text/javascript" src="/dojo/1.10/dojo/dojo.js"></script>
+<script type="text/javascript" src="/dojo/1.10.4/dojo/dojo.js"></script>
 <script type="text/javascript">
 require(['dojo/ready', 'rfe/FileExplorer'], function(ready, FileExplorer) {
 	ready(function() {
