@@ -41,6 +41,6 @@ to point to your installation directory. Also set the [parameter origPageUrl](rf
 * See [code on page rfe.php](rfe.php) for more information
 
 ## Licence
-remoteFileExplorer (rfe) is available under the same dual BSD/AFL license as the Dojo Toolkit.
+The remoteFileExplorer (rfe) is available under the same dual BSD/AFL license as the Dojo Toolkit.
 For more information on the license please see the [License Information](http://dojotoolkit.org/license).
 The remoteFileExplorer (rfe) is Copyright (c) 2005-2013, Simon Speich. All rights reserved.
