@@ -23,11 +23,11 @@ set_include_path($incPath);
 
 
 // config paths
-$rfeConfig = array(
-	'paths' => array(
+$rfeConfig = [
+	'paths' => [
 		'webroot' => $absPath,
 		'demo' => $absPath.'php/fs/demo/',
 		'fileSystemRoot' => $absPath.'php/fs/',
 		'thumbnailCache' => $absPath.'php/fs/cache/'
-	)
-);
+	]
+];
