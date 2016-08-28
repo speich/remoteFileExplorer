@@ -1,4 +1,5 @@
 <?php
+namespace WebsiteTemplate;
 
 /**
  * Helper class to parse HTTP responses.
@@ -6,7 +7,7 @@
 class Http {
 
 	/**
-	 * Extract the http resonse header into array.
+	 * Extract the http response header into array.
 	 * @param string $str http response
 	 * @return array
 	 */
@@ -27,6 +28,7 @@ class Http {
 	}
 
 	/**
+	 * Decode the chunked-encoded string.
 	 * @param $str
 	 * @return string
 	 */

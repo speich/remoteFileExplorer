@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <title>Remote File Explorer (rfe)</title>
-<link rel="stylesheet" type="text/css" href="/dojo/1.10.4/dijit/themes/claro/document.css">
-<link rel="stylesheet" type="text/css" href="/dojo/1.10.4/dijit/themes/claro/claro.css">
-<link rel="stylesheet" href="/dgrid/css/skins/claro.css">
-<link rel="stylesheet" href="/js/resources/reset.css">
-<link rel="stylesheet" href="/js/resources/rfe.css">
+<link rel="stylesheet" type="text/css" href="//ajax.googleapis.com/ajax/libs/dojo/1.9.9/dijit/themes/claro/document.css">
+<link rel="stylesheet" type="text/css" href="//ajax.googleapis.com/ajax/libs/dojo/1.9.9/dijit/themes/claro/claro.css">
+<link rel="stylesheet" href="dgrid/v0.3.16/css/skins/claro.css">
+<link rel="stylesheet" href="js/resources/reset.css">
+<link rel="stylesheet" href="js/resources/rfe.css">
 </head>
 
 <body class="claro rfe">
@@ -16,7 +16,7 @@
 var dojoConfig = {
 	async: true,
 	packages: [
-		{name: 'dgrid', location: '/dgrid'},
+		{name: 'dgrid', location: '/dgrid/v0.3.16'},
 		{name: 'xstyle', location: '/xstyle'},
 		{name: 'put-selector', location: '/put-selector'},
 		{name: 'rfe', location: '/js'},
@@ -34,7 +34,7 @@ var dojoConfig = {
 	}
 };
 </script>
-<script type="text/javascript" src="/dojo/1.10.4/dojo/dojo.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/dojo/1.9.9/dojo/dojo.js"></script>
 <script type="text/javascript">
 require(['dojo/ready', 'rfe/FileExplorer'], function(ready, FileExplorer) {
 	ready(function() {

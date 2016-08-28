@@ -1,10 +1,9 @@
 <?php
 /**
  * This file contains an error reporting class.
- *
  * @author Simon Speich
- * @package General
  */
+namespace WebsiteTemplate;
 
 /**
  * Class to work with PHP error messages.
@@ -12,7 +11,6 @@
  * Additional error messages can be set with the method set().
  *
  * @author Simon Speich
- * @package General
  */
 class Error {
 
@@ -71,7 +69,7 @@ class Error {
 		$json = '[';
 		foreach ($errs as $key => $err) {
 			// json_encode does not work if arr contains null
-			$msg = 'Error: '.$err['msg'];
+			$msg = 'Fehler: '.$err['msg'];
 			if ($err['line'] > 0) {
 				$msg.= ' in '.$err['file'].' on line '.$err['line'];
 			}
@@ -103,5 +101,4 @@ class Error {
 		}
 		return $str;
 	}
-
 }
