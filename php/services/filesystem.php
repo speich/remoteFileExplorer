@@ -18,8 +18,9 @@ $header = new Header();
 $header->setContentType('json');
 $ctrl = new Controller($header, $err);
 $data = $ctrl->getDataAsObject();
-$controller = $ctrl->getController();
-$resource = '/'.$controller.'/'.implode('/', $ctrl->getResources());
+$controller = $ctrl->getResources();
+$controller = is_array($controller) ? $controller[0] : null;
+$resource = $ctrl->getResources(true);
 $moduleType = 'session';
 $response = null;
 

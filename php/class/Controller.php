@@ -30,9 +30,6 @@ class Controller {
 	/** @var array array of path segments */
 	private $resources = array();
 
-	/** @var string|null first path segment */
-	private $controller = null;
-
 	/** @var null|Header  */
 	private $header = null;
 
@@ -50,7 +47,7 @@ class Controller {
 	 * If you don't want the first path segment to be set as the controller, set $useController to false.
 	 * @param Header $header
 	 * @param Error $error
-	 * @param Boolean $useController
+	 * @param Boolean $useController use first path segment as controller?
 	 */
 	public function __construct(Header $header, Error $error, $useController = true) {
 		$this->header = $header;
@@ -58,15 +55,6 @@ class Controller {
 		$this->method = $_SERVER['REQUEST_METHOD'];
 		$this->resources = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : null;
 		$this->err = $error;
-
-		if (!is_null($this->resources)) {
-			/* Resource (path) is split into an array. The first segment is saved as the controller. */
-			$this->resources = trim($this->resources, '/');
-			$this->resources = explode('/', $this->resources);
-			if ($useController) {
-				$this->controller = array_shift($this->resources);
-			}
-		}
 	}
 
 	/**
@@ -114,14 +102,6 @@ class Controller {
 	}
 
 	/**
-	 * Returns the first path segment.
-	 * @return null|string
-	 */
-	public function getController() {
-		return $this->controller;
-	}
-
-	/**
 	 * Returns the http method, e.g. GET, POST, PUT or DELETE
 	 * @return null|string
 	 */
@@ -139,10 +119,17 @@ class Controller {
 
 	/**
 	 * Returns the path split into segments (resources).
-	 * @return array
+	 * @param bool $asString return a string instead of an array
+	 * @return array|string
 	 */
-	public function getResources() {
-		return $this->resources;
+	public function getResources($asString = false) {
+		$resources = $this->resources;
+		if (!is_null($resources) && $asString === false) {
+			$resources = trim($resources, '/');
+			$resources = explode('/', $resources);
+		}
+
+		return $resources;
 	}
 
 	/**
