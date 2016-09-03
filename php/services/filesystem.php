@@ -17,7 +17,7 @@ $err = new Error();
 $header = new Header();
 $header->setContentType('json');
 $ctrl = new Controller($header, $err);
-$data = $ctrl->getDataAsObject();
+$data = $ctrl->getDataAsObject(true);
 $controller = $ctrl->getResources();
 $controller = is_array($controller) ? $controller[0] : null;
 $resource = $ctrl->getResources(true);

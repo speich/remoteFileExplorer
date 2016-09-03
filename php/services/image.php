@@ -1,6 +1,10 @@
 <?php
 use remoteFileExplorer\fs as fs;
 use remoteFileExplorer\image as img;
+use WebsiteTemplate\Controller;
+use WebsiteTemplate\Header;
+use WebsiteTemplate\Error;
+
 
 require_once '../inc_global.php';
 require_once 'CacheStore.php';
@@ -17,7 +21,7 @@ require_once 'Http.php';
 $err = new Error();
 $ctrl = new Controller(new Header(), $err);
 $data = $ctrl->getDataAsObject();
-$resource = $ctrl->getResource();
+$resource = $ctrl->getResources(true);
 $ctrl->contentType = 'json';
 $response = false;
 $header = false;
