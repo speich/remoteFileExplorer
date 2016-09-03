@@ -20,9 +20,10 @@ Working [demo of the remoteFileExplorer](http://www.speich.net/projects/programm
 * server side automatic generation of thumbnails with caching
 
 ## JavaScript Dependencies
-Requires the following dependencies to be installed or mapped:
+Requires the following dependencies to be installed:
 * [The Dojo Toolkit](http://dojotoolkit.org) SDK version 1.9.1 or higher, mapped to /dojo
-* [dgrid](https://github.com/SitePen/dgrid), mapped to /dgrid
+* [dgrid](https://github.com/SitePen/dgrid), v0.3.16 mapped to /dgrid
+  Newer versions of dgrid won't work, because they rely on dstore instead of dojo/store
 * [xstyle](https://github.com/kriszyp/xstyle), mapped to /xstyle
 * [put-selector](https://github.com/kriszyp/put-selector), mapped to /put-selector
 
