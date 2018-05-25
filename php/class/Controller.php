@@ -185,7 +185,7 @@ class Controller {
 	 * @param string $data response body
 	 */
 	public function printBody($data = null) {
-		if (count($this->err->get()) > 0) {
+		if ($this->err->get() !== null && count($this->err->get()) > 0) {
 			if ($this->header->getContentType() === 'application/json') {
 				echo $this->err->getAsJson();
 			}
