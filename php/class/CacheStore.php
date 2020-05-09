@@ -5,29 +5,29 @@ namespace remoteFileExplorer\fs;
 
 class CacheStore {
 
-	/** @var string|null  */
-	private $dbName = 'store.sqlite';
+    /** @var string|null  */
+   	private $dbName = 'cache.sqlite';
 
-	/** @var string|null */
-	private $dbPath = 'php/fs/cache/';
+   	/** @var string|null */
+   	private $dbPath = '/fs/cache/';
 
-	/** @var null|\PDO  */
-	private $db = null;	// holds the PDO database resource
+   	/** @var null|\PDO  */
+   	private $db = null;	// holds the PDO database resource
 
-	/**
-	 * Instantiates the database
-	 * @param string|null $dbName name of database
-	 * @param string|null $dbPath path to database
-	 */
-	public function __construct($dbName = null, $dbPath = null) {
-		if (!is_null($dbName) && !is_null($dbPath)) {
-			$this->dbName = $dbName;
-			$this->dbPath = rtrim($dbPath, '/').'/';
-		}
-		else {
-			$this->dbPath = rtrim($_SERVER['DOCUMENT_ROOT'],'/').'/';
-		}
-	}
+   	/**
+   	 * Instantiates the database
+   	 * @param string|null $dbName name of database
+   	 * @param string|null $dbPath path to database
+   	 */
+   	public function __construct($dbName = null, $dbPath = null) {
+   		if (!is_null($dbName) && !is_null($dbPath)) {
+   			$this->dbName = $dbName;
+   			$this->dbPath = rtrim($dbPath, '/').'/';
+   		}
+   		else {
+   		    $this->dbPath = __DIR__.'/..'.$this->dbPath;
+           }
+   	}
 
 	/**
 	 * Connect to the cache database.
