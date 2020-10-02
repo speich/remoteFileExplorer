@@ -1,0 +1,12 @@
+{
+	"name": "rfe",
+	"license": "BSD-3-Clause OR AFL-2.1",
+	"description": "Remote File Explorer (rfe) is a Windows Explorer like application that runs in your browser.",
+	"homepage": "https://www.speich.net/projects/programming/remoteFileExplorer.php",
+	"dependencies": {
+		"dgrid": "https://github.com/SitePen/dgrid#v0.3.21",
+		"dojo": "^1.9.1",
+		"put-selector": "^0.3.6",
+		"xstyle": "^0.3.3"
+	}
+}
