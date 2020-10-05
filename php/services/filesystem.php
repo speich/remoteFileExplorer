@@ -13,14 +13,15 @@ require_once 'Header.php';
 require_once 'Http.php';
 require_once 'InputChecker.php';
 
+
 $err = new Error();
 $header = new Header();
 $header->setContentType('json');
 $ctrl = new Controller($header, $err);
 $data = $ctrl->getDataAsObject(true);
-$controller = $ctrl->getResources();
-$controller = is_array($controller) ? $controller[0] : null;
-$resource = $ctrl->getResources(true);
+$resources = $ctrl->getResource();
+$controller = is_array($resources) ? $resources[0] : null;
+$resource = $ctrl->getResource(true);
 $moduleType = 'session';
 $response = null;
 

@@ -5,9 +5,9 @@ require_once 'FileSystem.php';
 class FileSession implements FileSystem {
 
 	/** @var array define allowed 'database' fields */
-	public $fields = array(
+	public $fields = [
 		'id', 'parId', 'name', 'size', 'mod', 'cre', 'dir', 'mime'
-	);
+    ];
 
 	/** @var int limit number of items that can be in filesystem */
 	private $numItemLimit = 100;
@@ -19,7 +19,7 @@ class FileSession implements FileSystem {
 	 * and send the GET as www.mysite.ch/resource instead of www.mysite.ch/target/resource
 	 * @var array
 	 */
-	private $fsDefault = array();
+	private $fsDefault = [];
 
 	private $rootDir = '/';
 
@@ -62,7 +62,7 @@ class FileSession implements FileSystem {
 	 */
 	public function get($resource) {
 		$json = false;
-		$fs = unserialize($_SESSION['rfe'][$this->getRoot()]);
+		$fs = unserialize($_SESSION['rfe'][$this->getRoot()], ['allowed_classes' => false]);
 		if (substr($resource, -1) === '/') {   // query for children of $resource
 			$json = $this->getChildren(rtrim($resource, '/'), $fs);
 		}
@@ -111,7 +111,7 @@ class FileSession implements FileSystem {
 	 */
 	public function update($data) {
 		$json = false;	// no need to raise error if not found. will be reported as resource not found if false
-		$fs = unserialize($_SESSION['rfe'][$this->getRoot()]);
+		$fs = unserialize($_SESSION['rfe'][$this->getRoot()], ['allowed_classes' => false]);
 		if (array_key_exists($data->id, $fs)) {
 			foreach ($data as $prop => $val) {
 				$fs[$data->id][$prop] = $val;
@@ -133,7 +133,7 @@ class FileSession implements FileSystem {
 	public function copy($resource, $target) {
 		$json = false;
 
-		$fs = unserialize($_SESSION['rfe'][$this->getRoot()]);
+		$fs = unserialize($_SESSION['rfe'][$this->getRoot()], ['allowed_classes' => false]);
 
 		if (array_key_exists($resource, $fs)) {
 
@@ -175,7 +175,7 @@ class FileSession implements FileSystem {
 		if (count($this->fsDefault) <= $this->numItemLimit) {
 			// number of items in filesystem is limited in demo
 			// TODO: raise error instead of $json = false
-			$fs = unserialize($_SESSION['rfe'][$this->getRoot()]);
+			$fs = unserialize($_SESSION['rfe'][$this->getRoot()], ['allowed_classes' => false]);
 
 			foreach ($data as $property => $value) {
 				$item[$property] = $value;
@@ -202,7 +202,7 @@ class FileSession implements FileSystem {
 	 */
 	public function del($resource) {
 		$json = false;
-		$fs = unserialize($_SESSION['rfe'][$this->getRoot()]);
+		$fs = unserialize($_SESSION['rfe'][$this->getRoot()], ['allowed_classes' => false]);
 		if (array_key_exists($resource, $fs)) {
 			// if $item has children, delete all children too
 			if (array_key_exists('dir', $fs[$resource])) {
@@ -236,7 +236,7 @@ class FileSession implements FileSystem {
 	 */
 	public function search($keyword, $start, $end) {
 		// this would be slow on large arrays, but since the demo arrays are short it doesn't matter
-		$fs = unserialize($_SESSION['rfe'][$this->getRoot()]);
+		$fs = unserialize($_SESSION['rfe'][$this->getRoot()], ['allowed_classes' => false]);
 		$arr = array();
 		$count = 0;
 		if ($keyword === '') {
@@ -270,7 +270,7 @@ class FileSession implements FileSystem {
 	public function getNumSearchRecords($keyword) {
 		// this would be slow on large arrays, but since the array of the demo is short it doesn't matter
 
-		$fs = unserialize($_SESSION['rfe'][$this->getRoot()]);
+		$fs = unserialize($_SESSION['rfe'][$this->getRoot()], ['allowed_classes' => false]);
 		$keyword = str_replace('*', '', $keyword);
 		if ($keyword === '') {
 			return count($fs);
