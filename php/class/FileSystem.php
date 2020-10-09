@@ -1,5 +1,5 @@
 <?php
-namespace remoteFileExplorer\fs;
+namespace remoteFileExplorer;
 
 interface FileSystem {
 

@@ -7,7 +7,7 @@
  * Unsharp mask algorithm by Torstein Hønsi 2003-07.
  * thoensi_at_netcom_dot_no.
  */
-namespace remoteFileExplorer\image;
+namespace remoteFileExplorer;
 
  
 class ImageTool {

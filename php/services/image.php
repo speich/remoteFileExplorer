@@ -1,41 +1,36 @@
 <?php
 
-use remoteFileExplorer\fs as fs;
-use remoteFileExplorer\image as img;
+use remoteFileExplorer\CacheStore;
+use remoteFileExplorer\ImageTool;
 use WebsiteTemplate\Controller;
 use WebsiteTemplate\Header;
 use WebsiteTemplate\Error;
 
 
-require_once '../inc_global.php';
-require_once 'CacheStore.php';
-require_once 'ImageTool.php';
-require_once 'Error.php';
-require_once 'Controller.php';
-require_once 'Header.php';
-require_once 'Http.php';
+require_once __DIR__.'../inc_global.php';
 
 // This file is just a quick and dirty hack to generate the thumbnails. The size is created exactly to the posted width.
 // Instead the dimensions should be created in discrete steps, the browser could then scale them to the required width.
 // Also paths are not created when they do not exist, cache size is not limited, ...
 
 $err = new Error();
+$header = new Header();
+$header->setContentType('json');
 $ctrl = new Controller(new Header(), $err);
 $data = $ctrl->getDataAsObject();
 $resource = $ctrl->getResource(true);
-$ctrl->contentType = 'json';
 $response = false;
 $header = false;
 
 
 if ($resource && file_exists($rfeConfig['paths']['fileSystemRoot'].ltrim($resource, '/'))) {
 
-    $imgTool = new img\ImageTool();
+    $imgTool = new ImageTool();
 
     // check if image resource is already in cache, then either create it or return it
     // TODO: Limit cache size!
     // TODO: do not use default, pass arguments to CacheStore()
-    $db = new fs\CacheStore();
+    $db = new CacheStore();
     $db = $db->connect();
 
     $db->beginTransaction();
@@ -57,9 +52,9 @@ if ($resource && file_exists($rfeConfig['paths']['fileSystemRoot'].ltrim($resour
     $db->commit();
 
     if (!file_exists($rfeConfig['paths']['thumbnailCache'].$id.".jpg")) {
-        $filters = array(
-            'unsharpMask' => array()
-        );
+        $filters = [
+            'unsharpMask' => []
+        ];
         $imgWidth = property_exists($data, 'w') ? $data->w : 256;
         $jpgQuality = 80;
         $imgSrc = $rfeConfig['paths']['fileSystemRoot'].ltrim($resource, '/');
