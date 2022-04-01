@@ -2,57 +2,300 @@
   <profile version="1.0">
     <option name="myName" value="Project Default" />
     <option name="myName" value="Project Default" />
-    <inspection_tool class="AlphaUnsortedPropertiesFile" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="AnonymousFunctionJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="AssignmentResultUsedJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="AssignmentToForLoopParameterJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="AssignmentToFunctionParameterJS" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="AmdModulesDependencies" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="Annotator" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="PHP only" level="ERROR" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="AnonymousFunctionJS" enabled="false" level="WARNING" enabled_by_default="false">
+      <scope name="PHP only" level="WARNING" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="ArgumentEqualsDefaultValueInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="AssignmentResultUsedJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="AssignmentToForLoopParameterJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="AssignmentToFunctionParameterJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="BadExceptionsProcessingInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="BlockStatementJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="BreakStatementJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="BreakStatementWithLabelJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="ChainedEqualityJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="ChainedFunctionCallJS" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="BadExpressionStatementJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="BlockStatementJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="BreakStatementJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="BreakStatementWithLabelJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="CallerJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="ChainedEqualityJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="ChainedFunctionCallJS" enabled="true" level="WARNING" enabled_by_default="false">
+      <scope name="PHP only" level="WARNING" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="CheckEmptyScriptTag" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="CheckImageSize" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="CheckValidXmlInScriptTagBody" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="PHP only" level="ERROR" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="ClassOverridesFieldOfSuperClassInspection" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="CommaExpressionJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="CompactCanBeUsedInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="ComparisonOperandsOrderInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="ConditionalExpressionJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="ConditionalExpressionWithIdenticalBranchesJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="ConfusingFloatingPointLiteralJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="ConfusingPlusesOrMinusesJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="ConstantOnLHSOfComparisonJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="ConstantOnRHSOfComparisonJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="ContinueStatementJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="ContinueStatementWithLabelJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="CssBrowserCompatibilityForProperties" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="CssConvertColorToHexInspection" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="CssConvertColorToRgbInspection" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="CssMissingSemicolon" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="ConditionalExpressionJS" enabled="true" level="WARNING" enabled_by_default="false">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="ConditionalExpressionWithIdenticalBranchesJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="ConfusingFloatingPointLiteralJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="ConfusingPlusesOrMinusesJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="ConstantConditionalExpressionJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="ConstantIfStatementJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="ConstantOnLHSOfComparisonJS" enabled="false" level="WARNING" enabled_by_default="false">
+      <scope name="PHP only" level="WARNING" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="ConstantOnRHSOfComparisonJS" enabled="false" level="WARNING" enabled_by_default="false">
+      <scope name="PHP only" level="WARNING" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="ContinueOrBreakFromFinallyBlockJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="ContinueStatementJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="ContinueStatementWithLabelJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="CssBrowserCompatibilityForProperties" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="myCheckIE" value="false" />
+    </inspection_tool>
+    <inspection_tool class="CssConvertColorToHexInspection" enabled="false" level="WARNING" enabled_by_default="false">
+      <scope name="PHP only" level="WARNING" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="CssConvertColorToRgbInspection" enabled="false" level="WARNING" enabled_by_default="false">
+      <scope name="PHP only" level="WARNING" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="CssFloatPxLength" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="CssInvalidAtRule" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="PHP only" level="ERROR" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="CssInvalidCharsetRule" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="CssInvalidElement" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="PHP only" level="ERROR" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="CssInvalidFunction" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="PHP only" level="ERROR" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="CssInvalidHtmlTagReference" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="CssInvalidImport" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="CssInvalidMediaFeature" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="PHP only" level="ERROR" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="CssInvalidPropertyValue" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="PHP only" level="ERROR" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="CssInvalidPseudoSelector" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="PHP only" level="ERROR" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="CssMissingComma" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="CssMissingSemicolon" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="CssNegativeValue" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="PHP only" level="ERROR" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="CssNoGenericFontName" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="CssOptimizeSimilarProperties" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="CssOverwrittenProperties" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="CssRedundantUnit" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="CssUnitlessNumber" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="CssUnknownProperty" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="myCustomPropertiesEnabled" value="false" />
+        <option name="myIgnoreVendorSpecificProperties" value="false" />
+        <option name="myCustomPropertiesList">
+          <value>
+            <list size="0" />
+          </value>
+        </option>
+      </scope>
+      <option name="myCustomPropertiesEnabled" value="false" />
+      <option name="myIgnoreVendorSpecificProperties" value="false" />
+      <option name="myCustomPropertiesList">
+        <value>
+          <list size="0" />
+        </value>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="CssUnknownTarget" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="PHP only" level="ERROR" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="CssUnresolvedClass" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="PHP only" level="ERROR" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="CssUnresolvedCustomProperty" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="PHP only" level="ERROR" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="CssUnresolvedCustomPropertySet" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="PHP only" level="ERROR" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="CssUnusedSymbol" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="CyclomaticComplexityJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="m_limit" value="10" />
+      </scope>
       <option name="m_limit" value="10" />
     </inspection_tool>
-    <inspection_tool class="DebuggerStatementJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="DefaultNotLastCaseInSwitchJS" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="DebuggerStatementJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="DefaultNotLastCaseInSwitchJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="DisallowWritingIntoStaticPropertiesInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="DivideByZeroJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="DocumentWriteJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="DuplicateConditionJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="DuplicatePropertyInspection" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="DynamicallyGeneratedCodeJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="ES6TopLevelAwaitExpression" enabled="true" level="ERROR" enabled_by_default="true" />
+    <inspection_tool class="DivideByZeroJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="DocumentWriteJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="DuplicateCaseLabelJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="DuplicateConditionJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="Duplicates" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="DynamicallyGeneratedCodeJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="ES6BindWithArrowFunction" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="ES6ConvertModuleExportToExport" enabled="true" level="INFORMATION" enabled_by_default="true">
+      <scope name="PHP only" level="INFORMATION" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="ES6ConvertRequireIntoImport" enabled="true" level="INFORMATION" enabled_by_default="true">
+      <scope name="PHP only" level="INFORMATION" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="ES6ConvertToForOf" enabled="true" level="INFORMATION" enabled_by_default="true">
+      <scope name="PHP only" level="INFORMATION" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="ES6ConvertVarToLetConst" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="ES6MissingAwait" enabled="true" level="INFORMATION" enabled_by_default="true">
+      <scope name="PHP only" level="INFORMATION" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="ES6ModulesDependencies" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="ES6PossiblyAsyncFunction" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="ES6ShorthandObjectProperty" enabled="true" level="INFORMATION" enabled_by_default="true">
+      <scope name="PHP only" level="INFORMATION" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="ES6UnusedImports" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="EfferentObjectCouplingInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="EmptyCatchBlockJS" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="EmptyCatchBlockJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="EmptyClassInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="EmptyFinallyBlockJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="EmptyTryBlockJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="Eslint" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="EmptyFinallyBlockJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="EmptyStatementBodyJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="m_reportEmptyBlocks" value="false" />
+      </scope>
+      <option name="m_reportEmptyBlocks" value="false" />
+    </inspection_tool>
+    <inspection_tool class="EmptyTryBlockJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="Eslint" enabled="false" level="ERROR" enabled_by_default="true">
+      <scope name="PHP only" level="ERROR" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="ExceptionCaughtLocallyJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="FallThroughInSwitchStatementJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="FixedTimeStartWithInspection" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="FlowJSCoverage" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="FlowJSError" enabled="true" level="ERROR" enabled_by_default="true" />
+    <inspection_tool class="FlowJSConfig" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="FlowJSCoverage" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="FlowJSError" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="PHP only" level="ERROR" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="FlowJSFlagCommentPlacement" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="ForLoopReplaceableByWhileJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="m_ignoreLoopsWithoutConditions" value="false" />
+      </scope>
       <option name="m_ignoreLoopsWithoutConditions" value="false" />
     </inspection_tool>
-    <inspection_tool class="ForLoopThatDoesntUseLoopVariableJS" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="ForLoopThatDoesntUseLoopVariableJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="ForgottenDebugOutputInspection" enabled="true" level="ERROR" enabled_by_default="true">
       <option name="configuration">
         <list>
@@ -74,7 +317,6 @@
           <option value="dpm" />
           <option value="dpq" />
           <option value="dsm" />
-          <option value="dump" />
           <option value="dvm" />
           <option value="error_log" />
           <option value="kpr" />
@@ -82,7 +324,6 @@
           <option value="print_r" />
           <option value="var_dump" />
           <option value="var_export" />
-          <option value="wp_die" />
           <option value="xdebug_break" />
           <option value="xdebug_call_class" />
           <option value="xdebug_call_file" />
@@ -121,126 +362,770 @@
       <option name="migratedIntoUserSpace" value="true" />
     </inspection_tool>
     <inspection_tool class="FunctionNamingConventionJS" enabled="true" level="WARNING" enabled_by_default="true">
-      <option name="m_regex" value="[a-z][A-Za-z]*" />
-      <option name="m_minLength" value="4" />
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="m_regex" value="[_a-z][A-Za-z]*" />
+        <option name="m_minLength" value="3" />
+        <option name="m_maxLength" value="32" />
+      </scope>
+      <option name="m_regex" value="[_a-z][A-Za-z]*" />
+      <option name="m_minLength" value="3" />
       <option name="m_maxLength" value="32" />
     </inspection_tool>
-    <inspection_tool class="FunctionWithInconsistentReturnsJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="FunctionWithMultipleLoopsJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="FunctionWithMultipleReturnPointsJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="HtmlNonExistentInternetResource" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="HtmlPresentationalElement" enabled="true" level="INFORMATION" enabled_by_default="true" />
+    <inspection_tool class="FunctionWithInconsistentReturnsJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="FunctionWithMultipleLoopsJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="FunctionWithMultipleReturnPointsJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="GjsLint" enabled="false" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="HtmlDeprecatedTag" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="HtmlExtraClosingTag" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="HtmlFormInputWithoutLabel" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="HtmlMissingClosingTag" enabled="true" level="INFORMATION" enabled_by_default="true">
+      <scope name="PHP only" level="INFORMATION" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="HtmlNonExistentInternetResource" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="HtmlPresentationalElement" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="HtmlRequiredSummaryAttribute" enabled="true" level="INFORMATION" enabled_by_default="true" />
     <inspection_tool class="HtmlRequiredTitleAttribute" enabled="true" level="INFORMATION" enabled_by_default="true" />
-    <inspection_tool class="IfStatementWithIdenticalBranchesJS" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="HtmlUnknownAnchorTarget" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="HtmlUnknownAttribute" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="myValues">
+          <value>
+            <list size="0" />
+          </value>
+        </option>
+        <option name="myCustomValuesEnabled" value="true" />
+      </scope>
+      <option name="myValues">
+        <value>
+          <list size="0" />
+        </value>
+      </option>
+      <option name="myCustomValuesEnabled" value="true" />
+    </inspection_tool>
+    <inspection_tool class="HtmlUnknownBooleanAttribute" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="HtmlUnknownTag" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="myValues">
+          <value>
+            <list size="6">
+              <item index="0" class="java.lang.String" itemvalue="nobr" />
+              <item index="1" class="java.lang.String" itemvalue="noembed" />
+              <item index="2" class="java.lang.String" itemvalue="comment" />
+              <item index="3" class="java.lang.String" itemvalue="noscript" />
+              <item index="4" class="java.lang.String" itemvalue="embed" />
+              <item index="5" class="java.lang.String" itemvalue="script" />
+            </list>
+          </value>
+        </option>
+        <option name="myCustomValuesEnabled" value="true" />
+      </scope>
+      <option name="myValues">
+        <value>
+          <list size="6">
+            <item index="0" class="java.lang.String" itemvalue="nobr" />
+            <item index="1" class="java.lang.String" itemvalue="noembed" />
+            <item index="2" class="java.lang.String" itemvalue="comment" />
+            <item index="3" class="java.lang.String" itemvalue="noscript" />
+            <item index="4" class="java.lang.String" itemvalue="embed" />
+            <item index="5" class="java.lang.String" itemvalue="script" />
+          </list>
+        </value>
+      </option>
+      <option name="myCustomValuesEnabled" value="true" />
+    </inspection_tool>
+    <inspection_tool class="HtmlUnknownTarget" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="IfStatementWithIdenticalBranchesJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="IfStatementWithTooManyBranchesJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="m_limit" value="3" />
+      </scope>
       <option name="m_limit" value="3" />
     </inspection_tool>
-    <inspection_tool class="InconsistentLineSeparators" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="IncrementDecrementResultUsedJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="InnerHTMLJS" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="IncompatibleMaskJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="InconsistentLineSeparators" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="IncrementDecrementResultUsedJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="InfiniteLoopJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="InfiniteRecursionJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="InjectedReferences" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="PHP only" level="ERROR" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="InnerHTMLJS" enabled="true" level="WARNING" enabled_by_default="false">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="InvertedIfElseConstructsInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="IsNullFunctionUsageInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="JSClassNamingConvention" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="JSConstructorReturnsPrimitive" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="JSDeclarationsAtScopeStart" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="JSEqualityComparisonWithCoercion.TS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="JSHint" enabled="true" level="ERROR" enabled_by_default="true" />
-    <inspection_tool class="JSLint" enabled="true" level="ERROR" enabled_by_default="false" />
-    <inspection_tool class="JSUnfilteredForInLoop" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="JSXSyntaxUsed" enabled="true" level="ERROR" enabled_by_default="true" />
-    <inspection_tool class="LabeledStatementJS" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="IsNullFunctionUsageInspection" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="JSAccessibilityCheck" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSAnnotator" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="PHP only" level="ERROR" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSBitwiseOperatorUsage" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSCheckFunctionSignatures" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSClassNamingConvention" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSClosureCompilerSyntax" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSCommentMatchesSignature" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSComparisonWithNaN" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSConsecutiveCommasInArrayLiteral" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSConstructorReturnsPrimitive" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSDeclarationsAtScopeStart" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSDeprecatedSymbols" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSDuplicatedDeclaration" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSEqualityComparisonWithCoercion" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSFileReferences" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSFunctionExpressionToArrowFunction" enabled="true" level="INFORMATION" enabled_by_default="true">
+      <scope name="PHP only" level="INFORMATION" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSHint" enabled="false" level="ERROR" enabled_by_default="false">
+      <scope name="PHP only" level="ERROR" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="JSIgnoredPromiseFromCall" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSJQueryEfficiency" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSLastCommaInArrayLiteral" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSLastCommaInObjectLiteral" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSLint" enabled="false" level="ERROR" enabled_by_default="false">
+      <scope name="PHP only" level="ERROR" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="JSMethodCanBeStatic" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSMismatchedCollectionQueryUpdate" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="queries" value="trace,write,forEach" />
+        <option name="updates" value="pop,push,shift,splice,unshift,add,insert,remove" />
+      </scope>
+      <option name="queries" value="trace,write,forEach" />
+      <option name="updates" value="pop,push,shift,splice,unshift,add,insert,remove" />
+    </inspection_tool>
+    <inspection_tool class="JSNonASCIINames" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSNonStrictModeUsed" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSPotentiallyInvalidConstructorUsage" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="myConsiderUppercaseFunctionsToBeConstructors" value="true" />
+      </scope>
+      <option name="myConsiderUppercaseFunctionsToBeConstructors" value="true" />
+    </inspection_tool>
+    <inspection_tool class="JSPotentiallyInvalidTargetOfIndexedPropertyAccess" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSPotentiallyInvalidUsageOfThis" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSPrimitiveTypeWrapperUsage" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSReferencingArgumentsOutsideOfFunction" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="PHP only" level="ERROR" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSReferencingMutableVariableFromClosure" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSRemoveUnnecessaryParentheses" enabled="true" level="INFORMATION" enabled_by_default="true">
+      <scope name="PHP only" level="INFORMATION" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSStringConcatenationToES6Template" enabled="true" level="INFORMATION" enabled_by_default="true">
+      <scope name="PHP only" level="INFORMATION" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSSuspiciousNameCombination" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <group names="x,width,left,right" />
+        <group names="y,height,top,bottom" />
+        <exclude classes="Math" />
+      </scope>
+      <group names="x,width,left,right" />
+      <group names="y,height,top,bottom" />
+      <exclude classes="Math" />
+    </inspection_tool>
+    <inspection_tool class="JSTypeOfValues" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSUndeclaredVariable" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSUndefinedPropertyAssignment" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSUnfilteredForInLoop" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSUnnecessarySemicolon" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSUnresolvedExtXType" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSUnresolvedFunction" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSUnresolvedLibraryURL" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSUnresolvedVariable" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSUnusedAssignment" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSUnusedGlobalSymbols" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSUnusedLocalSymbols" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSValidateJSDoc" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSValidateTypes" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="JSXNamespaceValidation" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="Jscs" enabled="false" level="ERROR" enabled_by_default="true">
+      <scope name="PHP only" level="ERROR" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="LabeledStatementJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="LocalVariableNamingConventionJS" enabled="true" level="WARNING" enabled_by_default="true">
-      <option name="m_regex" value="[a-z][A-Za-z]*" />
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="m_regex" value="[a-z][A-Za-z0-9]*" />
+        <option name="m_minLength" value="1" />
+        <option name="m_maxLength" value="32" />
+      </scope>
+      <option name="m_regex" value="[a-z][A-Za-z0-9]*" />
       <option name="m_minLength" value="1" />
       <option name="m_maxLength" value="32" />
     </inspection_tool>
     <inspection_tool class="LongInheritanceChainInspection" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="LongLine" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="MagicNumberJS" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="LongLine" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="LoopStatementThatDoesntLoopJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="MagicNumberJS" enabled="true" level="WARNING" enabled_by_default="false">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="MessDetectorValidationInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false">
+      <scope name="PHP only" level="WEAK WARNING" enabled="false" />
+    </inspection_tool>
     <inspection_tool class="MultipleReturnStatementsInspection" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="NegatedConditionalExpressionJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="NegatedIfStatementJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="NestedAssignmentJS" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="NegatedConditionalExpressionJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="NegatedIfStatementJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="NestedAssignmentJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="NestedAssignmentsUsageInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="NestedConditionalExpressionJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="NestedFunctionCallJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="NestedFunctionJS" enabled="true" level="WARNING" enabled_by_default="true">
+    <inspection_tool class="NestedConditionalExpressionJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="NestedFunctionCallJS" enabled="true" level="WARNING" enabled_by_default="false">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="NestedFunctionJS" enabled="true" level="WARNING" enabled_by_default="false">
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="m_includeAnonymousFunctions" value="false" />
+      </scope>
       <option name="m_includeAnonymousFunctions" value="false" />
     </inspection_tool>
-    <inspection_tool class="NestedSwitchStatementJS" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="NestedSwitchStatementJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="NestingDepthJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="m_limit" value="5" />
+      </scope>
       <option name="m_limit" value="5" />
     </inspection_tool>
-    <inspection_tool class="NonBlockStatementBodyJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="ObjectAllocationIgnoredJS" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="NodeJsCodingAssistanceForCoreModules" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="NodeModulesDependencies" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="NonBlockStatementBodyJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="NonShortCircuitBooleanExpressionJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="NpmUsedModulesInstalled" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="ObjectAllocationIgnoredJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="OctalIntegerJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="OffsetOperationsInspection" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="OverlyComplexArithmeticExpressionJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="m_limit" value="6" />
+      </scope>
       <option name="m_limit" value="6" />
     </inspection_tool>
     <inspection_tool class="OverlyComplexBooleanExpressionJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="m_limit" value="3" />
+      </scope>
       <option name="m_limit" value="3" />
     </inspection_tool>
     <inspection_tool class="ParameterDefaultValueIsNotNullInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="ParameterNamingConventionJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="m_regex" value="[a-z][A-Za-z]*" />
+        <option name="m_minLength" value="1" />
+        <option name="m_maxLength" value="32" />
+      </scope>
       <option name="m_regex" value="[a-z][A-Za-z]*" />
       <option name="m_minLength" value="1" />
       <option name="m_maxLength" value="32" />
     </inspection_tool>
     <inspection_tool class="ParametersPerFunctionJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="m_limit" value="5" />
+      </scope>
       <option name="m_limit" value="5" />
     </inspection_tool>
+    <inspection_tool class="PhpAbstractStaticMethodInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpAssignmentInConditionInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpAssignmentReplaceableWithOperatorAssignmentInspection" enabled="true" level="INFORMATION" enabled_by_default="true">
+      <scope name="PHP only" level="INFORMATION" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpAssignmentReplaceableWithPrefixExpressionInspection" enabled="true" level="INFORMATION" enabled_by_default="true">
+      <scope name="PHP only" level="INFORMATION" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="PhpCSValidationInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false">
-      <option name="EXTENSIONS" value="php,js,css,inc" />
+      <scope name="PHP only" level="WEAK WARNING" enabled="false" />
     </inspection_tool>
     <inspection_tool class="PhpClassHasTooManyDeclaredMembersInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="PhpClassNamingConventionInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpClassNamingConventionInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="m_minLength" value="3" />
+        <option name="m_maxLength" value="32" />
+      </scope>
+      <option name="m_minLength" value="3" />
+      <option name="m_maxLength" value="32" />
+    </inspection_tool>
     <inspection_tool class="PhpComplexClassInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpComplexFunctionInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpCompoundNamespaceDepthInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="PhpConstantNamingConventionInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpConstantNamingConventionInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="m_minLength" value="3" />
+      </scope>
+    </inspection_tool>
+    <inspection_tool class="PhpConstantReassignmentInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpConstructorStyleInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpDeprecationInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpDisabledExtensionStubsInspection" enabled="true" level="INFORMATION" enabled_by_default="true">
+      <scope name="PHP only" level="INFORMATION" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpDivisionByZeroInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpDocMissingReturnTagInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpDocMissingThrowsInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpDocRedundantThrowsInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpDocSignatureInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpDuplicateArrayKeysInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpDuplicateCaseInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpDynamicAsStaticMethodCallInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="PhpEnforceDocCommentInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpExpressionResultUnusedInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="PhpFeatureEnvyLocalInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpForeachArrayIsUsedAsValueInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpForeachNestedOuterKeyValueVariablesConflictInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="PhpFunctionCyclomaticComplexityInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="PhpFunctionNamingConventionInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpFunctionNamingConventionInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="m_regex" value="[a-z][_a-zA-Z\d]*" />
+        <option name="m_minLength" value="3" />
+        <option name="m_maxLength" value="32" />
+      </scope>
+      <option name="m_regex" value="[a-z][A-Za-z\d]*" />
+      <option name="m_minLength" value="3" />
+      <option name="m_maxLength" value="32" />
+    </inspection_tool>
+    <inspection_tool class="PhpGotoIntoLoopInspection" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="PHP only" level="ERROR" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="PhpHalsteadMetricInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpHierarchyChecksInspection" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="PHP only" level="ERROR" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpIllegalArrayKeyTypeInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpIllegalPsrClassPathInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpIllegalStringOffsetInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpIncludeInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpIncompatibleReturnTypeInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpInconsistentReturnPointsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpInternalEntityUsedInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpInvalidMagicMethodModifiersInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="PhpLackOfCohesionInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpLanguageLevelInspection" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="PHP only" level="ERROR" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="PhpLongTypeFormInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpMemberCanBePulledUpInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="PhpMethodNamingConventionInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="PhpMethodOrClassCallIsNotCaseSensitiveInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="PhpMissingDocCommentInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="PhpMissingParentCallCommonInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="PhpMissingParentCallMagicInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpMethodNamingConventionInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="m_minLength" value="3" />
+        <option name="m_maxLength" value="32" />
+      </scope>
+      <option name="m_minLength" value="3" />
+      <option name="m_maxLength" value="32" />
+    </inspection_tool>
+    <inspection_tool class="PhpMethodOrClassCallIsNotCaseSensitiveInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpMethodParametersCountMismatchInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpMissingBreakStatementInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpMissingDocCommentInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpMissingParentCallCommonInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpMissingParentCallMagicInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpMissingParentConstructorInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpMissingStrictTypesDeclarationInspection" enabled="false" level="WARNING" enabled_by_default="false">
+      <scope name="PHP only" level="WARNING" enabled="false" />
+    </inspection_tool>
     <inspection_tool class="PhpMissingVisibilityInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpModifierOrderInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpMultipleClassesDeclarationsInOneFile" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="PhpNewClassMissingParameterListInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
     <inspection_tool class="PhpNonCanonicalElementsOrderInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="PhpOverridingMethodVisibilityInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="PhpPropertyNamingConventionInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="PhpSeparateElseIfInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="PhpStaticAsDynamicMethodCallInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="PhpTooManyParametersInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="PhpTraditionalSyntaxArrayLiteralInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="PhpTraitsUseListInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="PhpUndefinedCallbackInspection" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="PhpUnnecessaryDoubleQuotesInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="PhpUsageOfSilenceOperatorInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="PhpVarUsageInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="PhpVariableNamingConventionInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
-      <option name="m_regex" value="[a-z]*[_a-z\d]*" />
-      <option name="m_minLength" value="2" />
+    <inspection_tool class="PhpNonCompoundUseInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
     </inspection_tool>
-    <inspection_tool class="PhpVariableVariableInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="PlatformDetectionJS" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpNonStrictObjectEqualityInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpOverridingMethodVisibilityInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpParamsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpPassByRefInspection" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="PHP only" level="ERROR" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpPropertyNamingConventionInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="m_minLength" value="2" />
+        <option name="m_maxLength" value="24" />
+      </scope>
+      <option name="m_minLength" value="2" />
+      <option name="m_maxLength" value="32" />
+    </inspection_tool>
+    <inspection_tool class="PhpRedundantCatchClauseInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpRedundantClosingTagInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpSeparateElseIfInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpShortOpenTagInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpSignatureMismatchDuringInheritanceInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpSillyAssignmentInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpStatementHasEmptyBodyInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpStaticAsDynamicMethodCallInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpStrictTypeCheckingInspection" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="PHP only" level="ERROR" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpSuperClassIncompatibleWithInterfaceInspection" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="PHP only" level="ERROR" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpToStringImplementationInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpToStringReturnInspection" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="PHP only" level="ERROR" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpTooManyParametersInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpTraditionalSyntaxArrayLiteralInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpTraitsUseListInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpUndefinedCallbackInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpUndefinedClassConstantInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpUndefinedClassInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpUndefinedConstantInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpUndefinedFieldInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpUndefinedFunctionInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpUndefinedGotoLabelInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpUndefinedMethodInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpUndefinedNamespaceInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpUndefinedVariableInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpUnhandledExceptionInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpUnitUndefinedDataProviderInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpUnnecessaryDoubleQuotesInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpUnnecessaryFullyQualifiedNameInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpUnreachableStatementInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpUnusedAliasInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpUnusedLocalVariableInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpUnusedParameterInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpUnusedPrivateFieldInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpUnusedPrivateMethodInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpUsageOfSilenceOperatorInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpVarUsageInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="PhpVariableNamingConventionInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="m_regex" value="[a-z][_a-zA-Z\d]*" />
+        <option name="m_minLength" value="1" />
+        <option name="m_maxLength" value="32" />
+      </scope>
+      <option name="m_regex" value="[a-z]+[A-Za-z0-9]*" />
+      <option name="m_minLength" value="1" />
+      <option name="m_maxLength" value="32" />
+    </inspection_tool>
+    <inspection_tool class="PhpVariableVariableInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WEAK WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpVoidFunctionResultUsedInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpWrongCatchClausesOrderInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpWrongForeachArgumentTypeInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PhpWrongStringConcatenationInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PlatformDetectionJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="PointlessArithmeticExpressionJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="PointlessBitwiseExpressionJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="m_ignoreExpressionsContainingConstants" value="false" />
+      </scope>
       <option name="m_ignoreExpressionsContainingConstants" value="false" />
     </inspection_tool>
-    <inspection_tool class="ProblematicWhitespace" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="PointlessBooleanExpressionJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="ProblematicWhitespace" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="false" />
+    </inspection_tool>
     <inspection_tool class="PropertyCanBeStaticInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="QuirksModeInspectionTool" enabled="false" level="WARNING" enabled_by_default="false">
+      <scope name="PHP only" level="WARNING" enabled="false" />
+    </inspection_tool>
     <inspection_tool class="RegExpAnonymousGroup" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="ReplaceAssignmentWithOperatorAssignmentJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="ReuseOfLocalVariableJS" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="ReplaceAssignmentWithOperatorAssignmentJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="RequiredAttributes" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="myAdditionalRequiredHtmlAttributes" value="" />
+      </scope>
+      <option name="myAdditionalRequiredHtmlAttributes" value="" />
+    </inspection_tool>
+    <inspection_tool class="ReservedWordUsedAsNameJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="ReturnFromFinallyBlockJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="ReuseOfLocalVariableJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="SSBasedInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="SecurityAdvisoriesInspection" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="optionConfiguration">
         <list>
@@ -271,7 +1156,10 @@
           <option value="phpspec/phpspec" />
           <option value="phpspec/prophecy" />
           <option value="phpstan/phpstan" />
+          <option value="phpunit/dbunit" />
+          <option value="phpunit/phpcov" />
           <option value="phpunit/phpunit" />
+          <option value="phpunit/phpunit-selenium" />
           <option value="povils/phpmnd" />
           <option value="roave/security-advisories" />
           <option value="satooshi/php-coveralls" />
@@ -296,37 +1184,118 @@
         </list>
       </option>
     </inspection_tool>
-    <inspection_tool class="ShortEchoTagCanBeUsedInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="SqlGotoInspection" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="SqlMissingColumnAliasesInspection" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="SqlNamedArgumentsInspection" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="StandardJS" enabled="true" level="ERROR" enabled_by_default="true" />
+    <inspection_tool class="ShiftOutOfRangeJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="SillyAssignmentJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="SqlRedundantOrderingDirectionInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="StandardJS" enabled="false" level="ERROR" enabled_by_default="true">
+      <scope name="PHP only" level="ERROR" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="StatementsPerFunctionJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="m_limit" value="30" />
+      </scope>
       <option name="m_limit" value="30" />
     </inspection_tool>
-    <inspection_tool class="StringLiteralBreaksHTMLJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="Stylelint" enabled="true" level="ERROR" enabled_by_default="true" />
-    <inspection_tool class="TailRecursionJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="TextLabelInSwitchStatementJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="ThreeNegationsPerFunctionJS" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="TodoComment" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="StringLiteralBreaksHTMLJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="Stylelint" enabled="false" level="ERROR" enabled_by_default="true">
+      <scope name="PHP only" level="ERROR" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="SwitchStatementWithNoDefaultBranchJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="SyntaxError" enabled="true" level="ERROR" enabled_by_default="true">
+      <scope name="PHP only" level="ERROR" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="TailRecursionJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="TextLabelInSwitchStatementJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="ThisExpressionReferencesGlobalObjectJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="ThreeNegationsPerFunctionJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="ThrowFromFinallyBlockJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="TodoComment" enabled="false" level="WARNING" enabled_by_default="false">
+      <scope name="PHP only" level="WARNING" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="TrivialConditionalJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="TrivialIfJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="UnNecessaryDoubleQuotesInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="UnnecessaryContinueJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="UnnecessaryLabelJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="UnnecessaryLabelOnBreakStatementJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="UnnecessaryLabelOnContinueStatementJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="UnnecessaryLocalVariableJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="m_ignoreImmediatelyReturnedVariables" value="false" />
+        <option name="m_ignoreAnnotatedVariables" value="false" />
+      </scope>
+      <option name="m_ignoreImmediatelyReturnedVariables" value="false" />
+      <option name="m_ignoreAnnotatedVariables" value="false" />
+    </inspection_tool>
+    <inspection_tool class="UnnecessaryReturnJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="UnqualifiedReferenceInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="UnreachableCodeJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="UnterminatedStatementJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="ignoreSemicolonAtEndOfBlock" value="true" />
+      </scope>
       <option name="ignoreSemicolonAtEndOfBlock" value="true" />
     </inspection_tool>
-    <inspection_tool class="UntrustedInclusionInspection" enabled="true" level="ERROR" enabled_by_default="true" />
     <inspection_tool class="UnusedCatchParameterJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="m_ignoreCatchBlocksWithComments" value="false" />
+      </scope>
       <option name="m_ignoreCatchBlocksWithComments" value="false" />
     </inspection_tool>
-    <inspection_tool class="UnusedDefine" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="UseEllipsisInPropertyInspection" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="UsingInclusionReturnValueInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
-    <inspection_tool class="VoidExpressionJS" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="VoidExpressionJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="W3CssValidation" enabled="true" level="WARNING" enabled_by_default="true">
-      <option name="myCssVersion" value="css3svg" />
+      <scope name="PHP only" level="WARNING" enabled="true">
+        <option name="myCssVersion" value="css3" />
+        <option name="myIgnoreVendorSpecificProperties" value="false" />
+      </scope>
+      <option name="myCssVersion" value="css3" />
       <option name="myIgnoreVendorSpecificProperties" value="false" />
     </inspection_tool>
-    <inspection_tool class="XHTMLIncompatabilitiesJS" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="WebpackConfigHighlighting" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="WithStatementJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
+    <inspection_tool class="XHTMLIncompatabilitiesJS" enabled="true" level="WARNING" enabled_by_default="false">
+      <scope name="PHP only" level="WARNING" enabled="true" />
+    </inspection_tool>
   </profile>
 </component>
