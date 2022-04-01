@@ -21,11 +21,11 @@ Working [demo of the remoteFileExplorer](http://www.speich.net/projects/programm
 
 ## JavaScript Dependencies
 Requires the following dependencies to be installed:
-* [The Dojo Toolkit](http://dojotoolkit.org) SDK version 1.9.1 or higher, mapped to /dojo
-* [dgrid](https://github.com/SitePen/dgrid), v0.3.16 mapped to /dgrid
+* [The Dojo Toolkit](http://dojotoolkit.org) SDK version 1.9.1 or higher, installed into /library/dojo
+* [dgrid](https://github.com/SitePen/dgrid), v0.3.21 installed into /library/dgrid. 
   Newer versions of dgrid won't work, because they rely on dstore instead of dojo/store
-* [xstyle](https://github.com/kriszyp/xstyle), mapped to /xstyle
-* [put-selector](https://github.com/kriszyp/put-selector), mapped to /put-selector
+* [xstyle](https://github.com/kriszyp/xstyle) v0.3.3 installed into /library/xstyle
+* [put-selector](https://github.com/kriszyp/put-selector) v0.3.6 installed into /library/put-selector
 
 ## PHP Dependencies
 Requires the following additional extensions to be loaded:
@@ -36,6 +36,7 @@ Requires the following additional extensions to be loaded:
 
 ## Installation
 * Clone this repository anywhere into your web project
+* First install all dependencies with npm, then run the "build" script from the package.json. It will copy the dependencies into the /library folder and minify them.
 * Change all paths of the [dojoConfig in rfe.php](rfe.php#L16)
 to point to your installation directory. Also set the [parameter origPageUrl](rfe.php#L40).
 * Change the $path variable in [php/inc_lobal.php on line 16](php/inc_global.php#L16) to your installation directory

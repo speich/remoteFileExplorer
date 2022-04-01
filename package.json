@@ -1,0 +1,41 @@
+{
+	"name": "rfe",
+	"license": "BSD-3-Clause OR AFL-2.1",
+	"description": "Remote File Explorer (rfe) is a Windows Explorer like application that runs in your browser.",
+	"homepage": "https://www.speich.net/projects/programming/remoteFileExplorer.php",
+	"dependencies": {
+		"dgrid": "https://github.com/SitePen/dgrid#v0.3.21",
+		"dojo": "^1.9.1",
+		"dijit": "^1.9.1",
+		"put-selector": "^0.3.6",
+		"xstyle": "^0.3.3"
+	},
+	"devDependencies": {
+		"copyfiles": "2.x",
+		"csso-cli": "3.x",
+		"rimraf": "3.x",
+		"uglifyjs-folder": "2.x",
+		"terser": "5.x"
+	},
+	"scripts": {
+		"dgrid:del": "VERSION=$(node -p \"require('dgrid/package.json').version\") && rimraf library/dgrid/$VERSION",
+		"dgrid:copy": "VERSION=$(node -p \"require('dgrid/package.json').version\") && copyfiles -u 2 -e **/test/** -e **/demos/** -e **/doc/** 'node_modules/dgrid/**/*' library/dgrid/$VERSION",
+		"dgrid:js": "VERSION=$(node -p \"require('dgrid/package.json').version\") && uglifyjs-folder library/dgrid/$VERSION -eo library/dgrid/$VERSION -x .js",
+		"dgrid:css": "VERSION=$(node -p \"require('dgrid/package.json').version\") && csso library/dgrid/$VERSION/css/dgrid.css -o library/dgrid/$VERSION/css/dgrid.css",
+		"dgrid:build": "npm run dgrid:del && npm run dgrid:copy && npm run dgrid:js",
+		"dojo:del": "VERSION=$(node -p \"require('dojo/package.json').version\") && rimraf library/dojo/$VERSION/dojo",
+		"dojo:copy": "VERSION=$(node -p \"require('dojo/package.json').version\") && copyfiles -u 2 -e **/tests/** -e **/testsDOH/** 'node_modules/dojo/**/*' library/dojo/$VERSION/dojo",
+		"dojo:js": "VERSION=$(node -p \"require('dojo/package.json').version\") && uglifyjs-folder dojo/$VERSION/dojo -eo library/dojo/$VERSION/dojo -x .js",
+		"dojo:build": "npm run dojo:del && npm run dojo:copy && npm run dojo:js",
+		"dijit:del": "VERSION=$(node -p \"require('dijit/package.json').version\") && rimraf library/dojo/$VERSION/dijit",
+		"dijit:copy": "VERSION=$(node -p \"require('dijit/package.json').version\") && copyfiles -u 2 -e **/tests/** 'node_modules/dijit/**/*' library/dojo/$VERSION/dijit",
+		"dijit:js": "VERSION=$(node -p \"require('dijit/package.json').version\") && uglifyjs-folder dojo/$VERSION/dijit -eo library/dojo/$VERSION/dijit -x .js",
+		"dijit:build": "npm run dijit:del && npm run dijit:copy && npm run dijit:js",
+		"put-selector:build": "VERSION=$(node -p \"require('put-selector/package.json').version\") && copyfiles -u 2 node_modules/put-selector/LICENSE node_modules/put-selector/package.json library/put-selector/$VERSION && terser node_modules/put-selector/put.js -mc -o library/put-selector/$VERSION/put.js",
+		"xstyle:del": "VERSION=$(node -p \"require('xstyle/package.json').version\") && rimraf library/xstyle/$VERSION",
+		"xstyle:copy": "VERSION=$(node -p \"require('xstyle/package.json').version\") && copyfiles -u 2 -e **/build/** 'node_modules/xstyle/**/*' library/xstyle/$VERSION",
+		"xstyle:js": "VERSION=$(node -p \"require('xstyle/package.json').version\") && uglifyjs-folder library/xstyle/$VERSION -eo library/xstyle/$VERSION -x .js",
+		"xstyle:build": "npm run xstyle:del && npm run xstyle:copy && npm run xstyle:js",
+		"build": "npm run dgrid:build && npm run dojo:build && npm run dijit:build && npm run put-selector:build && npm run xstyle:build"
+	}
+}

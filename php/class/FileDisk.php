@@ -1,8 +1,6 @@
 <?php
 namespace remoteFileExplorer\fs;
-use remoteFileExplorer\fs as rfe;
 
-require_once 'FileSystem.php';
 
 class FileDisk implements FileSystem {
 	
@@ -98,5 +96,34 @@ class FileDisk implements FileSystem {
 		$arr['size'] = filesize($fullPath);
 		return $arr;
 	}
-	
+
+    public function del($resource)
+    {
+        // TODO: Implement del() method.
+    }
+
+    public function copy($resource, $target)
+    {
+        // TODO: Implement copy() method.
+    }
+
+    public function setRoot($rootDir)
+    {
+        // TODO: Implement setRoot() method.
+    }
+
+    public function getRoot()
+    {
+        // TODO: Implement getRoot() method.
+    }
+
+    function search($keyword, $start, $end)
+    {
+        // TODO: Implement search() method.
+    }
+
+    function getNumSearchRecords($keyword)
+    {
+        // TODO: Implement getNumSearchRecords() method.
+    }
 }
