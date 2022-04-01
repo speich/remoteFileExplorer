@@ -33,7 +33,7 @@ class FileSession implements FileSystem
      */
     private array $fsDefault = [];
 
-    private string $rootDir = '/';
+    private string $rootDir;
 
     /**
      * Instantiates the session based filesystem.
@@ -56,7 +56,7 @@ class FileSession implements FileSystem
      * @param string $rootDir
      * @return void
      */
-    public function setRoot(string $rootDir)
+    public function setRoot(string $rootDir): void
     {
         $this->rootDir = $rootDir;
     }
@@ -75,11 +75,11 @@ class FileSession implements FileSystem
      * @param string $resource REST resource
      * @return string|bool json or false item data
      */
-    public function get(string $resource)
+    public function get(string $resource): bool|string
     {
         $json = false;
         $fs = unserialize($_SESSION['rfe'][$this->getRoot()], ['allowed_classes' => false]);
-        if (substr($resource, -1) === '/') {   // query for children of $resource
+        if (str_ends_with($resource, '/')) {   // query for children of $resource
             $json = $this->getChildren(rtrim($resource, '/'), $fs);
         } elseif (array_key_exists($resource, $fs)) { // get item
             $item = $fs[$resource];
@@ -94,7 +94,7 @@ class FileSession implements FileSystem
      * @param array $fs array with files
      * @return string json children data
      */
-    public function getChildren(string $resource, $fs)
+    public function getChildren(string $resource, $fs): string
     {
         $arr = [];
         foreach ($fs as $row) {
@@ -124,7 +124,7 @@ class FileSession implements FileSystem
      * @param object $data item data
      * @return string|bool json or false item data
      */
-    public function update($data)
+    public function update(object $data): bool|string
     {
         $json = false;    // no need to raise error if not found. will be reported as resource not found if false
         $fs = unserialize($_SESSION['rfe'][$this->getRoot()], ['allowed_classes' => false]);
@@ -142,14 +142,13 @@ class FileSession implements FileSystem
     /**
      * Copy given resource.
      * parentId property of data is assumed to already be set to new target location.
-     * @param $resource
-     * @param $target
+     * @param string $resource
+     * @param string $target
      * @return string|bool json or false item data
      */
-    public function copy($resource, $target)
+    public function copy(string $resource, string $target): bool|string
     {
         $json = false;
-
         $fs = unserialize($_SESSION['rfe'][$this->getRoot()], ['allowed_classes' => false]);
 
         if (array_key_exists($resource, $fs)) {
@@ -186,7 +185,7 @@ class FileSession implements FileSystem
      * @param object $data request data
      * @return string|bool json or false item data
      */
-    public function create($data)
+    public function create(object $data): bool|string
     {
         $json = false;
         if (count($this->fsDefault) <= $this->numItemLimit) {
@@ -217,7 +216,7 @@ class FileSession implements FileSystem
      * @param string $resource REST resource
      * @return string|bool json or false message
      */
-    public function del($resource)
+    public function del(string $resource): bool|string
     {
         $json = false;
         $fs = unserialize($_SESSION['rfe'][$this->getRoot()], ['allowed_classes' => false]);
@@ -239,21 +238,21 @@ class FileSession implements FileSystem
 
     /**
      * Returns a new unused id to use as a resource.
-     * @return int
+     * @return int|string
      */
-    private function getId()
+    private function getId(): int|string
     {
         return '/'.($_SESSION['rfe']['lastUsedItemId']++);
     }
 
     /**
      * Search files system array for keyword(s) in name.
-     * @param $keyword
-     * @param $start
-     * @param $end
+     * @param string $keyword
+     * @param int $start
+     * @param int $end
      * @return string json search data
      */
-    public function search($keyword, $start, $end)
+    public function search(string $keyword, int $start, int $end): string
     {
         // this would be slow on large arrays, but since the demo arrays are short it doesn't matter
         $fs = unserialize($_SESSION['rfe'][$this->getRoot()], ['allowed_classes' => false]);
@@ -286,7 +285,7 @@ class FileSession implements FileSystem
      * @param string $keyword
      * @return int
      */
-    public function getNumSearchRecords($keyword)
+    public function getNumSearchRecords($keyword): int
     {
         // this would be slow on large arrays, but since the array of the demo is short it doesn't matter
 
@@ -310,7 +309,7 @@ class FileSession implements FileSystem
      * @param $file
      * @return string path
      */
-    public function createPath($fs, $file)
+    public function createPath($fs, $file): string
     {
         $path = '';
 
@@ -333,7 +332,7 @@ class FileSession implements FileSystem
      * @param array $fs file system
      * @return array file system
      */
-    protected function copyChildren($resource, $target, $fs)
+    protected function copyChildren($resource, $target, $fs): array
     {
         foreach ($fs as $row) {
             if (count($fs) <= $this->numItemLimit) {

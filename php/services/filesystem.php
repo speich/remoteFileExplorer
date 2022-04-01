@@ -24,8 +24,9 @@ $response = null;
 
 switch ($moduleType) {
     case 'session':
+        session_start();
         // use session to store the user's filesystem
-        $fsData = require_once $rfeConfig['paths']['demo'].'demodata.php';
+        $fsData = require $rfeConfig['paths']['demo'].'demodata.php';
         $fs = new FileSession($rfeConfig['paths']['demo'], $fsData);
         break;
     case 'sqlite':
@@ -41,7 +42,7 @@ switch ($moduleType) {
 
 $checker = new InputChecker();
 
-if ((is_null($data) || $checker->sanitizeProperties($data, $fs->fields))) {
+if (($data === null || $checker->sanitizeProperties($data, $fs->fields))) {
     switch ($ctrl->getMethod()) {
         case 'GET':
             if ($controller === 'search') {
@@ -49,7 +50,7 @@ if ((is_null($data) || $checker->sanitizeProperties($data, $fs->fields))) {
                 $numRec = $fs->getNumSearchRecords($keyword);
                 $ranges = $header->getRange();
                 $rangeHeader = $header->createRange($ranges, $numRec);
-                $header->add($rangeHeader);
+                $header->add($rangeHeader[0], $rangeHeader[1]);
                 $response = $fs->search($keyword, $ranges['start'], $ranges['end']);
             } else {
                 $response = $fs->get($resource);

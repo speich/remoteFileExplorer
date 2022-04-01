@@ -1,19 +1,13 @@
 <?php
 
-use remoteFileExplorer\fs;
-use remoteFileExplorer\image as img;
+use remoteFileExplorer\CacheStore;
+use remoteFileExplorer\ImageTool;
 use WebsiteTemplate\Controller;
 use WebsiteTemplate\Header;
 use WebsiteTemplate\Error;
 
 
-require_once '../inc_global.php';
-require_once 'CacheStore.php';
-require_once 'ImageTool.php';
-require_once 'Error.php';
-require_once 'Controller.php';
-require_once 'Header.php';
-require_once 'Http.php';
+require_once __DIR__.'/../inc_global.php';
 
 // This file is just a quick and dirty hack to generate the thumbnails. The size is created exactly to the posted width.
 // Instead, the dimensions should be created in discrete steps, the browser could then scale them to the required width.
@@ -22,29 +16,28 @@ require_once 'Http.php';
 $err = new Error();
 $ctrl = new Controller(new Header(), $err);
 $data = $ctrl->getDataAsObject();
-$resource = $ctrl->getResources(true);
-$ctrl->contentType = 'json';
+$resource = $ctrl->getResource(true);
 $response = false;
 $header = false;
 
 if ($resource && file_exists($rfeConfig['paths']['fileSystemRoot'].ltrim($resource, '/'))) {
-    $imgTool = new img\ImageTool();
+    $imgTool = new ImageTool();
 
     // check if image resource is already in cache, then either create it or return it
     // TODO: Limit cache size!
     // TODO: do not use default, pass arguemtns to CacheStore()
-    $db = new fs\CacheStore();
+    $db = new CacheStore();
     $db = $db->connect();
 
     $db->beginTransaction();
-    $sql = "SELECT id FROM cache WHERE resource = :resource";
+    $sql = 'SELECT id FROM cache WHERE resource = :resource';
     $stmt = $db->prepare($sql);
     $stmt->bindParam(':resource', $resource);
     $stmt->execute();
     $rec = $stmt->fetchObject();
 
     if (!$rec) {
-        $sql = "INSERT INTO cache (resource) VALUES (:resource)";
+        $sql = 'INSERT INTO cache (resource) VALUES (:resource)';
         $stmt = $db->prepare($sql);
         $stmt->bindParam(':resource', $resource);
         $stmt->execute();
@@ -55,9 +48,9 @@ if ($resource && file_exists($rfeConfig['paths']['fileSystemRoot'].ltrim($resour
     $db->commit();
 
     if (!file_exists($rfeConfig['paths']['thumbnailCache'].$id.".jpg")) {
-        $filters = array(
-            'unsharpMask' => array()
-        );
+        $filters = [
+            'unsharpMask' => []
+        ];
         $imgWidth = property_exists($data, 'w') ? $data->w : 256;
         $jpgQuality = 80;
         $imgSrc = $rfeConfig['paths']['fileSystemRoot'].ltrim($resource, '/');
@@ -73,5 +66,5 @@ header('Content-Type: image/jpeg');    // thumbnails are always jpg
 if ($err->get()) {
     readfile($rfeConfig['paths']['webroot'].'js/resources/images/icons-64/file-image.png');
 } else {
-    readfile($rfeConfig['paths']['thumbnailCache'].$id.".jpg");
+    readfile($rfeConfig['paths']['thumbnailCache'].$id.'.jpg');
 }

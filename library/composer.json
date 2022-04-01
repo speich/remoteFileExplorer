@@ -1,0 +1,23 @@
+{
+  "require-dev": {
+    "roave/security-advisories": "dev-latest"
+  },
+  "require": {
+    "speich/websitetemplate": "0.8.*"
+  },
+  "autoload": {
+    "psr-4": {
+      "remoteFileExplorer\\": "../php/class",
+      "WebsiteTemplate\\": "vendor/speich/websitetemplate/scripts/php"
+    }
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/speich/WebsiteTemplate"
+    }
+  ],
+  "name": "speich.net/remoteFileExplorer",
+  "description": "Dependencies for the remoteFileExplorer",
+  "license": ["CC-BY-NC-SA-4.0"]
+}

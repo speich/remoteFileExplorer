@@ -3,7 +3,7 @@
 	"description": "Manages files and folders on a remote web server directly within your browser.",
 	"homepage": "https://www.speich.net/projects/programming/remoteFileExplorer.php/demo/photos",
 	"repository": "https://github.com/speich/remoteFileExplorer/",
-	"version": "0.9.1",
+	"version": "0.10",
 	"dependencies": {
 		"dgrid": "https://github.com/SitePen/dgrid#v0.3.21",
 		"dijit": "1.17.2",
