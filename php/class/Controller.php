@@ -6,6 +6,8 @@ namespace WebsiteTemplate;
 
 use stdClass;
 
+use function is_array;
+
 
 /**
  * This class is used as a REST controller.
@@ -42,7 +44,10 @@ class Controller {
 	/** @var int chunk size for flushing */
 	public $chunkSize = 4096;	// = 1 KB
 
-	/**
+    /** @var Error */
+    private $err;
+
+    /**
 	 * Constructs the controller instance.
 	 * If you don't want the first path segment to be set as the controller, set $useController to false.
 	 * @param Header $header
@@ -63,43 +68,60 @@ class Controller {
 	 * @param bool $json handle post data as json
 	 * @return stdClass |null
 	 */
-	public function getDataAsObject($json = false) {
-		switch ($this->method) {
-			case 'POST':
-				if ($json) {
-					$arr = json_decode(file_get_contents('php://input'));
-				}
-				else {
-					// note: Make sure you set the correct Content-Type when doint a xhr POST
-					$arr = $_POST;
-				}
-				break;
-			case 'PUT':
-				$data = file_get_contents('php://input');
-				if ($json) {
-					$arr = json_decode($data);
-				}
-				else {
-					parse_str($data, $arr);
-				}
-				break;
-			case 'GET':
-				$arr = $_GET;
-				break;
-			case 'DELETE':
-				if ($_SERVER['QUERY_STRING'] !== '') {
-					// Delete has no body, but a query string is possible
-					parse_str($_SERVER['QUERY_STRING'], $arr);
-				}
-				else {
-					$arr = array();
-				}
-				break;
-			default:
-				$arr = array();
-		}
-		return count($arr) > 0 ? (object) $arr : null;
-	}
+    public function getDataAsObject($json = false)
+    {
+        // Note on types when using json_decode():
+        // Values true, false and null are returned as TRUE, FALSE and NULL respectively.
+        // NULL is returned if the json cannot be decoded or if the encoded data is deeper than the recursion limit
+        $data = null;
+        switch ($this->method) {
+            case 'POST':
+                if ($json) {
+                    $data = json_decode(file_get_contents('php://input'), false);
+                } else {
+                    // note: Make sure you set the correct Content-Type when doing a xhr POST
+                    $data = $_POST;
+                }
+                break;
+            case 'PUT':
+                $data = $this->getInput($json);
+                break;
+            case 'GET':
+                $data = $_GET;
+                break;
+            case 'DELETE':
+                if ($_SERVER['QUERY_STRING'] !== '') {
+                    parse_str($_SERVER['QUERY_STRING'], $data);
+                }
+                else {
+                    $data = $this->getInput($json);
+                }
+                break;
+        }
+
+        if (is_array($data)) {
+            $data = count($data) > 0 ? (object)$data : null;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Read php input stream
+     * @param bool $json
+     * @return object|string mixed
+     */
+    private function getInput(bool $json)
+    {
+        $input = file_get_contents('php://input');
+        if ($json) {
+            $data = json_decode($input, false);
+        } else {
+            parse_str($input, $data);
+        }
+
+        return $data;
+    }
 
 	/**
 	 * Returns the http method, e.g. GET, POST, PUT or DELETE
@@ -162,7 +184,7 @@ class Controller {
 		}
 
 		// server error
-		if (count($this->err->get()) > 0) {
+		if ($this->err->get() !== null && count($this->err->get()) > 0) {
 			header($this->getProtocol().' 505 Internal Server Error');
 		}
 		// resource not found
@@ -170,7 +192,7 @@ class Controller {
 			header($this->getProtocol().' 404 Not Found');
 		}
 		// resource found and processed
-		else if ($this->getMethod() == 'POST') {
+		else if ($this->getMethod() === 'POST') {
 			header($this->getProtocol().' 201 Created');
 		}
 		else {
