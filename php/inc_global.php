@@ -8,7 +8,7 @@
 
 session_start();
 
-$timeout = 60;
+$timeout = 30;
 set_time_limit($timeout);
 date_default_timezone_set('Europe/Zurich');
 
