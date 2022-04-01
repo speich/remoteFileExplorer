@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="896fb754-8692-4b78-bcaf-23f940fc42ec" name="developer@rfe" url="https://rfe.test">
+        <fileTransfer rootFolder="/var/www/html/remoteFileExplorer" accessType="SFTP" host="192.168.1.52" port="22" sshConfigId="368a1b19-4907-424a-be53-eaac1bb14733" sshConfig="developer@192.168.1.52:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
