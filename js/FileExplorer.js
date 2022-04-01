@@ -44,8 +44,8 @@ define([
 	 *
 	 */
 	return declare([_Base, History, Layout, Edit, Keyboard], {
-		version: '0.9',
-		versionDate: '2014',
+		version: '0.9.1',
+		versionDate: '2022',
 		currentTreeObject: null,
 		context: null,
 		store: null,
