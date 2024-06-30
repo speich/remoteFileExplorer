@@ -5,6 +5,16 @@
       <MessDetectorConfiguration tool_path="C:/Program Files (x86)/PHP/phpmd" />
     </phpmd_settings>
   </component>
+  <component name="MessDetectorOptionsConfiguration">
+    <option name="transferred" value="true" />
+  </component>
+  <component name="PHPCSFixerOptionsConfiguration">
+    <option name="transferred" value="true" />
+  </component>
+  <component name="PHPCodeSnifferOptionsConfiguration">
+    <option name="highlightLevel" value="WARNING" />
+    <option name="transferred" value="true" />
+  </component>
   <component name="PhpCodeSniffer">
     <phpcs_settings>
       <PhpCSConfiguration tool_path="/usr/bin/phpcs" />
@@ -12,8 +22,8 @@
   </component>
   <component name="PhpInterpreters">
     <interpreters>
-      <interpreter id="ea5f00c9-f872-47df-a174-5d81a4cfa9dd" name="developer@192.168.1.52:22 password" home="sshConfig://DATA" debugger_id="php.debugger.XDebug">
-        <remote_data INTERPRETER_PATH="/usr/bin/php" HELPERS_PATH="/home/developer/.phpstorm_helpers" INITIALIZED="false" VALID="true" RUN_AS_ROOT_VIA_SUDO="false" SSH_CONFIG_ID="368a1b19-4907-424a-be53-eaac1bb14733" SSH_CONFIG_NAME="developer@192.168.1.52:22 password" SSH_CREDENTIALS_ID="sshConfig://developer@192.168.1.52:22 password" />
+      <interpreter id="ea5f00c9-f872-47df-a174-5d81a4cfa9dd" name="developer@192.168.1.52:22 password" home="sshConfig://DATA" auto="false" debugger_id="php.debugger.XDebug">
+        <remote_data INTERPRETER_PATH="/usr/bin/php" HELPERS_PATH="/home/developer/.phpstorm_helpers" VALID="true" RUN_AS_ROOT_VIA_SUDO="false" SSH_CONFIG_ID="368a1b19-4907-424a-be53-eaac1bb14733" SSH_CONFIG_NAME="developer@192.168.1.52:22 password" SSH_CREDENTIALS_ID="sshConfig://developer@192.168.1.52:22 password" />
       </interpreter>
     </interpreters>
   </component>
@@ -88,4 +98,10 @@
     </phpInfoCache>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.0" />
+  <component name="PhpStanOptionsConfiguration">
+    <option name="transferred" value="true" />
+  </component>
+  <component name="PsalmOptionsConfiguration">
+    <option name="transferred" value="true" />
+  </component>
 </project>

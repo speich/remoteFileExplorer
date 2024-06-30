@@ -1,7 +1,6 @@
 <component name="InspectionProjectProfileManager">
   <profile version="1.0">
     <option name="myName" value="Project Default" />
-    <option name="myName" value="Project Default" />
     <inspection_tool class="AmdModulesDependencies" enabled="true" level="WEAK WARNING" enabled_by_default="true">
       <scope name="PHP only" level="WEAK WARNING" enabled="true" />
     </inspection_tool>
@@ -570,8 +569,8 @@
     <inspection_tool class="JSNonASCIINames" enabled="true" level="WARNING" enabled_by_default="true">
       <scope name="PHP only" level="WARNING" enabled="true" />
     </inspection_tool>
-    <inspection_tool class="JSNonStrictModeUsed" enabled="true" level="WARNING" enabled_by_default="true">
-      <scope name="PHP only" level="WARNING" enabled="true" />
+    <inspection_tool class="JSNonStrictModeUsed" enabled="false" level="WARNING" enabled_by_default="false">
+      <scope name="PHP only" level="WARNING" enabled="false" />
     </inspection_tool>
     <inspection_tool class="JSPotentiallyInvalidConstructorUsage" enabled="true" level="WARNING" enabled_by_default="true">
       <scope name="PHP only" level="WARNING" enabled="true">

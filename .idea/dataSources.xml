@@ -2,14 +2,13 @@
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
     <data-source source="LOCAL" name="remoteFileExplorer cache" uuid="08125008-e1ab-41b1-b67a-91d0c84fe0b8">
-      <driver-ref>sqlite.xerial</driver-ref>
+      <driver-ref>4c7b6f67-4fb5-4e09-a12b-fecc327dc94b</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
       <jdbc-url>jdbc:sqlite:/$PROJECT_DIR$/fs/cache/store.sqlite</jdbc-url>
-      <default-dialect>SQLite</default-dialect>
       <libraries>
         <library>
-          <url>file://$PROJECT_DIR$/../../dbdrivers/sqlite-jdbc-3.7.2.jar</url>
+          <url>file://$USER_HOME$/dbdrivers/sqlite-jdbc-3.7.2.jar</url>
         </library>
       </libraries>
     </data-source>
