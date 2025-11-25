@@ -3,7 +3,7 @@
     "description": "Manage files and folders on a remote web server directly within your browser.",
     "homepage": "https://www.speich.net/projects/programming/remoteFileExplorer.php/demo/photos",
     "repository": "https://github.com/speich/remoteFileExplorer/",
-    "version": "0.10.2",
+    "version": "0.10.3",
     "dependencies": {
         "dgrid": "https://github.com/SitePen/dgrid#v0.3.21",
         "dijit": "1.17.3",
@@ -12,10 +12,10 @@
         "xstyle": "0.3.3"
     },
     "devDependencies": {
-        "copyfiles": "^2.4.1",
-        "csso-cli": "^4.0.2",
-        "rimraf": "^5.0.7",
-        "uglifyjs-folder": "^3.3.0"
+        "copyfiles": "2.4.1",
+        "csso-cli": "4.0.2",
+        "rimraf": "6.1.2",
+        "uglifyjs-folder": "3.3.0"
     },
     "scripts": {
         "dgrid:del": "VERSION=$(node -p \"require('dgrid/package.json').version\") && rimraf dgrid/$VERSION",
@@ -37,6 +37,6 @@
         "xstyle:js": "VERSION=$(node -p \"require('xstyle/package.json').version\") && uglifyjs-folder xstyle/$VERSION -eo xstyle/$VERSION -x .js",
         "xstyle:build": "npm run xstyle:del && npm run xstyle:copy && npm run xstyle:js",
         "cleanup": "rimraf node_modules",
-        "build:keep": "npm run dgrid:build && npm run dojo:build && npm run dijit:build && npm run put-selector:build && npm run xstyle:build"
+        "build:keep": "npm run dgrid:build && npm run dojo:build && npm run dijit:build && npm run put-selector:build && npm run xstyle:build && npm audit fix"
     }
 }
