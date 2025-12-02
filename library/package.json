@@ -33,6 +33,6 @@
     "_xstyle:del": "rimraf xstyle",
     "_xstyle:copyjs": "esbuild ./node_modules/xstyle/*.js ./node_modules/xstyle/**/*.js --outdir=./xstyle",
     "xstyle:build": "npm run _xstyle:del && npm run _xstyle:copyjs",
-    "build": "npm run dgrid:build && npm run dojo:build && npm run dijit:build && npm run put-selector:build && npm run xstyle:build && npm audit fix"
+    "build": "npm audit fix && npm run dgrid:build && npm run dojo:build && npm run dijit:build && npm run put-selector:build && npm run xstyle:build"
   }
 }
