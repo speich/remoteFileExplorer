@@ -6,11 +6,6 @@
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
       <jdbc-url>jdbc:sqlite:/$PROJECT_DIR$/fs/cache/store.sqlite</jdbc-url>
-      <libraries>
-        <library>
-          <url>file://$USER_HOME$/dbdrivers/sqlite-jdbc-3.7.2.jar</url>
-        </library>
-      </libraries>
     </data-source>
   </component>
 </project>

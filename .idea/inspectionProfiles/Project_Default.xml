@@ -1,6 +1,7 @@
 <component name="InspectionProjectProfileManager">
   <profile version="1.0">
     <option name="myName" value="Project Default" />
+    <option name="myName" value="Project Default" />
     <inspection_tool class="AmdModulesDependencies" enabled="true" level="WEAK WARNING" enabled_by_default="true">
       <scope name="PHP only" level="WEAK WARNING" enabled="true" />
     </inspection_tool>

@@ -12,8 +12,8 @@
     "xstyle": "0.3.3"
   },
   "devDependencies": {
-    "esbuild": "0.27.1",
-    "rimraf": "6.1.2"
+    "esbuild": "0.28.0",
+    "rimraf": "6.1.3"
   },
   "scripts": {
     "_dgrid:del": "rimraf dgrid",
